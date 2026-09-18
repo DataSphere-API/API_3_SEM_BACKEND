@@ -1,7 +1,7 @@
-package com.datasphere.fusex.services;
+package com.datasphere.fusex.beneficiario.services;
 
 import com.datasphere.fusex.model.BeneficiarioModel;
-import com.datasphere.fusex.repository.BeneficiarioRepository;
+import com.datasphere.fusex.beneficiario.BeneficiarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
