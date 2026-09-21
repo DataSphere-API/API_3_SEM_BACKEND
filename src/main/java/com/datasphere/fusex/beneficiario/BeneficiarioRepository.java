@@ -1,6 +1,5 @@
 package com.datasphere.fusex.beneficiario;
 
-import com.datasphere.fusex.model.BeneficiarioModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

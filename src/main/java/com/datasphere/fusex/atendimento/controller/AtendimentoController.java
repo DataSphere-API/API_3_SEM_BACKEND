@@ -1,7 +1,7 @@
-package com.datasphere.fusex.controller;
+package com.datasphere.fusex.atendimento.controller;
 
-import com.datasphere.fusex.model.GuiaProc;
-import com.datasphere.fusex.service.AtendimentoService;
+import com.datasphere.fusex.guiaProc.GuiaProcModel;
+import com.datasphere.fusex.atendimento.service.AtendimentoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,12 +14,12 @@ public class AtendimentoController {
     private AtendimentoService atendimentoService;
 
     @PostMapping ("/atendimentos/validar-qrcode")
-    public GuiaProc validarQrCode (@RequestBody String qr) {
+    public GuiaProcModel validarQrCode (@RequestBody String qr) {
         return atendimentoService.registrarRealizacao(qr);
             }
 
             @GetMapping ("/ocs/{cnpj}/atendimentos")
-                    public List<GuiaProc> ListarAtendimentosPorOcs (@PathVariable String cnpj) {
+                    public List<GuiaProcModel> ListarAtendimentosPorOcs (@PathVariable String cnpj) {
             return  atendimentoService.listarAtendimentosPorOcs(cnpj);
 
         }

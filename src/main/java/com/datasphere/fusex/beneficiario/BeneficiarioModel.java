@@ -1,4 +1,4 @@
-package com.datasphere.fusex.model;
+package com.datasphere.fusex.beneficiario;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

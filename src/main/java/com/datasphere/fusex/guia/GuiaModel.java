@@ -1,4 +1,4 @@
-package com.datasphere.fusex.model;
+package com.datasphere.fusex.guia;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

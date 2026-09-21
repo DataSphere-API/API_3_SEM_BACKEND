@@ -1,5 +1,7 @@
-package com.datasphere.fusex.model;
+package com.datasphere.fusex.contrato;
 
+import com.datasphere.fusex.ocs.OcsModel;
+import com.datasphere.fusex.procedimento.ProcedimentoModel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

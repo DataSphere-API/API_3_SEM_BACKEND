@@ -1,4 +1,4 @@
-package com.datasphere.fusex.model;
+package com.datasphere.fusex.guiaProc;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
 
 @Entity
 
-public class GuiaProc {
+public class GuiaProcModel {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long guiaId;
@@ -15,7 +15,7 @@ public class GuiaProc {
     private String qr;
     private String status;
 
-    public GuiaProc () {
+    public GuiaProcModel() {
     }
 
     public String getQr () {
