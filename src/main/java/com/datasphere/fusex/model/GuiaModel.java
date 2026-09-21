@@ -6,7 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class Guia {
+public class GuiaModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
@@ -16,7 +16,7 @@ public class Guia {
     private String data;
     private String status;
 
-    public Guia () {
+    public GuiaModel() {
         }
 
         public Long getId () {
@@ -52,7 +52,7 @@ public class Guia {
     }
 
     public String getStatus () {
-        return  getStatus();
+        return  status;
     }
 
     public void setStatus (String status) {
