@@ -1,9 +1,7 @@
-package com.datasphere.fusex.model;
+package com.datasphere.fusex.ocs;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -12,17 +10,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "procedimento")
+@Table(name = "ocs")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProcedimentoModel {
+public class OcsModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+    @Column(name = "cnpj", length = 14, nullable = false)
+    private String cnpj;
 
     @Column(name = "nome", length = 150, nullable = false)
     private String nome;

@@ -1,4 +1,4 @@
-package com.datasphere.fusex.controller;
+package com.datasphere.fusex.config.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,6 +1,5 @@
 package com.datasphere.fusex.procedimento;
 
-import com.datasphere.fusex.model.ProcedimentoModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,7 +1,7 @@
 package com.datasphere.fusex.procedimento.services;
 
 
-import com.datasphere.fusex.model.ProcedimentoModel;
+import com.datasphere.fusex.procedimento.ProcedimentoModel;
 import com.datasphere.fusex.procedimento.ProcedimentoRepository;
 import org.springframework.stereotype.Service;
 

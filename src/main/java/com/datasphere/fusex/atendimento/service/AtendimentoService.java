@@ -1,7 +1,7 @@
-package com.datasphere.fusex.service;
+package com.datasphere.fusex.atendimento.service;
 
-import com.datasphere.fusex.model.GuiaProc;
-import com.datasphere.fusex.repository.GuiaProcRepository;
+import com.datasphere.fusex.guiaProc.GuiaProcModel;
+import com.datasphere.fusex.guiaProc.GuiaProcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,17 +12,17 @@ public class AtendimentoService {
     @Autowired
     private GuiaProcRepository guiaProcRepository;
 
-    public GuiaProc validarQrCode (String qr) {
+    public GuiaProcModel validarQrCode (String qr) {
         return guiaProcRepository.findByQr(qr);
     }
 
-    public GuiaProc atualizarStatusGuiaProcRealizada (GuiaProc procedimento) {
+    public GuiaProcModel atualizarStatusGuiaProcRealizada (GuiaProcModel procedimento) {
         procedimento.setStatus("Realizada");
         return guiaProcRepository.save (procedimento);
     }
 
-    public GuiaProc registrarRealizacao (String qr) {
-        GuiaProc procedimento = validarQrCode(qr);
+    public GuiaProcModel registrarRealizacao (String qr) {
+        GuiaProcModel procedimento = validarQrCode(qr);
 
         if (procedimento != null) {
             System.out.println("Procedimento encontrado. Atualizando");
@@ -33,7 +33,7 @@ public class AtendimentoService {
         }
     }
 
-    public List<GuiaProc> listarAtendimentosPorOcs(String cnpj) {
+    public List<GuiaProcModel> listarAtendimentosPorOcs(String cnpj) {
         return guiaProcRepository.findAll();
     }
 
