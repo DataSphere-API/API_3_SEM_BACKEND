@@ -1,4 +1,4 @@
-package com.datasphere.fusex;
+package com.datasphare.fusex;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,5 +9,4 @@ public class FusexApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(FusexApplication.class, args);
 	}
-
 }
