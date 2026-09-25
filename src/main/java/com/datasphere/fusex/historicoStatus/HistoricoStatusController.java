@@ -1,6 +1,6 @@
 package com.datasphere.fusex.historicoStatus;
 
-import com.datasphere.fusex.historicoStatus.dto.HistoricoStatusResponse;
+import com.datasphere.fusex.historicoStatus.service.ListarHistoricoPorEntidadeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,10 +9,10 @@ import java.util.List;
 @RestController
 public class HistoricoStatusController {
 
-    private final HistoricoStatusService service;
+    private final ListarHistoricoPorEntidadeService listarHistoricoPorEntidadeService;
 
-    public HistoricoStatusController(HistoricoStatusService service) {
-        this.service = service;
+    public HistoricoStatusController(ListarHistoricoPorEntidadeService listarHistoricoPorEntidadeService) {
+        this.listarHistoricoPorEntidadeService = listarHistoricoPorEntidadeService;
     }
 
     @GetMapping("/guias/{id}/historico")
@@ -31,7 +31,7 @@ public class HistoricoStatusController {
     }
 
     private List<HistoricoStatusResponse> buscar(EntidadeTipo tipo, Long id) {
-        return service.listarHistoricoPorEntidade(tipo, id)
+        return listarHistoricoPorEntidadeService.executar(tipo, id)
                 .stream()
                 .map(HistoricoStatusResponse::from)
                 .toList();
