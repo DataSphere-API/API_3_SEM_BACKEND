@@ -32,6 +32,7 @@ public class HistoricoStatusController {
         return ResponseEntity.ok(buscar(EntidadeTipo.FATURA, id));
     }
 
+    @GetMapping("/{tipo}/historico")
     private List<HistoricoStatusResponse> buscar(EntidadeTipo tipo, Long id) {
         return service.listarHistoricoPorEntidade(tipo, id)
                 .stream()
