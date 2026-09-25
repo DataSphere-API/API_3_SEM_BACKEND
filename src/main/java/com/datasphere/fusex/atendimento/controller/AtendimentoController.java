@@ -22,9 +22,15 @@ public class AtendimentoController {
         this.listarAtendimentosPorOcs = listarAtendimentosPorOcs;
     }
 
-    @PostMapping ("/atendimentos/validar-qrcode")
-    public ResponseEntity<String> validarQrCode (@RequestBody String qr) {
-        registrarRealizacaoService.registrarRealizacao(qr);
+    @PostMapping("/atendimentos/validar-qrcode")
+    public ResponseEntity<String> validarQrCode(@RequestBody String qr) {
+        GuiaProcModel procedimento = registrarRealizacaoService.registrarRealizacao(qr);
+
+        if (procedimento == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("QR code não encontrado");
+        }
+
         return ResponseEntity.status(HttpStatus.OK)
                 .body("qr code validado");
     }
@@ -32,7 +38,7 @@ public class AtendimentoController {
     @GetMapping ("/ocs/{cnpj}/atendimentos")
     public ResponseEntity<?> ListarAtendimentosPorOcs (@PathVariable String cnpj) {
         List<GuiaProcModel> guiaProcModelList = listarAtendimentosPorOcs.listarAtendimentosPorOcs(cnpj);
-        if (guiaProcModelList == null){
+        if (guiaProcModelList.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("nenhum atendimento encontrado");
         }
