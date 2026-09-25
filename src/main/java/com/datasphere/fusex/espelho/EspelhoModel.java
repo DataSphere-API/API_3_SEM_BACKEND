@@ -2,6 +2,8 @@ package com.datasphere.fusex.espelho;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,4 +36,11 @@ public class EspelhoModel {
 
     @Column(name = "data_fim", nullable = false)
     private LocalDate dataFim;
+
+    @Column(name = "ocs_id", length = 14)
+    private String ocsId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private StatusEspelho status;
 }

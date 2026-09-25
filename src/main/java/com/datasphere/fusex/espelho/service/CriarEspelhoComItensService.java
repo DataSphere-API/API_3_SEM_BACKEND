@@ -2,6 +2,7 @@ package com.datasphere.fusex.espelho.service;
 
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.EspelhoRepository;
+import com.datasphere.fusex.espelho.StatusEspelho;
 import com.datasphere.fusex.espelho.request.EspelhoRequest;
 import com.datasphere.fusex.espelho.request.EspelhoResponse;
 import com.datasphere.fusex.espelho.request.ItemEspelhoRequest;
@@ -34,8 +35,10 @@ public class CriarEspelhoComItensService {
     public EspelhoResponse criarEspelhoComItens(EspelhoRequest request) {
         EspelhoModel espelho = new EspelhoModel();
         espelho.setAtendimentoId(request.atendimentoId());
+        espelho.setOcsId(request.ocsId());
         espelho.setDataInicio(LocalDate.now());
         espelho.setDataFim(LocalDate.now());
+        espelho.setStatus(StatusEspelho.EM_ABERTO);
         espelho = espelhoRepository.save(espelho);
 
         List<EspelhoItemModel> itens = new ArrayList<>();
@@ -52,6 +55,6 @@ public class CriarEspelhoComItensService {
             itens.add(item);
         }
 
-        return new EspelhoResponse(espelho.getId(), espelho.getAtendimentoId(), itens);
+        return new EspelhoResponse(espelho.getId(), espelho.getAtendimentoId(), espelho.getStatus(), itens);
     }
 }
