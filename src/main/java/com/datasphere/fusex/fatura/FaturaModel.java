@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "fatura")
 @Getter
@@ -27,4 +29,21 @@ public class FaturaModel {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "esp_fat", nullable = false)
     private EspelhoModel espelhoModel;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private StatusFatura status = StatusFatura.ATIVA;
+
+    @Column(name = "data_geracao", nullable = false)
+    private LocalDateTime dataGeracao;
+
+    @Column(name = "fatura_origem_id")
+    private Long faturaOrigemId;
+
+    @PrePersist
+    private void preencherDataGeracao() {
+        if (dataGeracao == null) {
+            dataGeracao = LocalDateTime.now();
+        }
+    }
 }

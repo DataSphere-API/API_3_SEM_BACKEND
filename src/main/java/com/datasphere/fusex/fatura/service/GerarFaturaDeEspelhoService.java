@@ -35,11 +35,16 @@ public class GerarFaturaDeEspelhoService {
     }
 
     public FaturaResponse gerarFaturaDeEspelho(EspelhoModel espelho) {
+        return gerarFaturaDeEspelho(espelho, null);
+    }
+
+    public FaturaResponse gerarFaturaDeEspelho(EspelhoModel espelho, Long faturaOrigemId) {
         GuiaProcModel atendimento = guiaProcRepository.findById(espelho.getAtendimentoId()).orElseThrow();
 
         FaturaModel fatura = new FaturaModel();
         fatura.setGuiaProcModel(atendimento);
         fatura.setEspelhoModel(espelho);
+        fatura.setFaturaOrigemId(faturaOrigemId);
         fatura = faturaRepository.save(fatura);
 
         List<ItemFaturaModel> itens = montarItensFaturaService.montarItensFatura(espelho, fatura);
@@ -49,6 +54,6 @@ public class GerarFaturaDeEspelhoService {
 
         atualizarStatusGuiaProcParaFaturadaService.atualizarStatusGuiaProcParaFaturada(atendimento);
 
-        return new FaturaResponse(fatura.getId(), espelho.getAtendimentoId(), espelho.getId(), itens);
+        return FaturaResponse.from(fatura, itens);
     }
 }
