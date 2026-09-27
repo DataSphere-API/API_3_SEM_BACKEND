@@ -27,7 +27,7 @@ public class RemoverItemDoEspelhoService {
 
     public boolean removerItemDoEspelho(Integer espelhoId, Integer itemId) {
         EspelhoModel espelho = buscarEspelhoPorIdService.buscarEspelhoPorId(espelhoId);
-        if (espelho == null || espelho.getStatus() != StatusEspelho.EM_ABERTO) {
+        if (espelho == null || espelho.getStatus() == StatusEspelho.CANCELADO) {
             return false;
         }
 

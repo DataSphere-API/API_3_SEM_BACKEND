@@ -28,7 +28,7 @@ public class CorrigirItemEspelhoService {
 
     public EspelhoItemModel corrigirItemEspelho(Integer espelhoId, Integer itemId, ItemEspelhoRequest dados) {
         EspelhoModel espelho = buscarEspelhoPorIdService.buscarEspelhoPorId(espelhoId);
-        if (espelho == null || espelho.getStatus() != StatusEspelho.EM_ABERTO) {
+        if (espelho == null || espelho.getStatus() == StatusEspelho.CANCELADO) {
             return null;
         }
 
