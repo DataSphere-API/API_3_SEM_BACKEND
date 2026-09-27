@@ -9,5 +9,4 @@ public class FusexApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(FusexApplication.class, args);
 	}
-
 }
