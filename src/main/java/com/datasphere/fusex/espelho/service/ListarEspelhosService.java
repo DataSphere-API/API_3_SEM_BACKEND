@@ -10,12 +10,19 @@ import java.util.List;
 public class ListarEspelhosService {
 
     private final EspelhoRepository espelhoRepository;
+    private final EnriquecerListaEspelhosService enriquecerListaEspelhosService;
 
-    public ListarEspelhosService(EspelhoRepository espelhoRepository) {
+    public ListarEspelhosService(EspelhoRepository espelhoRepository,
+                                 EnriquecerListaEspelhosService enriquecerListaEspelhosService) {
         this.espelhoRepository = espelhoRepository;
+        this.enriquecerListaEspelhosService = enriquecerListaEspelhosService;
     }
 
     public List<EspelhoModel> listarEspelhos() {
-        return espelhoRepository.findAll();
+        List<EspelhoModel> espelhos = espelhoRepository.findAll();
+
+        enriquecerListaEspelhosService.enriquecer(espelhos);
+
+        return espelhos;
     }
 }
