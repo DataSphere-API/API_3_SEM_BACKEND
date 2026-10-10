@@ -1,7 +1,8 @@
-package com.datasphare.fusex.dto;
+package com.datasphere.fusex.historicoStatus;
 
-import com.datasphare.fusex.domain.HistoricoStatus;
-import com.datasphare.fusex.domain.enums.EntidadeTipo;
+import com.datasphere.fusex.historicoStatus.EntidadeTipo;
+import com.datasphere.fusex.historicoStatus.HistoricoStatusModel;
+
 import java.time.LocalDateTime;
 
 public record HistoricoStatusResponse(
@@ -13,7 +14,7 @@ public record HistoricoStatusResponse(
         LocalDateTime data,
         String origem
 ) {
-    public static HistoricoStatusResponse from(HistoricoStatus h) {
+    public static HistoricoStatusResponse from(HistoricoStatusModel h) {
         return new HistoricoStatusResponse(
                 h.getId(), h.getEntidadeTipo(), h.getEntidadeId(),
                 h.getStatusAnterior(), h.getStatusNovo(), h.getData(), h.getOrigem());

@@ -1,6 +1,5 @@
-package com.datasphare.fusex.domain;
+package com.datasphere.fusex.historicoStatus;
 
-import com.datasphare.fusex.domain.enums.EntidadeTipo;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -9,7 +8,7 @@ import java.time.LocalDateTime;
         @Index(name = "idx_hist_entidade", columnList = "entidade_tipo, entidade_id"),
         @Index(name = "idx_hist_data", columnList = "data")
 })
-public class HistoricoStatus {
+public class HistoricoStatusModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,11 +33,11 @@ public class HistoricoStatus {
     @Column(name = "origem", nullable = false, length = 50)
     private String origem;
 
-    public HistoricoStatus() {}
+    public HistoricoStatusModel() {}
 
-    public HistoricoStatus(EntidadeTipo entidadeTipo, Long entidadeId,
-                           String statusAnterior, String statusNovo,
-                           String origem) {
+    public HistoricoStatusModel(EntidadeTipo entidadeTipo, Long entidadeId,
+                                String statusAnterior, String statusNovo,
+                                String origem) {
         this.entidadeTipo = entidadeTipo;
         this.entidadeId = entidadeId;
         this.statusAnterior = statusAnterior;

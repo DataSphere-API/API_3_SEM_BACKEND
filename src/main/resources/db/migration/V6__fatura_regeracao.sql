@@ -1,0 +1,15 @@
+ALTER TABLE Fatura
+    ADD COLUMN Status VARCHAR(20) NOT NULL DEFAULT 'ATIVA',
+    ADD COLUMN Data_Geracao TIMESTAMP,
+    ADD COLUMN Fatura_Origem_ID INT NULL,
+    ADD CONSTRAINT fk_fatura_origem FOREIGN KEY (Fatura_Origem_ID)
+        REFERENCES Fatura (ID)
+        ON UPDATE CASCADE ON DELETE SET NULL;
+
+UPDATE Fatura SET Data_Geracao = NOW() WHERE Data_Geracao IS NULL;
+
+ALTER TABLE Fatura
+    ALTER COLUMN Data_Geracao SET NOT NULL;
+
+ALTER TABLE Espelho
+    ADD COLUMN Data_Atualizacao TIMESTAMP;

@@ -1,4 +1,4 @@
-package com.datasphare.fusex.domain.enums;
+package com.datasphere.fusex.historicoStatus;
 
 public enum EntidadeTipo {
     GUIA_PROC,
