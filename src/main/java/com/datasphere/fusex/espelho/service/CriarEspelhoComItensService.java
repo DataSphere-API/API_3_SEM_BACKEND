@@ -55,6 +55,6 @@ public class CriarEspelhoComItensService {
             itens.add(item);
         }
 
-        return new EspelhoResponse(espelho.getId(), espelho.getAtendimentoId(), espelho.getStatus(), itens);
+        return EspelhoResponse.from(espelho, itens);
     }
 }

@@ -2,12 +2,11 @@ package com.datasphere.fusex.espelho.controller;
 
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.StatusEspelho;
-import com.datasphere.fusex.espelho.request.EspelhoRequest;
-import com.datasphere.fusex.espelho.request.EspelhoResponse;
-import com.datasphere.fusex.espelho.request.EspelhoResumoResponse;
-import com.datasphere.fusex.espelho.request.ItemEspelhoRequest;
+import com.datasphere.fusex.espelho.request.*;
 import com.datasphere.fusex.espelho.service.*;
 import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
+import com.datasphere.fusex.espelhoItem.EspelhoItemRepository;
+import com.datasphere.fusex.espelhoItem.request.EspelhoItemResponse;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -107,7 +106,7 @@ public class EspelhoController {
         if (espelho == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("espelho não encontrado");
         }
-        return ResponseEntity.ok(espelho);
+        return ResponseEntity.ok(enriquecerListaEspelhosService.enriquecer(List.of(espelho)).get(0));
     }
 
     @GetMapping("/espelhos/{id}/itens")
@@ -116,20 +115,22 @@ public class EspelhoController {
         if (espelho == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("espelho não encontrado");
         }
-        List<EspelhoItemModel> itens = listarItensDoEspelhoService.listarItensDoEspelho(id);
+
+        List<EspelhoItemResponse> itens = listarItensDoEspelhoService.listarItensDoEspelho(id).stream().map(EspelhoItemResponse::from).toList();
+
         return ResponseEntity.ok(itens);
     }
 
     @PatchMapping("/espelhos/{id}/itens/{itemId}")
     public ResponseEntity<?> corrigirItem(@PathVariable Integer id,
                                           @PathVariable Integer itemId,
-                                          @RequestBody ItemEspelhoRequest dados) {
+                                          @RequestBody EspelhoItemPatchRequest dados) {
         EspelhoItemModel item = corrigirItemEspelhoService.corrigirItemEspelho(id, itemId, dados);
         if (item == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("não foi possível corrigir o item");
         }
-        return ResponseEntity.ok(item);
+        return ResponseEntity.ok(EspelhoItemResponse.from(item));
     }
 
     @DeleteMapping("/espelhos/{id}/itens/{itemId}")
