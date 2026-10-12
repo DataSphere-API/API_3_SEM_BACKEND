@@ -52,18 +52,6 @@ public class EspelhoModel {
     @Column(name = "data_atualizacao")
     private LocalDateTime dataAtualizacao;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @Transient
-    private String ocsNome;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @Transient
-    private Integer quantidadeItens;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @Transient
-    private BigDecimal valorTotal;
-
     @PreUpdate
     private void marcarAtualizacao() {
         dataAtualizacao = LocalDateTime.now();
