@@ -4,17 +4,9 @@ import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.StatusEspelho;
 import com.datasphere.fusex.espelho.request.EspelhoRequest;
 import com.datasphere.fusex.espelho.request.EspelhoResponse;
+import com.datasphere.fusex.espelho.request.EspelhoResumoResponse;
 import com.datasphere.fusex.espelho.request.ItemEspelhoRequest;
-import com.datasphere.fusex.espelho.service.BuscarEspelhoPorIdService;
-import com.datasphere.fusex.espelho.service.CorrigirItemEspelhoService;
-import com.datasphere.fusex.espelho.service.CriarEspelhoComItensService;
-import com.datasphere.fusex.espelho.service.ListarEspelhosPorOcsService;
-import com.datasphere.fusex.espelho.service.ListarEspelhosPorStatusService;
-import com.datasphere.fusex.espelho.service.ListarEspelhosService;
-import com.datasphere.fusex.espelho.service.ListarItensDoEspelhoService;
-import com.datasphere.fusex.espelho.service.RemoverItemDoEspelhoService;
-import com.datasphere.fusex.espelho.service.ValidarAtendimentoRealizadoService;
-import com.datasphere.fusex.espelho.service.ValidarEspelhoNaoDuplicadoPorAtendimentoService;
+import com.datasphere.fusex.espelho.service.*;
 import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import org.springframework.http.HttpStatus;
@@ -44,6 +36,7 @@ public class EspelhoController {
     private final ListarItensDoEspelhoService listarItensDoEspelhoService;
     private final CorrigirItemEspelhoService corrigirItemEspelhoService;
     private final RemoverItemDoEspelhoService removerItemDoEspelhoService;
+    private final EnriquecerListaEspelhosService enriquecerListaEspelhosService;
 
     public EspelhoController(ValidarAtendimentoRealizadoService validarAtendimentoRealizadoService,
                              ValidarEspelhoNaoDuplicadoPorAtendimentoService validarEspelhoNaoDuplicadoPorAtendimentoService,
@@ -54,7 +47,7 @@ public class EspelhoController {
                              BuscarEspelhoPorIdService buscarEspelhoPorIdService,
                              ListarItensDoEspelhoService listarItensDoEspelhoService,
                              CorrigirItemEspelhoService corrigirItemEspelhoService,
-                             RemoverItemDoEspelhoService removerItemDoEspelhoService) {
+                             RemoverItemDoEspelhoService removerItemDoEspelhoService, EnriquecerListaEspelhosService enriquecerListaEspelhosService) {
         this.validarAtendimentoRealizadoService = validarAtendimentoRealizadoService;
         this.validarEspelhoNaoDuplicadoPorAtendimentoService = validarEspelhoNaoDuplicadoPorAtendimentoService;
         this.criarEspelhoComItensService = criarEspelhoComItensService;
@@ -65,6 +58,7 @@ public class EspelhoController {
         this.listarItensDoEspelhoService = listarItensDoEspelhoService;
         this.corrigirItemEspelhoService = corrigirItemEspelhoService;
         this.removerItemDoEspelhoService = removerItemDoEspelhoService;
+        this.enriquecerListaEspelhosService = enriquecerListaEspelhosService;
     }
 
     @PostMapping("/espelhos")
@@ -86,8 +80,8 @@ public class EspelhoController {
     }
 
     @GetMapping("/espelhos")
-    public ResponseEntity<List<EspelhoModel>> listarEspelhos(@RequestParam(required = false) String cnpj,
-                                                             @RequestParam(required = false) StatusEspelho status) {
+    public ResponseEntity<List<EspelhoResumoResponse>> listarEspelhos(@RequestParam(required = false) String cnpj,
+                                                                      @RequestParam(required = false) StatusEspelho status) {
         if (cnpj != null && status != null) {
             List<EspelhoModel> porOcs = listarEspelhosPorOcsService.listarEspelhosPorOcs(cnpj);
             List<EspelhoModel> filtrados = new ArrayList<>();
@@ -96,13 +90,13 @@ public class EspelhoController {
                     filtrados.add(espelho);
                 }
             }
-            return ResponseEntity.ok(filtrados);
+            return ResponseEntity.ok(enriquecerListaEspelhosService.enriquecer(filtrados));
         }
         if (cnpj != null) {
-            return ResponseEntity.ok(listarEspelhosPorOcsService.listarEspelhosPorOcs(cnpj));
+            return ResponseEntity.ok(enriquecerListaEspelhosService.enriquecer(listarEspelhosPorOcsService.listarEspelhosPorOcs(cnpj)));
         }
         if (status != null) {
-            return ResponseEntity.ok(listarEspelhosPorStatusService.listarEspelhosPorStatus(status));
+            return ResponseEntity.ok(enriquecerListaEspelhosService.enriquecer(listarEspelhosPorStatusService.listarEspelhosPorStatus(status)));
         }
         return ResponseEntity.ok(listarEspelhosService.listarEspelhos());
     }
