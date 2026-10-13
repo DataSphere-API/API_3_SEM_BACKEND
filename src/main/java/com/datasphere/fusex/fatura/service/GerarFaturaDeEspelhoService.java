@@ -21,17 +21,19 @@ public class GerarFaturaDeEspelhoService {
     private final GuiaProcRepository guiaProcRepository;
     private final MontarItensFaturaService montarItensFaturaService;
     private final AtualizarStatusGuiaProcParaFaturadaService atualizarStatusGuiaProcParaFaturadaService;
+    private final MontarFaturaResponseService montarFaturaResponseService;
 
     public GerarFaturaDeEspelhoService(FaturaRepository faturaRepository,
                                        EspelhoRepository espelhoRepository,
                                        GuiaProcRepository guiaProcRepository,
                                        MontarItensFaturaService montarItensFaturaService,
-                                       AtualizarStatusGuiaProcParaFaturadaService atualizarStatusGuiaProcParaFaturadaService) {
+                                       AtualizarStatusGuiaProcParaFaturadaService atualizarStatusGuiaProcParaFaturadaService, MontarFaturaResponseService montarFaturaResponseService) {
         this.faturaRepository = faturaRepository;
         this.espelhoRepository = espelhoRepository;
         this.guiaProcRepository = guiaProcRepository;
         this.montarItensFaturaService = montarItensFaturaService;
         this.atualizarStatusGuiaProcParaFaturadaService = atualizarStatusGuiaProcParaFaturadaService;
+        this.montarFaturaResponseService = montarFaturaResponseService;
     }
 
     public FaturaResponse gerarFaturaDeEspelho(EspelhoModel espelho) {
@@ -54,6 +56,6 @@ public class GerarFaturaDeEspelhoService {
 
         atualizarStatusGuiaProcParaFaturadaService.atualizarStatusGuiaProcParaFaturada(atendimento);
 
-        return FaturaResponse.from(fatura, itens);
+        return montarFaturaResponseService.montar(fatura, itens);
     }
 }
