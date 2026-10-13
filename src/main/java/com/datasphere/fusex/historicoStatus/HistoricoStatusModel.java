@@ -1,8 +1,15 @@
 package com.datasphere.fusex.historicoStatus;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "historico_status", indexes = {
         @Index(name = "idx_hist_entidade", columnList = "entidade_tipo, entidade_id"),
@@ -33,24 +40,4 @@ public class HistoricoStatusModel {
     @Column(name = "origem", nullable = false, length = 50)
     private String origem;
 
-    public HistoricoStatusModel() {}
-
-    public HistoricoStatusModel(EntidadeTipo entidadeTipo, Long entidadeId,
-                                String statusAnterior, String statusNovo,
-                                String origem) {
-        this.entidadeTipo = entidadeTipo;
-        this.entidadeId = entidadeId;
-        this.statusAnterior = statusAnterior;
-        this.statusNovo = statusNovo;
-        this.origem = origem;
-        this.data = LocalDateTime.now();
-    }
-
-    public Long getId() { return id; }
-    public EntidadeTipo getEntidadeTipo() { return entidadeTipo; }
-    public Long getEntidadeId() { return entidadeId; }
-    public String getStatusAnterior() { return statusAnterior; }
-    public String getStatusNovo() { return statusNovo; }
-    public LocalDateTime getData() { return data; }
-    public String getOrigem() { return origem; }
 }
