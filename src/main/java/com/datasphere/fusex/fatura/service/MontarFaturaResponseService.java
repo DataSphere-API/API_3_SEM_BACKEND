@@ -2,7 +2,7 @@ package com.datasphere.fusex.fatura.service;
 
 import com.datasphere.fusex.fatura.FaturaModel;
 import com.datasphere.fusex.fatura.ItemFaturaModel;
-import com.datasphere.fusex.fatura.request.FaturaResponse;
+import com.datasphere.fusex.fatura.dto.FaturaResponse;
 import com.datasphere.fusex.ocs.OcsModel;
 import com.datasphere.fusex.ocs.OcsRepository;
 import org.springframework.stereotype.Service;
@@ -32,16 +32,8 @@ public class MontarFaturaResponseService {
                     .orElse(null);
         }
 
-        return new FaturaResponse(
-                fatura.getId(),
-                fatura.getGuiaProcModel().getGuiaId(),
-                fatura.getEspelhoModel().getId(),
-                ocsId,
-                ocsNome,
-                itens,
-                fatura.getStatus(),
-                fatura.getDataGeracao(),
-                fatura.getFaturaOrigemId()
+        return FaturaResponse.from(
+                fatura,itens, ocsNome
         );
     }
 }
