@@ -1,9 +1,9 @@
-package com.datasphere.fusex.espelho.request;
+package com.datasphere.fusex.espelho.dto;
 
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.StatusEspelho;
 import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
-import com.datasphere.fusex.espelhoItem.request.EspelhoItemResponse;
+import com.datasphere.fusex.espelhoItem.dto.EspelhoItemResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;

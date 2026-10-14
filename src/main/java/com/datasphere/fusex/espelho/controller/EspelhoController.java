@@ -2,11 +2,10 @@ package com.datasphere.fusex.espelho.controller;
 
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.StatusEspelho;
-import com.datasphere.fusex.espelho.request.*;
+import com.datasphere.fusex.espelho.dto.*;
 import com.datasphere.fusex.espelho.service.*;
 import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
-import com.datasphere.fusex.espelhoItem.EspelhoItemRepository;
-import com.datasphere.fusex.espelhoItem.request.EspelhoItemResponse;
+import com.datasphere.fusex.espelhoItem.dto.EspelhoItemResponse;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

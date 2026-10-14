@@ -1,3 +1,3 @@
-package com.datasphere.fusex.fatura.request;
+package com.datasphere.fusex.fatura.dto;
 
 public record FaturaRequest(Integer espelhoId) {}

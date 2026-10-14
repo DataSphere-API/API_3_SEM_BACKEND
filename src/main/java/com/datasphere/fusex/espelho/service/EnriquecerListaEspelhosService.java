@@ -1,7 +1,7 @@
 package com.datasphere.fusex.espelho.service;
 
 import com.datasphere.fusex.espelho.EspelhoModel;
-import com.datasphere.fusex.espelho.request.EspelhoResumoResponse;
+import com.datasphere.fusex.espelho.dto.EspelhoResumoResponse;
 import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
 import com.datasphere.fusex.espelhoItem.EspelhoItemRepository;
 import com.datasphere.fusex.ocs.OcsModel;

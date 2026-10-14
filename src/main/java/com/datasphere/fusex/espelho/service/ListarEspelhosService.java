@@ -2,7 +2,7 @@ package com.datasphere.fusex.espelho.service;
 
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.EspelhoRepository;
-import com.datasphere.fusex.espelho.request.EspelhoResumoResponse;
+import com.datasphere.fusex.espelho.dto.EspelhoResumoResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

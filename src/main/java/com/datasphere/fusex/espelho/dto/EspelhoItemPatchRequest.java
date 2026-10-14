@@ -1,4 +1,4 @@
-package com.datasphere.fusex.espelho.request;
+package com.datasphere.fusex.espelho.dto;
 
 import java.math.BigDecimal;
 

@@ -1,4 +1,4 @@
-package com.datasphere.fusex.espelhoItem.request;
+package com.datasphere.fusex.espelhoItem.dto;
 
 import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
 

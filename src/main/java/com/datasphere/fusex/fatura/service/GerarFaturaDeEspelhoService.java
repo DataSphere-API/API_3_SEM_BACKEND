@@ -6,7 +6,7 @@ import com.datasphere.fusex.espelho.StatusEspelho;
 import com.datasphere.fusex.fatura.FaturaModel;
 import com.datasphere.fusex.fatura.FaturaRepository;
 import com.datasphere.fusex.fatura.ItemFaturaModel;
-import com.datasphere.fusex.fatura.request.FaturaResponse;
+import com.datasphere.fusex.fatura.dto.FaturaResponse;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import com.datasphere.fusex.guiaProc.GuiaProcRepository;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.datasphere.fusex.fatura.request;
+package com.datasphere.fusex.fatura.dto;
 
 import com.datasphere.fusex.fatura.ItemFaturaModel;
 
