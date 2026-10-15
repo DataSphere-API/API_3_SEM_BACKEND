@@ -14,25 +14,10 @@ import java.util.List;
 @RestController
 public class AtendimentoController {
 
-    private RegistrarRealizacaoService registrarRealizacaoService;
     private ListarAtendimentosPorOcs listarAtendimentosPorOcs;
 
-    public AtendimentoController(RegistrarRealizacaoService registrarRealizacaoService, ListarAtendimentosPorOcs listarAtendimentosPorOcs) {
-        this.registrarRealizacaoService = registrarRealizacaoService;
+    public AtendimentoController(ListarAtendimentosPorOcs listarAtendimentosPorOcs) {
         this.listarAtendimentosPorOcs = listarAtendimentosPorOcs;
-    }
-
-    @PostMapping("/atendimentos/validar-qrcode")
-    public ResponseEntity<String> validarQrCode(@RequestBody String qr) {
-        GuiaProcModel procedimento = registrarRealizacaoService.registrarRealizacao(qr);
-
-        if (procedimento == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("QR code não encontrado");
-        }
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body("qr code validado");
     }
 
     @GetMapping ("/ocs/{cnpj}/atendimentos")
