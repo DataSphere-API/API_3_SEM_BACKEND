@@ -1,4 +1,4 @@
-package com.datasphere.fusex.fatura.request;
+package com.datasphere.fusex.fatura.dto;
 
 import com.datasphere.fusex.fatura.FaturaModel;
 import com.datasphere.fusex.fatura.ItemFaturaModel;
@@ -9,7 +9,7 @@ import java.util.List;
 
 public record FaturaResponse(
         Long id,
-        Long atendimentoId,
+        Integer atendimentoId,
         Integer espelhoId,
         String ocsId,
         String ocsNome,
@@ -24,7 +24,7 @@ public record FaturaResponse(
 
         return new FaturaResponse(
                 fatura.getId(),
-                fatura.getGuiaProcModel().getGuiaId(),
+                fatura.getGuiaProcModel().getId(),
                 fatura.getEspelhoModel().getId(),
                 fatura.getEspelhoModel().getOcsId(),
                 null,
