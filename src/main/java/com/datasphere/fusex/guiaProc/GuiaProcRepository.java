@@ -7,7 +7,6 @@ import java.util.List;
 
 @Repository
 public interface GuiaProcRepository extends JpaRepository <GuiaProcModel, Long> {
-    GuiaProcModel findByQr (String qr);
 
     List<GuiaProcModel> findByContratoModel_OcsModel_Cnpj(String cnpj);
 
