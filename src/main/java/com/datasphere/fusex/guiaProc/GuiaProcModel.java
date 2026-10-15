@@ -7,8 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.time.LocalDateTime;
 
 import java.time.LocalDate;
+
 
 @Entity
 @Table(name = "guia_proc")
@@ -43,4 +45,7 @@ public class GuiaProcModel {
 
     @Column(name = "data_validade")
     private LocalDate dataValidade;
+
+    @Column(name = "data_validacao")
+    private LocalDateTime dataValidacao;
 }

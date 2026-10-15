@@ -4,6 +4,8 @@ import com.datasphere.fusex.atendimento.service.*;
 import com.datasphere.fusex.dto.request.ConferenciaQrResponse;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import com.datasphere.fusex.service.ValidacaoQrService;
+import com.datasphere.fusex.dto.request.BaixaResponse;
+import com.datasphere.fusex.dto.request.ValidarQrCodeRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +28,9 @@ public class AtendimentoController {
     }
 
     @PostMapping("/atendimentos/validar-qrcode")
-    public ResponseEntity<String> validarQrCode(@RequestBody String qr) {
-        GuiaProcModel procedimento = registrarRealizacaoService.registrarRealizacao(qr);
+    public ResponseEntity<BaixaResponse> validarQrCode(@RequestBody ValidarQrCodeRequest request) {
+        return ResponseEntity.ok(registrarRealizacaoService.registrarRealizacao(request));
+    }
 
         if (procedimento == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
