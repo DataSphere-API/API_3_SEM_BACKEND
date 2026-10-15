@@ -2,6 +2,7 @@ package com.datasphere.fusex.atendimento.service;
 
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import com.datasphere.fusex.guiaProc.GuiaProcRepository;
+import com.datasphere.fusex.guiaProc.StatusProcedimento;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,7 +15,7 @@ public class AtualizarStatusGuiaProcRealizadaService {
     }
 
     public GuiaProcModel atualizarStatusGuiaProcRealizada (GuiaProcModel procedimento) {
-        procedimento.setStatus("Realizada");
+        procedimento.setStatus(StatusProcedimento.REALIZADA);
         return guiaProcRepository.save (procedimento);
     }
 }

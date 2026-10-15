@@ -2,7 +2,7 @@ package com.datasphere.fusex.fatura.service;
 
 import com.datasphere.fusex.fatura.FaturaModel;
 import com.datasphere.fusex.fatura.ItemFaturaModel;
-import com.datasphere.fusex.fatura.request.FaturaResponse;
+import com.datasphere.fusex.fatura.dto.FaturaResponse;
 import com.datasphere.fusex.ocs.OcsModel;
 import com.datasphere.fusex.ocs.OcsRepository;
 import org.springframework.stereotype.Service;
