@@ -2,9 +2,9 @@ package com.datasphere.fusex.espelho.controller;
 
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.StatusEspelho;
-import com.datasphere.fusex.espelho.request.EspelhoRequest;
-import com.datasphere.fusex.espelho.request.EspelhoResponse;
-import com.datasphere.fusex.espelho.request.ItemEspelhoRequest;
+import com.datasphere.fusex.espelho.dto.EspelhoRequest;
+import com.datasphere.fusex.espelho.dto.EspelhoResponse;
+import com.datasphere.fusex.espelho.dto.ItemEspelhoRequest;
 import com.datasphere.fusex.espelho.service.BuscarEspelhoPorIdService;
 import com.datasphere.fusex.espelho.service.CorrigirItemEspelhoService;
 import com.datasphere.fusex.espelho.service.CriarEspelhoComItensService;

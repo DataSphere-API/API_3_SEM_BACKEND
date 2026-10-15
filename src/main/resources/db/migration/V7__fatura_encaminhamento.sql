@@ -1,0 +1,3 @@
+ALTER TABLE Fatura
+ALTER COLUMN Status TYPE VARCHAR(30),
+    ADD COLUMN Data_Encaminhamento TIMESTAMP;
