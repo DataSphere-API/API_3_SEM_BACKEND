@@ -11,8 +11,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface GuiaProcRepository extends JpaRepository <GuiaProcModel, Long> {
-    GuiaProcModel findByQr (String qr);
+public interface GuiaProcRepository extends JpaRepository<GuiaProcModel, Long> {
+
+    GuiaProcModel findByQr(String qr);
 
     List<GuiaProcModel> findByContratoModel_OcsModel_Cnpj(String cnpj);
 
@@ -22,4 +23,7 @@ public interface GuiaProcRepository extends JpaRepository <GuiaProcModel, Long> 
 
     List<GuiaProcModel> findByGuiaModel_Id(Long guiaId);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select g from GuiaProcModel g where g.guiaId = :id")
+    Optional<GuiaProcModel> findByIdParaSessao(@Param("id") Long id);
 }
