@@ -212,3 +212,20 @@ SELECT setval(pg_get_serial_sequence('espelho_item', 'id'), (SELECT MAX(id) FROM
 SELECT setval(pg_get_serial_sequence('fatura', 'id'), (SELECT MAX(id) FROM fatura));
 SELECT setval(pg_get_serial_sequence('item_fatura', 'id'), (SELECT MAX(id) FROM item_fatura));
 
+-- =========================================================
+-- US004-3: CENARIOS PARA TESTE DA BAIXA POR QR CODE
+-- =========================================================
+INSERT INTO guia (id, benf_id, med_id, emissor_id, chefe_id, pdf, status, data) VALUES
+       (11, '358495831', 272865, 101, 1, 'guia_011.pdf', 'EMITIDA', CURRENT_DATE),
+       (12, '358495832', 265664, 102, 1, 'guia_012.pdf', 'EMITIDA', CURRENT_DATE)
+    ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO guia_proc (id, cont_id, guia_id, qr, status, qtd_autorizada, qtd_realizada, data_validade) VALUES
+        (1011, 1, 11, 'QR1011', 'Pendente', 1, 0, CURRENT_DATE + 30),   -- sessao unica
+        (1012, 2, 11, 'QR1012', 'Pendente', 3, 3, CURRENT_DATE + 30),   -- sessoes completas
+        (1013, 1, 12, 'QR1013', 'Pendente', 10, 3, CURRENT_DATE + 30),  -- sessoes incompletas (3 de 10)
+        (1014, 1, 12, 'QR1014', 'Pendente', 1, 0, CURRENT_DATE - 1)     -- guia expirada
+    ON CONFLICT (id) DO NOTHING;
+
+SELECT setval(pg_get_serial_sequence('guia', 'id'), (SELECT MAX(id) FROM guia));
+SELECT setval(pg_get_serial_sequence('guia_proc', 'id'), (SELECT MAX(id) FROM guia_proc));
