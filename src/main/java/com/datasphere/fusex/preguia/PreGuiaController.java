@@ -1,7 +1,7 @@
 package com.datasphere.fusex.preguia;
 
-import com.datasphere.fusex.preguia.request.AprovacaoResponse;
-import com.datasphere.fusex.preguia.request.ReprovarRequest;
+import com.datasphere.fusex.preguia.DTO.AprovacaoResponse;
+import com.datasphere.fusex.preguia.DTO.ReprovarRequest;
 import com.datasphere.fusex.preguia.service.AtualizarStatusPreGuiaService;
 import com.datasphere.fusex.preguia.service.BuscarPreGuiaPorIdService;
 import com.datasphere.fusex.preguia.service.ValidarPreGuiaValidadaService;

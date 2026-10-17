@@ -1,4 +1,4 @@
-package com.datasphere.fusex.preguia.request;
+package com.datasphere.fusex.preguia.DTO;
 
 import com.datasphere.fusex.preguia.StatusPreGuia;
 import com.fasterxml.jackson.annotation.JsonInclude;

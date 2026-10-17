@@ -5,7 +5,7 @@ import com.datasphere.fusex.historicoStatus.service.RegistrarMudancaStatusServic
 import com.datasphere.fusex.preguia.PreGuiaModel;
 import com.datasphere.fusex.preguia.PreGuiaRepository;
 import com.datasphere.fusex.preguia.StatusPreGuia;
-import com.datasphere.fusex.preguia.request.AprovacaoResponse;
+import com.datasphere.fusex.preguia.DTO.AprovacaoResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
