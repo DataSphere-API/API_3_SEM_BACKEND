@@ -1,4 +1,9 @@
 package com.datasphere.fusex.guia.dto.request;
 
-public record ValidarPreGuiaResponse() {
-}
+import java.util.List;
+
+public record ValidarPreGuiaResponse(
+        Long preGuiaId,
+        String status,
+        boolean validada,
+        List<PendenciaResponse> pendencias) {}
