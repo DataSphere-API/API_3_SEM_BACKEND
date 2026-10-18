@@ -85,6 +85,17 @@ public class PreGuiaValidacaoService {
     // TODO(US000-11): MOCK TEMPORÁRIO. Trocar por leitura real de Guia/GuiaProc/contrato
     // quando a US000-11 for mergeada. As regras acima não mudam.
     private PreGuiaDados carregarPreGuia(Long id) {
+
+        // MOCK: o id 8 é uma pré-guia sem pendências (usada para testar a revalidação da US006-2)
+        if (Long.valueOf(8).equals(id)) {
+            return new PreGuiaDados(
+                    new BeneficiarioDados(LocalDate.of(1990, 1, 1)),
+                    new MedicoDados("SP123456"),
+                    "Clínica X",
+                    new BigDecimal("720.49"),
+                    List.of(new ProcedimentoDados(20L, "TC Abdome Superior", 1, new BigDecimal("720.49"))));
+        }
+
         return new PreGuiaDados(
                 new BeneficiarioDados(null),
                 new MedicoDados("SP123456"),
