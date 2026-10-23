@@ -1,52 +1,79 @@
 package com.datasphere.fusex.guia;
 
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import com.datasphere.fusex.beneficiario.BeneficiarioModel;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
-@Table(name="guia")
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Table(name = "guia")
 public class GuiaModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column(name = "benf_id", nullable = false)
+    @Column(name = "benf_id")
     private String benfId;
 
-    @Column(name = "emissor_id")
-    private Integer emissorId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "benf_id", insertable = false, updatable = false)
+    private BeneficiarioModel beneficiarioModel;
 
-    @Column(name = "status", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private StatusGuia status;
+    private String pdf;
+    private String data;
+    private String status;
 
-    @Column(name = "data", nullable = false)
-    private LocalDate dataSolicitacao;
+    public GuiaModel() {
+    }
 
-    @Column(name = "data_emissao")
-    private LocalDate dataEmissao;
+    public Long getId() {
+        return id;
+    }
 
-    @Column(name = "motivo_reprovacao")
-    private String motivoReprovacao;
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    @Column(name = "data_aprovacao_chefe")
-    private LocalDateTime dataAprovacaoChefe;
+    public String getBenfId() {
+        return benfId;
+    }
 
-    @Column(name = "data_aprovacao_medico")
-    private LocalDateTime dataAprovacaoMedico;
+    public void setBenfId(String benfId) {
+        this.benfId = benfId;
+    }
 
-    @Column(name = "med_id")
-    private Integer medId;
+    public BeneficiarioModel getBeneficiarioModel() {
+        return beneficiarioModel;
+    }
 
-    @Column(name = "chefe_id")
-    private Integer chefeId;
+    public String getPdf() {
+        return pdf;
+    }
 
+    public void setPdf(String pdf) {
+        this.pdf = pdf;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }
