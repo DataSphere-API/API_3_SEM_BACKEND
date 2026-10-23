@@ -85,12 +85,12 @@ INSERT INTO contrato (id, proc_id, ocs_id, valor) VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- 5. GUIAS + GUIA_PROC EXISTENTES
-INSERT INTO guia (id, benf_id, med_id, emissor_id, chefe_id, pdf, status, data) VALUES
-    (1, '358495831', 272865, 101, 1, 'guia_001.pdf', 'EMITIDA', '2026-01-10'),
-    (2, '358495832', 265664, 102, 1, 'guia_002.pdf', 'EMITIDA', '2026-01-12'),
-    (3, '358495833', 198432, 103, 1, 'guia_003.pdf', 'PENDENTE', '2026-01-15'),
-    (4, '358495834', 312001, 101, 1, 'guia_004.pdf', 'EMITIDA', '2026-01-18'),
-    (5, '358495835', 154890, 102, 1, 'guia_005.pdf', 'FINALIZADA', '2026-01-20')
+INSERT INTO guia (id, benf_id, med_id, emissor_id, chefe_id, status, data) VALUES
+    (1, '358495831', 272865, 101, 1,  'EMITIDA', '2026-01-10'),
+    (2, '358495832', 265664, 102, 1,  'EMITIDA', '2026-01-12'),
+    (3, '358495833', 198432, 103, 1,  'PENDENTE', '2026-01-15'),
+    (4, '358495834', 312001, 101, 1,  'EMITIDA', '2026-01-18'),
+    (5, '358495835', 154890, 102, 1,  'FINALIZADA', '2026-01-20')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO guia_proc (id, cont_id, guia_id, qr, status) VALUES
@@ -103,12 +103,12 @@ ON CONFLICT (id) DO NOTHING;
 
 -- 6. NOVOS ATENDIMENTOS REALIZADOS DISPONIVEIS PARA CRIAR ESPELHO
 -- Estes atendimentos nao possuem espelho e podem ser usados pelo frontend.
-INSERT INTO guia (id, benf_id, med_id, emissor_id, chefe_id, pdf, status, data) VALUES
-    (6, '358495836', 389112, 103, 2, 'guia_006.pdf', 'EMITIDA', '2026-06-01'),
-    (7, '358495837', 272865, 101, 1, 'guia_007.pdf', 'EMITIDA', '2026-06-05'),
-    (8, '358495838', 265664, 102, 1, 'guia_008.pdf', 'EMITIDA', '2026-06-10'),
-    (9, '358495839', 198432, 103, 2, 'guia_009.pdf', 'EMITIDA', '2026-06-15'),
-    (10, '358495840', 312001, 101, 1, 'guia_010.pdf', 'EMITIDA', '2026-06-20')
+INSERT INTO guia (id, benf_id, med_id, emissor_id, chefe_id, status, data) VALUES
+    (6, '358495836', 389112, 103, 2,  'EMITIDA', '2026-06-01'),
+    (7, '358495837', 272865, 101, 1,  'EMITIDA', '2026-06-05'),
+    (8, '358495838', 265664, 102, 1,  'EMITIDA', '2026-06-10'),
+    (9, '358495839', 198432, 103, 2,  'EMITIDA', '2026-06-15'),
+    (10, '358495840', 312001, 101, 1,  'EMITIDA', '2026-06-20')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO guia_proc (id, cont_id, guia_id, qr, status) VALUES
