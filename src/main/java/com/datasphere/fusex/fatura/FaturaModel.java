@@ -31,7 +31,7 @@ public class FaturaModel {
     private EspelhoModel espelhoModel;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
+    @Column(name = "status", nullable = false, length = 30)
     private StatusFatura status = StatusFatura.ATIVA;
 
     @Column(name = "data_geracao", nullable = false)
@@ -39,6 +39,9 @@ public class FaturaModel {
 
     @Column(name = "fatura_origem_id")
     private Long faturaOrigemId;
+
+    @Column(name = "data_encaminhamento")
+    private LocalDateTime dataEncaminhamento;
 
     @PrePersist
     private void preencherDataGeracao() {

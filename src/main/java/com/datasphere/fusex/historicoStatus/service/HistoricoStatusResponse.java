@@ -1,4 +1,4 @@
-package com.datasphere.fusex.historicoStatus;
+package com.datasphere.fusex.historicoStatus.service;
 
 import com.datasphere.fusex.historicoStatus.EntidadeTipo;
 import com.datasphere.fusex.historicoStatus.HistoricoStatusModel;

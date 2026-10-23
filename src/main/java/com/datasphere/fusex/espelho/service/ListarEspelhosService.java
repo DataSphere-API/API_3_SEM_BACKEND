@@ -2,6 +2,7 @@ package com.datasphere.fusex.espelho.service;
 
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.EspelhoRepository;
+import com.datasphere.fusex.espelho.dto.EspelhoResumoResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,11 +19,10 @@ public class ListarEspelhosService {
         this.enriquecerListaEspelhosService = enriquecerListaEspelhosService;
     }
 
-    public List<EspelhoModel> listarEspelhos() {
+    public List<EspelhoResumoResponse> listarEspelhos() {
+
         List<EspelhoModel> espelhos = espelhoRepository.findAll();
 
-        enriquecerListaEspelhosService.enriquecer(espelhos);
-
-        return espelhos;
+        return enriquecerListaEspelhosService.enriquecer(espelhos);
     }
 }
