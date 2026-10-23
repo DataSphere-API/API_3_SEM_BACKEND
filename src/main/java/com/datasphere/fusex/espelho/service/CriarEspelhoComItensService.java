@@ -3,9 +3,9 @@ package com.datasphere.fusex.espelho.service;
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.EspelhoRepository;
 import com.datasphere.fusex.espelho.StatusEspelho;
-import com.datasphere.fusex.espelho.request.EspelhoRequest;
-import com.datasphere.fusex.espelho.request.EspelhoResponse;
-import com.datasphere.fusex.espelho.request.ItemEspelhoRequest;
+import com.datasphere.fusex.espelho.dto.EspelhoRequest;
+import com.datasphere.fusex.espelho.dto.EspelhoResponse;
+import com.datasphere.fusex.espelho.dto.ItemEspelhoRequest;
 import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
 import com.datasphere.fusex.espelhoItem.EspelhoItemRepository;
 import org.springframework.stereotype.Service;
@@ -55,6 +55,6 @@ public class CriarEspelhoComItensService {
             itens.add(item);
         }
 
-        return new EspelhoResponse(espelho.getId(), espelho.getAtendimentoId(), espelho.getStatus(), itens);
+        return EspelhoResponse.from(espelho, itens);
     }
 }

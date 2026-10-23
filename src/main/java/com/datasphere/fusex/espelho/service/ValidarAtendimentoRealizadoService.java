@@ -2,6 +2,7 @@ package com.datasphere.fusex.espelho.service;
 
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import com.datasphere.fusex.guiaProc.GuiaProcRepository;
+import com.datasphere.fusex.guiaProc.StatusProcedimento;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -23,7 +24,7 @@ public class ValidarAtendimentoRealizadoService {
         }
 
         GuiaProcModel atendimento = atendimentoOptional.get();
-        if (!"Realizada".equals(atendimento.getStatus())) {
+        if (!StatusProcedimento.REALIZADA.equals(atendimento.getStatus())) {
             return null;
         }
 

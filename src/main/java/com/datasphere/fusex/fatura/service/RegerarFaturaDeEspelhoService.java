@@ -4,7 +4,7 @@ import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.fatura.FaturaModel;
 import com.datasphere.fusex.fatura.FaturaRepository;
 import com.datasphere.fusex.fatura.StatusFatura;
-import com.datasphere.fusex.fatura.request.FaturaResponse;
+import com.datasphere.fusex.fatura.dto.FaturaResponse;
 import com.datasphere.fusex.historicoStatus.EntidadeTipo;
 import com.datasphere.fusex.historicoStatus.service.RegistrarMudancaStatusService;
 import org.springframework.stereotype.Service;

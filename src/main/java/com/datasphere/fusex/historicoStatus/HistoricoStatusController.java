@@ -1,5 +1,6 @@
 package com.datasphere.fusex.historicoStatus;
 
+import com.datasphere.fusex.historicoStatus.service.HistoricoStatusResponse;
 import com.datasphere.fusex.historicoStatus.service.ListarHistoricoPorEntidadeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
