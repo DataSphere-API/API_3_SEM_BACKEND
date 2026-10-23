@@ -2,6 +2,7 @@ package com.datasphere.fusex.atendimento.controller;
 
 import com.datasphere.fusex.atendimento.service.ListarAtendimentosPorOcs;
 import com.datasphere.fusex.atendimento.service.RegistrarRealizacaoService;
+import com.datasphere.fusex.atendimento.service.RegistrarSessaoService;
 import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.dto.request.ConferenciaQrResponse;
 import com.datasphere.fusex.exception.BusinessException;
@@ -36,12 +37,18 @@ class ConferenciaQrControllerTest {
     @Mock
     private ValidacaoQrService validacaoQrService;
 
+    @Mock
+    private RegistrarSessaoService registrarSessaoService;
+
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         AtendimentoController controller = new AtendimentoController(
-                registrarRealizacaoService, listarAtendimentosPorOcs, validacaoQrService);
+                registrarRealizacaoService,
+                listarAtendimentosPorOcs,
+                validacaoQrService,
+                registrarSessaoService);
 
         mockMvc = MockMvcBuilders
                 .standaloneSetup(controller)

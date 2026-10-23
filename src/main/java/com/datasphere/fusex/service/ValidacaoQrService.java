@@ -10,14 +10,14 @@ import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import com.datasphere.fusex.guiaProc.GuiaProcRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Set;
 
 import java.time.LocalDate;
 
 @Service
 public class ValidacaoQrService {
 
-    private static final String STATUS_REALIZADO = "REALIZADO"; // AJUSTE: valor real usado em GuiaProcModel.status
-
+    private static final Set<String> STATUS_JA_REALIZADO = Set.of("REALIZADO", "REALIZADA", "FATURADA");
     private final GuiaProcRepository guiaProcRepository;
 
     public ValidacaoQrService(GuiaProcRepository guiaProcRepository) {
@@ -62,7 +62,9 @@ public class ValidacaoQrService {
 
     /** Erro: PROCEDIMENTO_JA_REALIZADO */
     public void validarProcedimentoNaoRealizado(GuiaProcModel p) {
-        if (STATUS_REALIZADO.equalsIgnoreCase(p.getStatus())) {
+        boolean jaRealizado = STATUS_JA_REALIZADO.stream()
+                .anyMatch(s -> s.equalsIgnoreCase(p.getStatus()));
+        if (jaRealizado) {
             throw new BusinessException(ErrorCode.PROCEDIMENTO_JA_REALIZADO);
         }
     }
