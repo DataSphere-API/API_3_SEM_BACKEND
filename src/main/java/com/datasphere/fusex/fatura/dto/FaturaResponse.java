@@ -9,26 +9,27 @@ import java.util.List;
 
 public record FaturaResponse(
         Long id,
-        Integer atendimentoId,
+        Long atendimentoId,
         Integer espelhoId,
         String ocsId,
         String ocsNome,
-        List<ItemFaturaModel> itens,
+        List<ItemFaturaResponse> itens,
         StatusFatura status,
         LocalDateTime dataGeracao,
         Long faturaOrigemId) {
 
     public static FaturaResponse from(
             FaturaModel fatura,
-            List<ItemFaturaModel> itens) {
+            List<ItemFaturaModel> itens,
+            String ocsNome) {
 
         return new FaturaResponse(
                 fatura.getId(),
-                fatura.getGuiaProcModel().getId(),
+                fatura.getGuiaProcModel().getGuiaId(),
                 fatura.getEspelhoModel().getId(),
                 fatura.getEspelhoModel().getOcsId(),
-                null,
-                itens,
+                ocsNome,
+                itens.stream().map(ItemFaturaResponse::from).toList(),
                 fatura.getStatus(),
                 fatura.getDataGeracao(),
                 fatura.getFaturaOrigemId()

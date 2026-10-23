@@ -32,16 +32,8 @@ public class MontarFaturaResponseService {
                     .orElse(null);
         }
 
-        return new FaturaResponse(
-                fatura.getId(),
-                fatura.getGuiaProcModel().getGuiaId(),
-                fatura.getEspelhoModel().getId(),
-                ocsId,
-                ocsNome,
-                itens,
-                fatura.getStatus(),
-                fatura.getDataGeracao(),
-                fatura.getFaturaOrigemId()
+        return FaturaResponse.from(
+                fatura,itens, ocsNome
         );
     }
 }

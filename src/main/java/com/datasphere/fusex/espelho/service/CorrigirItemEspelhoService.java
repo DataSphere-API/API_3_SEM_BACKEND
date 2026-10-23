@@ -3,11 +3,12 @@ package com.datasphere.fusex.espelho.service;
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.EspelhoRepository;
 import com.datasphere.fusex.espelho.StatusEspelho;
-import com.datasphere.fusex.espelho.dto.ItemEspelhoRequest;
+import com.datasphere.fusex.espelho.dto.EspelhoItemPatchRequest;
 import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
 import com.datasphere.fusex.espelhoItem.EspelhoItemRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -26,7 +27,7 @@ public class CorrigirItemEspelhoService {
         this.buscarEspelhoPorIdService = buscarEspelhoPorIdService;
     }
 
-    public EspelhoItemModel corrigirItemEspelho(Integer espelhoId, Integer itemId, ItemEspelhoRequest dados) {
+    public EspelhoItemModel corrigirItemEspelho(Integer espelhoId, Integer itemId, EspelhoItemPatchRequest dados) {
         EspelhoModel espelho = buscarEspelhoPorIdService.buscarEspelhoPorId(espelhoId);
         if (espelho == null || espelho.getStatus() == StatusEspelho.CANCELADO) {
             return null;
@@ -38,9 +39,26 @@ public class CorrigirItemEspelhoService {
         }
 
         EspelhoItemModel item = itemOptional.get();
-        item.setDescricao(dados.descricao());
-        item.setValor(dados.valor());
-        item.setBeneficiarioId(dados.beneficiarioId());
+        boolean alterado = false;
+
+        if (dados.descricao() != null && !dados.descricao().isBlank()) {
+            item.setDescricao(dados.descricao());
+            alterado = true;
+        }
+
+        if (dados.beneficiarioId() != null && !dados.beneficiarioId().isBlank()) {
+            item.setBeneficiarioId(dados.beneficiarioId());
+            alterado = true;
+        }
+
+        if (dados.valor() != null && dados.valor().compareTo(BigDecimal.ZERO) > 0) {
+            item.setValor(dados.valor());
+            alterado = true;
+        }
+
+        if (!alterado) {
+            return null;
+        }
 
         EspelhoItemModel salvo = espelhoItemRepository.save(item);
 
