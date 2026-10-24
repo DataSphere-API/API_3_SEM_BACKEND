@@ -15,7 +15,7 @@ public class AtualizarStatusGuiaProcParaFaturadaService {
     }
 
     public GuiaProcModel atualizarStatusGuiaProcParaFaturada(GuiaProcModel procedimento) {
-        procedimento.setStatus(StatusProcedimento.FATURADA);
+        procedimento.setStatus(StatusProcedimento.FATURADA.name());
         return guiaProcRepository.save(procedimento);
     }
 }

@@ -24,7 +24,7 @@ public class ValidarAtendimentoRealizadoService {
         }
 
         GuiaProcModel atendimento = atendimentoOptional.get();
-        if (!StatusProcedimento.REALIZADA.equals(atendimento.getStatus())) {
+        if (!StatusProcedimento.REALIZADA.name().equalsIgnoreCase(atendimento.getStatus())) {
             return null;
         }
 
