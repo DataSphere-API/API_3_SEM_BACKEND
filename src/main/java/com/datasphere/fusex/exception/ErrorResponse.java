@@ -1,4 +1,5 @@
 package com.datasphere.fusex.exception;
 
-public class ErrorResponse {
-}
+import java.util.Map;
+
+public record ErrorResponse(String codigo, String mensagem, Map<String, Object> detalhes) {}
