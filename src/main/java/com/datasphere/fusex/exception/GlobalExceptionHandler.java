@@ -1,32 +1,27 @@
 package com.datasphere.fusex.exception;
 
 import com.datasphere.fusex.domain.enums.ErrorCode;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<Map<String, Object>> handleBusiness(BusinessException ex) {
+    public ResponseEntity<ErrorResponse> handleBusiness(BusinessException ex) {
         ErrorCode errorCode = ex.getErrorCode();
+        ErrorResponse corpo = new ErrorResponse(errorCode.getCodigo(), errorCode.getMensagem(), ex.getDetalhes());
+        return ResponseEntity.status(errorCode.getStatus()).body(corpo);
+    }
 
-        HttpStatus status = errorCode == ErrorCode.QR_NAO_ENCONTRADO
-                ? HttpStatus.NOT_FOUND
-                : HttpStatus.UNPROCESSABLE_ENTITY;
-
-        Map<String, Object> corpo = new LinkedHashMap<>();
-        corpo.put("codigo", errorCode.getCodigo());
-        corpo.put("mensagem", errorCode.getMensagem());
-        if (!ex.getDetalhes().isEmpty()) {
-            corpo.put("detalhes", ex.getDetalhes());
-        }
-
-        return ResponseEntity.status(status).body(corpo);
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleCorpoInvalido(HttpMessageNotReadableException ex) {
+        ErrorCode errorCode = ErrorCode.DADOS_INVALIDOS;
+        ErrorResponse corpo = new ErrorResponse(errorCode.getCodigo(), errorCode.getMensagem(), Map.of());
+        return ResponseEntity.status(errorCode.getStatus()).body(corpo);
     }
 }
