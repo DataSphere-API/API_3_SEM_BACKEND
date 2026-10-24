@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record PreGuiaResumoResponse(
-        Integer id,
+        Long id,
         String beneficiarioNome,
         StatusGuia status,
         int qtdProcedimentos,

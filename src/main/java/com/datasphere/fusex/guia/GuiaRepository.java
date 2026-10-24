@@ -9,9 +9,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface GuiaRepository extends JpaRepository<GuiaModel, Long> {
+
+    java.util.List<GuiaModel> findByStatusInOrderByIdAsc(Set<String> statuses);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select g from GuiaModel g where g.id = :id")

@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "guia")
@@ -39,7 +40,8 @@ public class GuiaModel {
     private BigDecimal valorTotal;
 
     private String pdf;
-    private String data;
+    @Column(name = "data")
+    private LocalDate data;
     private String status;
 
     public GuiaModel() {
@@ -93,11 +95,11 @@ public class GuiaModel {
         this.pdf = pdf;
     }
 
-    public String getData() {
+    public LocalDate getData() {
         return data;
     }
 
-    public void setData(String data) {
+    public void setData(LocalDate data) {
         this.data = data;
     }
 

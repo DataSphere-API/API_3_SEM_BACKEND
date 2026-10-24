@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 
 @Repository
@@ -22,6 +23,8 @@ public interface GuiaProcRepository extends JpaRepository<GuiaProcModel, Long> {
     Optional<GuiaProcModel> findByQrParaBaixa(@Param("qr") String qr);
 
     List<GuiaProcModel> findByGuiaModel_Id(Long guiaId);
+
+    List<GuiaProcModel> findByGuiaModel_IdIn(Collection<Long> guiaIds);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select g from GuiaProcModel g where g.guiaId = :id")

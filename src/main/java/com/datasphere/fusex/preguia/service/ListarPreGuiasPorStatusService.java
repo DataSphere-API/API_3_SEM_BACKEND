@@ -37,7 +37,7 @@ public class ListarPreGuiasPorStatusService {
 
     // Retorna null quando o status informado é inválido (mesmo padrão dos demais services do projeto)
     public List<PreGuiaResumoResponse> listarPreGuiasPorStatus(String status) {
-        Set<StatusGuia> filtro = STATUS_PRE_GUIA;
+        Set<String> filtro = STATUS_PRE_GUIA.stream().map(StatusGuia::name).collect(Collectors.toSet());
 
         if (status != null && !status.isBlank()) {
             StatusGuia statusInformado;
@@ -51,7 +51,7 @@ public class ListarPreGuiasPorStatusService {
                 return null;
             }
 
-            filtro = EnumSet.of(statusInformado);
+            filtro = Set.of(statusInformado.name());
         }
 
         List<GuiaModel> guias = guiaRepository.findByStatusInOrderByIdAsc(filtro);
@@ -59,10 +59,10 @@ public class ListarPreGuiasPorStatusService {
             return List.of();
         }
 
-        List<Integer> guiaIds = guias.stream().map(GuiaModel::getId).toList();
-        Map<Integer, List<GuiaProcModel>> procedimentosPorGuia = guiaProcRepository.findByGuiaIdIn(guiaIds)
+        List<Long> guiaIds = guias.stream().map(GuiaModel::getId).toList();
+        Map<Long, List<GuiaProcModel>> procedimentosPorGuia = guiaProcRepository.findByGuiaModel_IdIn(guiaIds)
                 .stream()
-                .collect(Collectors.groupingBy(GuiaProcModel::getGuiaId));
+                .collect(Collectors.groupingBy(procedimento -> procedimento.getGuiaModel().getId()));
 
         return guias.stream()
                 .map(guia -> montarResumo(guia, procedimentosPorGuia.getOrDefault(guia.getId(), List.of())))
@@ -80,9 +80,9 @@ public class ListarPreGuiasPorStatusService {
         return new PreGuiaResumoResponse(
                 guia.getId(),
                 beneficiarioNome,
-                guia.getStatus(),
+                StatusGuia.valueOf(guia.getStatus()),
                 procedimentos.size(),
                 valorTotal,
-                guia.getDataSolicitacao());
+                guia.getData());
     }
 }
