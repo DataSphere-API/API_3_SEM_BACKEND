@@ -1,14 +1,14 @@
 package com.datasphere.fusex.guia.service;
 
+import com.datasphere.fusex.guia.GuiaModel;
+import com.datasphere.fusex.guia.GuiaRepository;
 import com.datasphere.fusex.guia.dto.request.ValidacaoPreGuiaResponse;
 import com.datasphere.fusex.guia.dto.request.ValidarPreGuiaResponse;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import com.datasphere.fusex.historicoStatus.EntidadeTipo;
+import com.datasphere.fusex.historicoStatus.service.RegistrarMudancaStatusService;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ValidarPreGuiaService {
@@ -25,36 +25,36 @@ public class ValidarPreGuiaService {
         }
     }
 
-    record HistoricoStatus(Long preGuiaId, String statusAnterior, String statusNovo, LocalDateTime data) {}
-
     private static final Set<String> STATUS_VALIDAVEIS = Set.of("PRE_GUIA", "COM_PENDENCIAS");
 
+    private final GuiaRepository guiaRepository;
     private final PreGuiaValidacaoService preGuiaValidacaoService;
+    private final RegistrarMudancaStatusService registrarMudancaStatusService;
 
-    // TODO(US000-11): MOCKS TEMPORÁRIOS. Trocar por leitura/gravação real da Guia e do histórico.
-    // Ids do mock: 7 = PRE_GUIA, 8 = COM_PENDENCIAS (valida limpo), 9 = APROVADA. Outros = 404.
-    private final Map<Long, String> statusPorId = new ConcurrentHashMap<>(
-            Map.of(7L, "PRE_GUIA", 8L, "COM_PENDENCIAS", 9L, "APROVADA"));
-    private final List<HistoricoStatus> historico = new CopyOnWriteArrayList<>();
-
-    public ValidarPreGuiaService(PreGuiaValidacaoService preGuiaValidacaoService) {
+    public ValidarPreGuiaService(GuiaRepository guiaRepository,
+                                 PreGuiaValidacaoService preGuiaValidacaoService,
+                                 RegistrarMudancaStatusService registrarMudancaStatusService) {
+        this.guiaRepository = guiaRepository;
         this.preGuiaValidacaoService = preGuiaValidacaoService;
+        this.registrarMudancaStatusService = registrarMudancaStatusService;
     }
 
+    @Transactional
     public ValidarPreGuiaResponse validarPreGuia(Long id) {
-        String statusAtual = statusPorId.get(id);
-        if (statusAtual == null) {
-            throw new PreGuiaNaoEncontradaException(id);
-        }
-        if (!STATUS_VALIDAVEIS.contains(statusAtual)) {
+        GuiaModel guia = guiaRepository.findByIdParaAtualizar(id)
+                .orElseThrow(() -> new PreGuiaNaoEncontradaException(id));
+        String statusAtual = guia.getStatus();
+        if (statusAtual == null || !STATUS_VALIDAVEIS.contains(statusAtual)) {
             throw new PreGuiaStatusInvalidoException(id, statusAtual);
         }
 
-        ValidacaoPreGuiaResponse validacao = preGuiaValidacaoService.consolidarPendencias(id);
+        ValidacaoPreGuiaResponse validacao = preGuiaValidacaoService.consolidarPendencias(guia);
         String novoStatus = validacao.validada() ? "VALIDADA" : "COM_PENDENCIAS";
 
-        statusPorId.put(id, novoStatus);
-        historico.add(new HistoricoStatus(id, statusAtual, novoStatus, LocalDateTime.now()));
+        guia.setStatus(novoStatus);
+        guiaRepository.save(guia);
+        registrarMudancaStatusService.executar(EntidadeTipo.GUIA, id,
+                statusAtual, novoStatus, "validacao-pre-guia");
 
         return new ValidarPreGuiaResponse(id, novoStatus, validacao.validada(), validacao.pendencias());
     }

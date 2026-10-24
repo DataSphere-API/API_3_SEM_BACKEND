@@ -1,6 +1,7 @@
 package com.datasphere.fusex.guia;
 
 import com.datasphere.fusex.beneficiario.BeneficiarioModel;
+import com.datasphere.fusex.medico.MedicoModel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "guia")
@@ -22,9 +24,19 @@ public class GuiaModel {
     @Column(name = "benf_id")
     private String benfId;
 
+    @Column(name = "med_id")
+    private Integer medId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "benf_id", insertable = false, updatable = false)
     private BeneficiarioModel beneficiarioModel;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "med_id", insertable = false, updatable = false)
+    private MedicoModel medicoModel;
+
+    @Column(name = "valor_total", precision = 12, scale = 2)
+    private BigDecimal valorTotal;
 
     private String pdf;
     private String data;
@@ -45,12 +57,32 @@ public class GuiaModel {
         return benfId;
     }
 
+    public Integer getMedId() {
+        return medId;
+    }
+
+    public void setMedId(Integer medId) {
+        this.medId = medId;
+    }
+
     public void setBenfId(String benfId) {
         this.benfId = benfId;
     }
 
     public BeneficiarioModel getBeneficiarioModel() {
         return beneficiarioModel;
+    }
+
+    public MedicoModel getMedicoModel() {
+        return medicoModel;
+    }
+
+    public BigDecimal getValorTotal() {
+        return valorTotal;
+    }
+
+    public void setValorTotal(BigDecimal valorTotal) {
+        this.valorTotal = valorTotal;
     }
 
     public String getPdf() {

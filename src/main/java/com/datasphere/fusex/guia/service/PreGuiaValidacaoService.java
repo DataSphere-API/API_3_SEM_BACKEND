@@ -2,27 +2,59 @@ package com.datasphere.fusex.guia.service;
 
 import static com.datasphere.fusex.guia.dto.request.PendenciaResponse.CodigoPendencia.*;
 
+import com.datasphere.fusex.beneficiario.BeneficiarioModel;
+import com.datasphere.fusex.contrato.ContratoModel;
+import com.datasphere.fusex.guia.GuiaModel;
+import com.datasphere.fusex.guia.GuiaRepository;
 import com.datasphere.fusex.guia.dto.request.PendenciaResponse;
 import com.datasphere.fusex.guia.dto.request.ValidacaoPreGuiaResponse;
+import com.datasphere.fusex.guiaProc.GuiaProcModel;
+import com.datasphere.fusex.guiaProc.GuiaProcRepository;
+import com.datasphere.fusex.medico.MedicoModel;
+import com.datasphere.fusex.procedimento.ProcedimentoModel;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PreGuiaValidacaoService {
 
-    // Dados mínimos que a validação precisa. Não dependem das entidades.
-    record BeneficiarioDados(LocalDate dataNascimento) {}
-    record MedicoDados(String crm) {}
-    // valorContratado == null significa "sem contrato com a OCS"
-    record ProcedimentoDados(Long atendimentoId, String nome, Integer qtdAutorizada, BigDecimal valorContratado) {}
-    record PreGuiaDados(BeneficiarioDados beneficiario, MedicoDados medico, String ocsNome,
-                        BigDecimal valorTotalInformado, List<ProcedimentoDados> procedimentos) {}
+    private final GuiaRepository guiaRepository;
+    private final GuiaProcRepository guiaProcRepository;
 
+    public PreGuiaValidacaoService(GuiaRepository guiaRepository,
+                                   GuiaProcRepository guiaProcRepository) {
+        this.guiaRepository = guiaRepository;
+        this.guiaProcRepository = guiaProcRepository;
+    }
+
+    @Transactional(readOnly = true)
     public ValidacaoPreGuiaResponse consolidarPendencias(Long preGuiaId) {
-        PreGuiaDados dados = carregarPreGuia(preGuiaId);
+        GuiaModel guia = guiaRepository.findById(preGuiaId).orElse(null);
+        if (guia == null) {
+            throw new ValidarPreGuiaService.PreGuiaNaoEncontradaException(preGuiaId);
+        }
+
+        return consolidarPendencias(guia);
+    }
+
+    @Transactional(readOnly = true)
+    public ValidacaoPreGuiaResponse consolidarPendencias(GuiaModel guia) {
+        BeneficiarioModel beneficiario = guia.getBeneficiarioModel();
+        MedicoModel medico = guia.getMedicoModel();
+        List<ProcedimentoDados> procedimentos = guiaProcRepository.findByGuiaModel_Id(guia.getId())
+                .stream()
+                .map(this::mapearProcedimento)
+                .toList();
+
+        PreGuiaDados dados = new PreGuiaDados(
+                beneficiario == null ? null : new BeneficiarioDados(beneficiario.getDataNasc()),
+                medico == null ? null : new MedicoDados(medico.getCrm()),
+                guia.getValorTotal(),
+                procedimentos);
 
         List<PendenciaResponse> pendencias = new ArrayList<>();
         pendencias.addAll(validarBeneficiarioDaPreGuia(dados));
@@ -34,75 +66,81 @@ public class PreGuiaValidacaoService {
         return new ValidacaoPreGuiaResponse(pendencias.isEmpty(), pendencias);
     }
 
-    List<PendenciaResponse> validarBeneficiarioDaPreGuia(PreGuiaDados d) {
-        if (d.beneficiario() == null || d.beneficiario().dataNascimento() == null) {
+    private ProcedimentoDados mapearProcedimento(GuiaProcModel guiaProc) {
+        ContratoModel contrato = guiaProc.getContratoModel();
+        ProcedimentoModel procedimento = contrato == null ? null : contrato.getProcedimentoModel();
+        String ocsNome = contrato == null || contrato.getOcsModel() == null
+                ? null : contrato.getOcsModel().getNome();
+
+        return new ProcedimentoDados(
+                guiaProc.getGuiaId(),
+                procedimento == null ? "desconhecido" : procedimento.getNome(),
+                guiaProc.getQtdAutorizada(),
+                contrato == null ? null : contrato.getValor(),
+                ocsNome);
+    }
+
+    List<PendenciaResponse> validarBeneficiarioDaPreGuia(PreGuiaDados dados) {
+        if (dados.beneficiario() == null || dados.beneficiario().dataNascimento() == null) {
             return List.of(new PendenciaResponse(BENEFICIARIO_INVALIDO, null,
                     "Beneficiário inexistente ou sem data de nascimento"));
         }
         return List.of();
     }
 
-    List<PendenciaResponse> validarMedicoDaPreGuia(PreGuiaDados d) {
-        if (d.medico() == null || d.medico().crm() == null || d.medico().crm().isBlank()) {
+    List<PendenciaResponse> validarMedicoDaPreGuia(PreGuiaDados dados) {
+        if (dados.medico() == null || dados.medico().crm() == null || dados.medico().crm().isBlank()) {
             return List.of(new PendenciaResponse(MEDICO_SEM_CRM, null, "Médico sem CRM informado"));
         }
         return List.of();
     }
 
-    List<PendenciaResponse> validarContratoDosProcedimentos(PreGuiaDados d) {
-        if (d.procedimentos().isEmpty()) {
+    List<PendenciaResponse> validarContratoDosProcedimentos(PreGuiaDados dados) {
+        if (dados.procedimentos().isEmpty()) {
             return List.of(new PendenciaResponse(PRE_GUIA_SEM_PROCEDIMENTOS, null,
                     "A pré-guia não possui procedimentos"));
         }
-        return d.procedimentos().stream()
-                .filter(p -> p.valorContratado() == null)
-                .map(p -> new PendenciaResponse(PROCEDIMENTO_SEM_CONTRATO, p.atendimentoId(),
-                        "Procedimento " + p.nome() + " não possui contrato com a OCS " + d.ocsNome()))
+
+        return dados.procedimentos().stream()
+                .filter(procedimento -> procedimento.valorContratado() == null)
+                .map(procedimento -> new PendenciaResponse(PROCEDIMENTO_SEM_CONTRATO,
+                        procedimento.atendimentoId(),
+                        "Procedimento " + procedimento.nome() + " não possui contrato com a OCS "
+                                + (procedimento.ocsNome() == null ? "informada" : procedimento.ocsNome())))
                 .toList();
     }
 
-    List<PendenciaResponse> validarQuantidadeDeSessoes(PreGuiaDados d) {
-        return d.procedimentos().stream()
-                .filter(p -> p.qtdAutorizada() == null || p.qtdAutorizada() <= 0)
-                .map(p -> new PendenciaResponse(SESSOES_INVALIDAS, p.atendimentoId(),
-                        "Quantidade autorizada de " + p.nome() + " deve ser maior que zero"))
+    List<PendenciaResponse> validarQuantidadeDeSessoes(PreGuiaDados dados) {
+        return dados.procedimentos().stream()
+                .filter(procedimento -> procedimento.qtdAutorizada() == null
+                        || procedimento.qtdAutorizada() <= 0)
+                .map(procedimento -> new PendenciaResponse(SESSOES_INVALIDAS,
+                        procedimento.atendimentoId(),
+                        "Quantidade autorizada de " + procedimento.nome() + " deve ser maior que zero"))
                 .toList();
     }
 
-    List<PendenciaResponse> validarValorTotal(PreGuiaDados d) {
-        BigDecimal esperado = d.procedimentos().stream()
-                .filter(p -> p.valorContratado() != null && p.qtdAutorizada() != null && p.qtdAutorizada() > 0)
-                .map(p -> p.valorContratado().multiply(BigDecimal.valueOf(p.qtdAutorizada())))
+    List<PendenciaResponse> validarValorTotal(PreGuiaDados dados) {
+        BigDecimal esperado = dados.procedimentos().stream()
+                .filter(procedimento -> procedimento.valorContratado() != null
+                        && procedimento.qtdAutorizada() != null)
+                .map(procedimento -> procedimento.valorContratado()
+                        .multiply(BigDecimal.valueOf(procedimento.qtdAutorizada())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        if (d.valorTotalInformado() != null && esperado.compareTo(d.valorTotalInformado()) != 0) {
+        if (dados.valorTotalInformado() == null
+                || esperado.compareTo(dados.valorTotalInformado()) != 0) {
             return List.of(new PendenciaResponse(VALOR_TOTAL_DIVERGENTE, null,
-                    "Valor total informado " + d.valorTotalInformado() + " difere do calculado " + esperado));
+                    "Valor total informado " + dados.valorTotalInformado()
+                            + " difere do calculado " + esperado));
         }
         return List.of();
     }
 
-    // TODO(US000-11): MOCK TEMPORÁRIO. Trocar por leitura real de Guia/GuiaProc/contrato
-    // quando a US000-11 for mergeada. As regras acima não mudam.
-    private PreGuiaDados carregarPreGuia(Long id) {
-
-        // MOCK: o id 8 é uma pré-guia sem pendências (usada para testar a revalidação da US006-2)
-        if (Long.valueOf(8).equals(id)) {
-            return new PreGuiaDados(
-                    new BeneficiarioDados(LocalDate.of(1990, 1, 1)),
-                    new MedicoDados("SP123456"),
-                    "Clínica X",
-                    new BigDecimal("720.49"),
-                    List.of(new ProcedimentoDados(20L, "TC Abdome Superior", 1, new BigDecimal("720.49"))));
-        }
-
-        return new PreGuiaDados(
-                new BeneficiarioDados(null),
-                new MedicoDados("SP123456"),
-                "Clínica X",
-                new BigDecimal("100.00"),
-                List.of(
-                        new ProcedimentoDados(12L, "TC Abdome Superior", 0, new BigDecimal("720.49")),
-                        new ProcedimentoDados(13L, "Sessão de psicoterapia", 3, null)));
-    }
+    record BeneficiarioDados(LocalDate dataNascimento) {}
+    record MedicoDados(String crm) {}
+    record ProcedimentoDados(Long atendimentoId, String nome, Integer qtdAutorizada,
+                             BigDecimal valorContratado, String ocsNome) {}
+    record PreGuiaDados(BeneficiarioDados beneficiario, MedicoDados medico,
+                        BigDecimal valorTotalInformado, List<ProcedimentoDados> procedimentos) {}
 }
