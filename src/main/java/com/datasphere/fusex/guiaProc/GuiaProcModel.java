@@ -45,6 +45,6 @@ public class GuiaProcModel {
     @Column(name = "data_validade")
     private LocalDate dataValidade;
 
-    public void setDataValidacao(LocalDateTime localDateTime) {
-    }
+    @Column(name = "data_validacao")
+    private LocalDateTime dataValidacao;
 }
