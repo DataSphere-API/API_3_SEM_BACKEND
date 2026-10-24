@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@RestController("preGuiaAprovacaoController")
 public class PreGuiaController {
 
     private static final String HEADER_CHEFE_ID = "X-Chefe-Id";
