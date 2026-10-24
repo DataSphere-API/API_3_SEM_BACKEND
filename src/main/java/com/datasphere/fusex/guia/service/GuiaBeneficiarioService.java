@@ -1,87 +1,73 @@
 package com.datasphere.fusex.guia.service;
 
+import com.datasphere.fusex.beneficiario.BeneficiarioRepository;
+import com.datasphere.fusex.domain.enums.ErrorCode;
+import com.datasphere.fusex.exception.BusinessException;
+import com.datasphere.fusex.guia.GuiaModel;
+import com.datasphere.fusex.guia.GuiaRepository;
 import com.datasphere.fusex.guia.dto.request.GuiaBeneficiarioResponse;
 import com.datasphere.fusex.guia.dto.request.ProcedimentoGuiaResponse;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Value;
+import com.datasphere.fusex.guiaProc.GuiaProcModel;
+import com.datasphere.fusex.guiaProc.GuiaProcRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class GuiaBeneficiarioService {
 
-    public static class BeneficiarioNaoEncontradoException extends RuntimeException {
-        public BeneficiarioNaoEncontradoException(String precCp) {
-            super("Beneficiário " + precCp + " não encontrado");
-        }
+    private final BeneficiarioRepository beneficiarioRepository;
+    private final GuiaRepository guiaRepository;
+    private final GuiaProcRepository guiaProcRepository;
+    private final ValidadeGuiaService validadeGuiaService;
+
+    public GuiaBeneficiarioService(BeneficiarioRepository beneficiarioRepository,
+                                   GuiaRepository guiaRepository,
+                                   GuiaProcRepository guiaProcRepository,
+                                   ValidadeGuiaService validadeGuiaService) {
+        this.beneficiarioRepository = beneficiarioRepository;
+        this.guiaRepository = guiaRepository;
+        this.guiaProcRepository = guiaProcRepository;
+        this.validadeGuiaService = validadeGuiaService;
     }
 
-    // Dados mínimos que a listagem precisa. Não dependem das entidades.
-    record BeneficiarioDados(String precCp, String nome) {}
-    record ProcedimentoDados(Long atendimentoId, String nome, String ocsCnpj, String ocsNome,
-                             String status, Integer qtdAutorizada, long qtdRealizada, boolean temQr) {}
-    record GuiaDados(Long id, String status, LocalDate dataEmissao, List<ProcedimentoDados> procedimentos) {}
-
-    // Padrão 60 caso a propriedade ainda não exista no application.properties
-    @Value("${fusex.guia.validade-dias:60}")
-    private long validadeDias;
-
+    @Transactional(readOnly = true)
     public List<GuiaBeneficiarioResponse> listarGuiasPorBeneficiario(String precCp) {
-        BeneficiarioDados beneficiario = buscarBeneficiarioPorPrecCp(precCp);
+        buscarBeneficiarioPorPrecCp(precCp);
 
-        return carregarGuias(beneficiario.precCp()).stream()
-                .filter(g -> g.dataEmissao() != null) // pré-guia ainda não foi emitida: não lista
-                .map(g -> new GuiaBeneficiarioResponse(
-                        g.id(),
-                        g.status(),
-                        g.dataEmissao(),
-                        calcularDiasRestantes(g.dataEmissao()),
-                        listarProcedimentosDaGuia(g)))
-                .toList();
-    }
-
-    BeneficiarioDados buscarBeneficiarioPorPrecCp(String precCp) {
-        return carregarBeneficiario(precCp)
-                .orElseThrow(() -> new BeneficiarioNaoEncontradoException(precCp));
-    }
-
-    List<ProcedimentoGuiaResponse> listarProcedimentosDaGuia(GuiaDados g) {
-        return g.procedimentos().stream()
-                .map(p -> new ProcedimentoGuiaResponse(
-                        p.atendimentoId(),
-                        p.nome(),
-                        new ProcedimentoGuiaResponse.Ocs(p.ocsCnpj(), p.ocsNome()),
-                        p.status(),
-                        p.qtdAutorizada(),
-                        p.qtdRealizada(),
-                        p.temQr()))
-                .toList();
-    }
-
-    // Validade = dataEmissao + validadeDias. Nunca devolve negativo.
-    long calcularDiasRestantes(LocalDate dataEmissao) {
-        long diasDesdeEmissao = ChronoUnit.DAYS.between(dataEmissao, LocalDate.now());
-        return Math.max(0, validadeDias - diasDesdeEmissao);
-    }
-
-    // TODO(US000-11): MOCKS TEMPORÁRIOS. Trocar por leitura real de Beneficiario/Guia/GuiaProc.
-    // Na versão real, qtdRealizada = contagem em Sessao_Procedimento.
-    // No mock, só o precCp "123456" existe; qualquer outro devolve 404.
-    private Optional<BeneficiarioDados> carregarBeneficiario(String precCp) {
-        if (!"123456".equals(precCp)) {
-            return Optional.empty();
+        List<GuiaBeneficiarioResponse> respostas = new ArrayList<>();
+        for (GuiaModel guia : guiaRepository.findByBenfIdOrderByIdDesc(precCp)) {
+            respostas.add(new GuiaBeneficiarioResponse(
+                    guia.getId(),
+                    guia.getStatus(),
+                    guia.getDataEmissao(),
+                    validadeGuiaService.calcularDiasRestantes(guia.getDataEmissao()),
+                    listarProcedimentosDaGuia(guia.getId())));
         }
-        return Optional.of(new BeneficiarioDados("123456", "Fulano"));
+        return respostas;
     }
 
-    private List<GuiaDados> carregarGuias(String precCp) {
-        return List.of(
-                new GuiaDados(4L, "EMITIDA", LocalDate.now().minusDays(8), List.of(
-                        new ProcedimentoDados(10L, "Sessão de psicoterapia", "12345678000199", "Clínica X",
-                                "EM_ANDAMENTO", 10, 3, true))),
-                // pré-guia (sem data de emissão): não deve aparecer na lista
-                new GuiaDados(7L, "PRE_GUIA", null, List.of()));
+    void buscarBeneficiarioPorPrecCp(String precCp) {
+        beneficiarioRepository.findByPrecCP(precCp)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BENEFICIARIO_NAO_ENCONTRADO));
+    }
+
+    List<ProcedimentoGuiaResponse> listarProcedimentosDaGuia(Long guiaId) {
+        List<ProcedimentoGuiaResponse> procedimentos = new ArrayList<>();
+        for (GuiaProcModel p : guiaProcRepository.findByGuiaModel_Id(guiaId)) {
+            procedimentos.add(new ProcedimentoGuiaResponse(
+                    p.getGuiaId(),
+                    p.getContratoModel().getProcedimentoModel().getNome(),
+                    new ProcedimentoGuiaResponse.Ocs(
+                            p.getContratoModel().getOcsModel().getCnpj(),
+                            p.getContratoModel().getOcsModel().getNome()),
+                    p.getStatus(),
+                    p.getQtdAutorizada(),
+                    p.getQtdRealizada(),
+                    p.getQr() != null));
+        }
+        return procedimentos;
     }
 }
