@@ -1,4 +1,4 @@
-package com.datasphere.fusex.guia.dto.request;
+package com.datasphere.fusex.preguia.dto;
 
 public record PendenciaResponse(CodigoPendencia codigo, Long atendimentoId, String mensagem) {
 
