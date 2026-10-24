@@ -4,8 +4,6 @@ import com.datasphere.fusex.beneficiario.BeneficiarioModel;
 import com.datasphere.fusex.beneficiario.BeneficiarioRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 public class BuscarBenificarioPorPrecCPService {
     private final BeneficiarioRepository beneficiarioRepository;
@@ -14,8 +12,7 @@ public class BuscarBenificarioPorPrecCPService {
         this.beneficiarioRepository = beneficiarioRepository;
     }
 
-    public BeneficiarioModel buscarBeneficioarioPorPrecCP(String precCP){
-        Optional<BeneficiarioModel> beneficiarioModelOptional = beneficiarioRepository.findByPrecCP(precCP);
-        return beneficiarioModelOptional.orElse(null);
+    public BeneficiarioModel buscarBeneficioarioPorPrecCP(String precCP) {
+        return beneficiarioRepository.findByPrecCP(precCP).orElse(null);
     }
 }

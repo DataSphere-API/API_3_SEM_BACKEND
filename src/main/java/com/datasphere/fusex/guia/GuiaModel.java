@@ -10,9 +10,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "guia")
+@Getter
+@Setter
+@NoArgsConstructor
 public class GuiaModel {
 
     @Id
@@ -26,54 +35,31 @@ public class GuiaModel {
     @JoinColumn(name = "benf_id", insertable = false, updatable = false)
     private BeneficiarioModel beneficiarioModel;
 
-    private String pdf;
-    private String data;
+    @Column(name = "med_id")
+    private Integer medId;
+
+    @Column(name = "emissor_id")
+    private Integer emissorId;
+
+    @Column(name = "chefe_id")
+    private Integer chefeId;
+
+    @Column(name = "status", nullable = false, length = 30)
     private String status;
 
-    public GuiaModel() {
-    }
+    // Data de criação da guia (coluna "Data", NOT NULL desde a V1).
+    @Column(name = "data", nullable = false)
+    private LocalDate data;
 
-    public Long getId() {
-        return id;
-    }
+    @Column(name = "data_emissao")
+    private LocalDate dataEmissao;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @Column(name = "motivo_reprovacao")
+    private String motivoReprovacao;
 
-    public String getBenfId() {
-        return benfId;
-    }
+    @Column(name = "data_aprovacao_medico")
+    private LocalDateTime dataAprovacaoMedico;
 
-    public void setBenfId(String benfId) {
-        this.benfId = benfId;
-    }
-
-    public BeneficiarioModel getBeneficiarioModel() {
-        return beneficiarioModel;
-    }
-
-    public String getPdf() {
-        return pdf;
-    }
-
-    public void setPdf(String pdf) {
-        this.pdf = pdf;
-    }
-
-    public String getData() {
-        return data;
-    }
-
-    public void setData(String data) {
-        this.data = data;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    @Column(name = "data_aprovacao_chefe")
+    private LocalDateTime dataAprovacaoChefe;
 }
