@@ -1,4 +1,11 @@
 package com.datasphere.fusex.preguia.dto;
 
-public class EmissaoResponse {
-}
+import java.time.LocalDate;
+import java.util.List;
+
+public record EmissaoResponse(
+        Long guiaId,
+        String status,
+        LocalDate dataEmissao,
+        LocalDate validoAte,
+        List<EmissaoProcedimentoResponse> procedimentos) {}

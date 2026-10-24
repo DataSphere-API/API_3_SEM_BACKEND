@@ -1,4 +1,3 @@
 package com.datasphere.fusex.preguia.dto;
 
-public class EmissaoProcedimentoResponse {
-}
+public record EmissaoProcedimentoResponse(Long atendimentoId) {}
