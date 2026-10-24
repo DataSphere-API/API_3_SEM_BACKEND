@@ -5,17 +5,15 @@ import com.datasphere.fusex.guia.GuiaRepository;
 import com.datasphere.fusex.guia.StatusGuia;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import com.datasphere.fusex.guiaProc.GuiaProcRepository;
+import com.datasphere.fusex.guiaProc.StatusProcedimento;
 import com.datasphere.fusex.historicoStatus.EntidadeTipo;
 import com.datasphere.fusex.historicoStatus.service.RegistrarMudancaStatusService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class RecalcularStatusDaGuiaService {
-
-    private static final Set<String> STATUS_REALIZADO = Set.of("REALIZADA", "REALIZADO", "FATURADA");
 
     private final GuiaProcRepository guiaProcRepository;
     private final GuiaRepository guiaRepository;
@@ -35,21 +33,32 @@ public class RecalcularStatusDaGuiaService {
 
         List<GuiaProcModel> procedimentos = guiaProcRepository.findByGuiaModel_Id(guiaId);
 
-        boolean todosRealizados = !procedimentos.isEmpty() && procedimentos.stream()
-                .allMatch(p -> p.getStatus() != null && STATUS_REALIZADO.contains(p.getStatus().toUpperCase()));
-
-        String novoStatus = todosRealizados ? "REALIZADA" : "PARCIALMENTE_REALIZADA";
         String statusAnterior = guia.getStatus();
+        String statusFinal = StatusGuia.FINALIZADA.name();
 
-        if (!todosRealizados) {
-            return statusAnterior; // a dev não tem estado parcial: segue EMITIDA
+        if (!todosRealizados(procedimentos)) {
+            return statusAnterior;
         }
 
-        if (!novoStatus.equals(statusAnterior)) {
-            guiaRepository.atualizarStatus(guiaId, novoStatus);
+        if (!statusFinal.equals(statusAnterior)) {
+            guiaRepository.atualizarStatus(guiaId, statusFinal);
             registrarMudancaStatusService.executar(EntidadeTipo.GUIA, guiaId,
-                    statusAnterior, novoStatus, "validacao-qrcode");
+                    statusAnterior, statusFinal, "validacao-qrcode");
         }
-        return novoStatus;
+        return statusFinal;
+    }
+
+    private boolean todosRealizados(List<GuiaProcModel> procedimentos) {
+        if (procedimentos.isEmpty()) {
+            return false;
+        }
+        for (GuiaProcModel p : procedimentos) {
+            boolean realizada = StatusProcedimento.REALIZADA.name().equalsIgnoreCase(p.getStatus());
+            boolean faturada = StatusProcedimento.FATURADA.name().equalsIgnoreCase(p.getStatus());
+            if (!realizada && !faturada) {
+                return false;
+            }
+        }
+        return true;
     }
 }
