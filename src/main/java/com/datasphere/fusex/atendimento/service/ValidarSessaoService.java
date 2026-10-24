@@ -3,6 +3,7 @@ package com.datasphere.fusex.atendimento.service;
 import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.guia.GuiaModel;
+import com.datasphere.fusex.guia.StatusGuia;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +13,7 @@ import java.util.Set;
 @Service
 public class ValidarSessaoService {
 
-    private static final Set<String> STATUS_GUIA_PERMITIDOS =
-            Set.of("EMITIDA", "PARCIALMENTE_REALIZADA");
+    private static final Set<String> STATUS_GUIA_PERMITIDOS = Set.of(StatusGuia.EMITIDA.name());
 
     public void validarOcsDoContrato(GuiaProcModel atendimento, String cnpjRequest) {
         if (cnpjRequest == null || cnpjRequest.isBlank()) {

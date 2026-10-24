@@ -20,9 +20,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(
-        name = "sessao",
+        name = "sessao_procedimento",
         uniqueConstraints = @UniqueConstraint(
-                name = "uk_sessao_guia_proc_numero",
+                name = "uq_sessao_guia_proc_numero",
                 columnNames = {"guia_proc_id", "numero_sessao"}
         )
 )
@@ -46,4 +46,7 @@ public class SessaoModel {
 
     @Column(name = "data_realizacao", nullable = false)
     private LocalDateTime dataRealizacao;
+
+    @Column(name = "ocs_id", nullable = false, length = 14)
+    private String ocsId;
 }

@@ -4,6 +4,6 @@ public enum EntidadeTipo {
     GUIA_PROC,
     ESPELHO,
     FATURA,
-    PRE_GUIA
+    GUIA, PRE_GUIA
 
 }

@@ -2,6 +2,7 @@ package com.datasphere.fusex.atendimento.service;
 
 import com.datasphere.fusex.guia.GuiaModel;
 import com.datasphere.fusex.guia.GuiaRepository;
+import com.datasphere.fusex.guia.StatusGuia;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import com.datasphere.fusex.guiaProc.GuiaProcRepository;
 import com.datasphere.fusex.historicoStatus.EntidadeTipo;
@@ -28,7 +29,7 @@ public class RecalcularStatusDaGuiaService {
         this.registrarMudancaStatusService = registrarMudancaStatusService;
     }
 
-    public String recalcularStatusDaGuia (Long guiaId) {
+    public String recalcularStatusDaGuia(Long guiaId) {
         GuiaModel guia = guiaRepository.findByIdParaAtualizar(guiaId)
                 .orElseThrow(() -> new IllegalStateException("Guia não encontrada: " + guiaId));
 
@@ -39,6 +40,10 @@ public class RecalcularStatusDaGuiaService {
 
         String novoStatus = todosRealizados ? "REALIZADA" : "PARCIALMENTE_REALIZADA";
         String statusAnterior = guia.getStatus();
+
+        if (!todosRealizados) {
+            return statusAnterior; // a dev não tem estado parcial: segue EMITIDA
+        }
 
         if (!novoStatus.equals(statusAnterior)) {
             guiaRepository.atualizarStatus(guiaId, novoStatus);

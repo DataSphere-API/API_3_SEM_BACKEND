@@ -3,5 +3,6 @@ package com.datasphere.fusex.guiaProc;
 public enum StatusProcedimento {
     PENDENTE,
     REALIZADA,
-    FATURADA
+    FATURADA,
+    EM_ANDAMENTO
 }

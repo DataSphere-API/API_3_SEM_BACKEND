@@ -8,6 +8,7 @@ import com.datasphere.fusex.dto.request.SessaoResponse;
 import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import com.datasphere.fusex.guiaProc.GuiaProcRepository;
+import com.datasphere.fusex.guiaProc.StatusProcedimento;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 @Service
 public class RegistrarSessaoService {
 
-    private static final String STATUS_EM_ANDAMENTO = "EM_ANDAMENTO";
+    private static final String STATUS_EM_ANDAMENTO = StatusProcedimento.EM_ANDAMENTO.name();
 
     private final GuiaProcRepository guiaProcRepository;
     private final SessaoRepository sessaoRepository;
@@ -58,6 +59,7 @@ public class RegistrarSessaoService {
         sessao.setGuiaProc(atendimento);
         sessao.setNumeroSessao(proximoNumero);
         sessao.setDataRealizacao(agora);
+        sessao.setOcsId(request.cnpj().trim());
         sessaoRepository.save(sessao);
 
         int novaQtdRealizada = atendimento.getQtdRealizada() + 1;

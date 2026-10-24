@@ -50,35 +50,34 @@ class RecalcularStatusDaGuiaServiceTest {
     }
 
     @Test
-    void todosRealizados_guiaFicaRealizada() {
+    void todosRealizados_guiaFicaFinalizada() {
         when(guiaRepository.findByIdParaAtualizar(11L)).thenReturn(Optional.of(guia("EMITIDA")));
         when(guiaProcRepository.findByGuiaModel_Id(11L)).thenReturn(List.of(proc("Realizada"), proc("Realizada")));
 
-        assertEquals("REALIZADA", service.recalcularStatusDaGuia(11L));
+        assertEquals("FINALIZADA", service.recalcularStatusDaGuia(11L));
 
-        verify(guiaRepository).atualizarStatus(11L, "REALIZADA");
+        verify(guiaRepository).atualizarStatus(11L, "FINALIZADA");
         verify(registrarMudancaStatusService)
-                .executar(EntidadeTipo.GUIA, 11L, "EMITIDA", "REALIZADA", "validacao-qrcode");
+                .executar(EntidadeTipo.GUIA, 11L, "EMITIDA", "FINALIZADA", "validacao-qrcode");
     }
 
     @Test
-    void umProcedimentoPendente_guiaFicaParcialmenteRealizada() {
+    void umProcedimentoPendente_guiaFicaEmitida() {
         when(guiaRepository.findByIdParaAtualizar(11L)).thenReturn(Optional.of(guia("EMITIDA")));
         when(guiaProcRepository.findByGuiaModel_Id(11L)).thenReturn(List.of(proc("Realizada"), proc("Pendente")));
 
-        assertEquals("PARCIALMENTE_REALIZADA", service.recalcularStatusDaGuia(11L));
+        assertEquals("EMITIDA", service.recalcularStatusDaGuia(11L));
 
-        verify(guiaRepository).atualizarStatus(11L, "PARCIALMENTE_REALIZADA");
-        verify(registrarMudancaStatusService)
-                .executar(EntidadeTipo.GUIA, 11L, "EMITIDA", "PARCIALMENTE_REALIZADA", "validacao-qrcode");
+        verify(guiaRepository, never()).atualizarStatus(anyLong(), anyString());
+        verifyNoInteractions(registrarMudancaStatusService);
     }
 
     @Test
     void statusJaCorreto_naoGravaNemRegistraHistorico() {
-        when(guiaRepository.findByIdParaAtualizar(11L)).thenReturn(Optional.of(guia("REALIZADA")));
+        when(guiaRepository.findByIdParaAtualizar(11L)).thenReturn(Optional.of(guia("FINALIZADA")));
         when(guiaProcRepository.findByGuiaModel_Id(11L)).thenReturn(List.of(proc("Realizada")));
 
-        assertEquals("REALIZADA", service.recalcularStatusDaGuia(11L));
+        assertEquals("FINALIZADA", service.recalcularStatusDaGuia(11L));
 
         verify(guiaRepository, never()).atualizarStatus(anyLong(), anyString());
         verifyNoInteractions(registrarMudancaStatusService);

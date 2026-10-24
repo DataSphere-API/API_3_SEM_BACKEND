@@ -2,6 +2,7 @@ package com.datasphere.fusex.atendimento.service;
 
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import com.datasphere.fusex.guiaProc.GuiaProcRepository;
+import com.datasphere.fusex.guiaProc.StatusProcedimento;
 import com.datasphere.fusex.historicoStatus.EntidadeTipo;
 import com.datasphere.fusex.historicoStatus.service.RegistrarMudancaStatusService;
 import org.springframework.stereotype.Service;
@@ -23,12 +24,12 @@ public class AtualizarStatusGuiaProcRealizadaService {
 
     public GuiaProcModel atualizarStatusGuiaProcRealizada (GuiaProcModel procedimento) {
         String statusAnterior = procedimento.getStatus();
-        procedimento.setStatus("Realizada");
+        procedimento.setStatus(StatusProcedimento.REALIZADA.name());
         procedimento.setDataValidacao(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         GuiaProcModel salvo = guiaProcRepository.save (procedimento);
 
         registrarMudancaStatusService.executar(EntidadeTipo.GUIA_PROC, salvo.getGuiaId(),
-                statusAnterior, "Realizada", "validacao-qrcode");
+                statusAnterior, StatusProcedimento.REALIZADA.name(), "validacao-qrcode");
         return salvo;
     }
 }

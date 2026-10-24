@@ -111,7 +111,7 @@ class RegistrarRealizacaoServiceTest {
         GuiaProcModel p = procedimento(1, 0);
         when(guiaProcRepository.findByQrParaBaixa(QR)).thenReturn(Optional.of(p));
         simularAtualizacao();
-        when(recalcularStatusDaGuia.recalcularStatusDaGuia(4L)).thenReturn("REALIZADA");
+        when(recalcularStatusDaGuia.recalcularStatusDaGuia(4L)).thenReturn("FINALIZADA");
 
         BaixaResponse r = service.registrarRealizacao(REQUEST);
 
@@ -123,7 +123,7 @@ class RegistrarRealizacaoServiceTest {
         assertEquals(1, r.qtdAutorizada());
         assertEquals(1, r.qtdRealizada());
         assertNotNull(r.dataValidacao());
-        assertEquals("REALIZADA", r.statusGuia());
+        assertEquals("FINALIZADA", r.statusGuia());
     }
 
     @Test
@@ -131,13 +131,13 @@ class RegistrarRealizacaoServiceTest {
         GuiaProcModel p = procedimento(10, 10);
         when(guiaProcRepository.findByQrParaBaixa(QR)).thenReturn(Optional.of(p));
         simularAtualizacao();
-        when(recalcularStatusDaGuia.recalcularStatusDaGuia(4L)).thenReturn("PARCIALMENTE_REALIZADA");
+        when(recalcularStatusDaGuia.recalcularStatusDaGuia(4L)).thenReturn("EMITIDA");
 
         BaixaResponse r = service.registrarRealizacao(REQUEST);
 
         assertEquals(10, r.qtdAutorizada());
         assertEquals(10, r.qtdRealizada());
         assertEquals("Realizada", r.statusProcedimento());
-        assertEquals("PARCIALMENTE_REALIZADA", r.statusGuia());
+        assertEquals("EMITIDA", r.statusGuia());
     }
 }

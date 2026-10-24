@@ -63,7 +63,7 @@ class BaixaQrControllerTest {
     @Test
     void baixaConcluida_retorna200ComTodosOsCamposDoBaixaResponse() throws Exception {
         BaixaResponse resposta = new BaixaResponse(
-                10L, "Realizada", 10, 10, LocalDateTime.of(2026, 11, 20, 10, 5), "PARCIALMENTE_REALIZADA");
+                10L, "Realizada", 10, 10, LocalDateTime.of(2026, 11, 20, 10, 5), "EMITIDA");
         when(registrarRealizacaoService.registrarRealizacao(any(ValidarQrCodeRequest.class))).thenReturn(resposta);
 
         mockMvc.perform(post("/atendimentos/validar-qrcode")
@@ -75,7 +75,7 @@ class BaixaQrControllerTest {
                 .andExpect(jsonPath("$.qtdAutorizada").value(10))
                 .andExpect(jsonPath("$.qtdRealizada").value(10))
                 .andExpect(jsonPath("$.dataValidacao").exists())
-                .andExpect(jsonPath("$.statusGuia").value("PARCIALMENTE_REALIZADA"));
+                .andExpect(jsonPath("$.statusGuia").value("EMITIDA"));
     }
 
     @Test
