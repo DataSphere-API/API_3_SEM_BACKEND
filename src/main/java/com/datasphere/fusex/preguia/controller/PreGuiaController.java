@@ -2,6 +2,7 @@ package com.datasphere.fusex.preguia.controller;
 
 import com.datasphere.fusex.preguia.dto.AprovacaoResponse;
 import com.datasphere.fusex.preguia.dto.EmissaoResponse;
+import com.datasphere.fusex.preguia.dto.PacoteSireResponse;
 import com.datasphere.fusex.preguia.dto.PreGuiaDetalheResponse;
 import com.datasphere.fusex.preguia.dto.PreGuiaResumoResponse;
 import com.datasphere.fusex.preguia.dto.ReprovarRequest;
@@ -9,9 +10,13 @@ import com.datasphere.fusex.preguia.dto.ValidarPreGuiaResponse;
 import com.datasphere.fusex.preguia.service.AprovarPreGuiaService;
 import com.datasphere.fusex.preguia.service.DetalharPreGuiaService;
 import com.datasphere.fusex.preguia.service.EmitirGuiaService;
+import com.datasphere.fusex.preguia.service.GerarDocumentoConferenciaService;
 import com.datasphere.fusex.preguia.service.ListarPreGuiasService;
+import com.datasphere.fusex.preguia.service.MontarPacoteSireService;
 import com.datasphere.fusex.preguia.service.ReprovarPreGuiaService;
 import com.datasphere.fusex.preguia.service.ValidarPreGuiaService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -35,19 +40,25 @@ public class PreGuiaController {
     private final AprovarPreGuiaService aprovarPreGuiaService;
     private final ReprovarPreGuiaService reprovarPreGuiaService;
     private final EmitirGuiaService emitirGuiaService;
+    private final MontarPacoteSireService montarPacoteSireService;
+    private final GerarDocumentoConferenciaService gerarDocumentoConferenciaService;
 
     public PreGuiaController(ListarPreGuiasService listarPreGuiasService,
                              DetalharPreGuiaService detalharPreGuiaService,
                              ValidarPreGuiaService validarPreGuiaService,
                              AprovarPreGuiaService aprovarPreGuiaService,
                              ReprovarPreGuiaService reprovarPreGuiaService,
-                             EmitirGuiaService emitirGuiaService) {
+                             EmitirGuiaService emitirGuiaService,
+                             MontarPacoteSireService montarPacoteSireService,
+                             GerarDocumentoConferenciaService gerarDocumentoConferenciaService) {
         this.listarPreGuiasService = listarPreGuiasService;
         this.detalharPreGuiaService = detalharPreGuiaService;
         this.validarPreGuiaService = validarPreGuiaService;
         this.aprovarPreGuiaService = aprovarPreGuiaService;
         this.reprovarPreGuiaService = reprovarPreGuiaService;
         this.emitirGuiaService = emitirGuiaService;
+        this.montarPacoteSireService = montarPacoteSireService;
+        this.gerarDocumentoConferenciaService = gerarDocumentoConferenciaService;
     }
 
     @GetMapping("/pre-guias")
@@ -89,5 +100,19 @@ public class PreGuiaController {
     @PostMapping("/pre-guias/{id}/emitir")
     public ResponseEntity<EmissaoResponse> emitir(@PathVariable Long id) {
         return ResponseEntity.ok(emitirGuiaService.emitir(id));
+    }
+
+    @GetMapping("/pre-guias/{id}/pacote-sire")
+    public ResponseEntity<PacoteSireResponse> pacoteSire(@PathVariable Long id) {
+        return ResponseEntity.ok(montarPacoteSireService.montarPacote(id));
+    }
+
+    @GetMapping("/pre-guias/{id}/documento-conferencia")
+    public ResponseEntity<byte[]> documentoConferencia(@PathVariable Long id) {
+        byte[] pdf = gerarDocumentoConferenciaService.gerarDocumento(id);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=pre-guia-" + id + ".pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
     }
 }
