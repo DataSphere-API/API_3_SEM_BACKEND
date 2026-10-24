@@ -1,4 +1,3 @@
 package com.datasphere.fusex.preguia.dto;
 
-public class ReprovarRequest {
-}
+public record ReprovarRequest(String motivo) {}
