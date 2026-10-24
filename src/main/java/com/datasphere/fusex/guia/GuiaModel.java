@@ -10,9 +10,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "guia")
+@Getter
+@Setter
+@NoArgsConstructor
 public class GuiaModel {
 
     @Id
@@ -26,54 +34,17 @@ public class GuiaModel {
     @JoinColumn(name = "benf_id", insertable = false, updatable = false)
     private BeneficiarioModel beneficiarioModel;
 
-    private String pdf;
-    private String data;
+    @Column(name = "med_id")
+    private Integer medId;
+
+    @Column(name = "emissor_id")
+    private Integer emissorId;
+
+    @Column(name = "chefe_id")
+    private Integer chefeId;
+
+    @Column(name = "data_emissao")
+    private LocalDate dataEmissao;
+
     private String status;
-
-    public GuiaModel() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getBenfId() {
-        return benfId;
-    }
-
-    public void setBenfId(String benfId) {
-        this.benfId = benfId;
-    }
-
-    public BeneficiarioModel getBeneficiarioModel() {
-        return beneficiarioModel;
-    }
-
-    public String getPdf() {
-        return pdf;
-    }
-
-    public void setPdf(String pdf) {
-        this.pdf = pdf;
-    }
-
-    public String getData() {
-        return data;
-    }
-
-    public void setData(String data) {
-        this.data = data;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 }

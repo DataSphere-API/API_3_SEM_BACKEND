@@ -4,5 +4,6 @@ public enum StatusProcedimento {
     PENDENTE,
     REALIZADA,
     FATURADA,
-    EM_ANDAMENTO
+    EM_ANDAMENTO,
+    EXPIRADA
 }
