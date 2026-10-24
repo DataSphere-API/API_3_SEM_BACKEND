@@ -40,6 +40,13 @@ public class HistoricoStatusModel {
     @Column(name = "origem", nullable = false, length = 50)
     private String origem;
 
-    public HistoricoStatusModel(EntidadeTipo tipo, Long entidadeId, String statusAnterior, String statusNovo, String origem) {
+    public HistoricoStatusModel(EntidadeTipo tipo, Long entidadeId, String statusAnterior,
+                                String statusNovo, String origem) {
+        this.entidadeTipo = tipo;
+        this.entidadeId = entidadeId;
+        this.statusAnterior = statusAnterior;
+        this.statusNovo = statusNovo;
+        this.origem = origem;
+        this.data = LocalDateTime.now();
     }
 }

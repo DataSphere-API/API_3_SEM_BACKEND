@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "guia_proc")
@@ -21,7 +22,7 @@ public class GuiaProcModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long guiaId; // na prática é o id do atendimento (guia_proc.id)
+    private Long guiaId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cont_id", nullable = false)
@@ -43,4 +44,7 @@ public class GuiaProcModel {
 
     @Column(name = "data_validade")
     private LocalDate dataValidade;
+
+    public void setDataValidacao(LocalDateTime localDateTime) {
+    }
 }
