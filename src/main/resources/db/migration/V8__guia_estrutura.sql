@@ -14,8 +14,8 @@ ALTER TABLE Guia
 UPDATE Guia_Proc SET Status = UPPER(Status);
 
 ALTER TABLE Guia_Proc
-    ADD COLUMN Qtd_Autorizada INT NOT NULL DEFAULT 1,
-    ADD COLUMN Data_Validacao TIMESTAMP,
+    ADD COLUMN IF NOT EXISTS Qtd_Autorizada INT NOT NULL DEFAULT 1,
+    ADD COLUMN IF NOT EXISTS Data_Validacao TIMESTAMP,
     ADD CONSTRAINT ck_guia_proc_qtd_autorizada CHECK (Qtd_Autorizada > 0);
 
 CREATE TABLE Sessao_Procedimento (
@@ -34,3 +34,4 @@ CREATE TABLE Sessao_Procedimento (
                                          REFERENCES Ocs (CNPJ)
                                          ON UPDATE CASCADE ON DELETE RESTRICT
 );
+
