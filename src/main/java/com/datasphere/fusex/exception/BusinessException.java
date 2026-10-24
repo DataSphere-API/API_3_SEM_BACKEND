@@ -19,6 +19,13 @@ public class BusinessException extends RuntimeException {
         this.detalhes = detalhes;
     }
 
+    // Mensagem específica do caso (ex.: nome do procedimento sem contrato).
+    public BusinessException(ErrorCode errorCode, String mensagem) {
+        super(mensagem);
+        this.errorCode = errorCode;
+        this.detalhes = Map.of();
+    }
+
     public ErrorCode getErrorCode() {
         return errorCode;
     }
