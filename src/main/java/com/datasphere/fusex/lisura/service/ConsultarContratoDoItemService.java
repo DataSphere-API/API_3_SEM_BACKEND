@@ -1,6 +1,5 @@
 package com.datasphere.fusex.lisura.service;
 
-import com.datasphere.fusex.contrato.ContratoModel;
 import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import com.datasphere.fusex.guiaProc.GuiaProcRepository;
@@ -15,13 +14,7 @@ public class ConsultarContratoDoItemService {
         this.guiaProcRepository = guiaProcRepository;
     }
 
-    public ContratoModel consultarContratoDoItem(EspelhoItemModel item) {
-        GuiaProcModel guiaProc = guiaProcRepository.findById(item.getAtendimentoId()).orElse(null);
-
-        if (guiaProc == null) {
-            return null;
-        }
-
-        return guiaProc.getContratoModel();
+    public GuiaProcModel consultarAtendimentoDoItem(EspelhoItemModel item) {
+        return guiaProcRepository.findById(item.getAtendimentoId()).orElse(null);
     }
 }
