@@ -38,7 +38,7 @@ public class RecalcularStatusDaGuiaService {
         boolean todosRealizados = !procedimentos.isEmpty() && procedimentos.stream()
                 .allMatch(p -> p.getStatus() != null && STATUS_REALIZADO.contains(p.getStatus().toUpperCase()));
 
-        String novoStatus = todosRealizados ? "REALIZADA" : "PARCIALMENTE_REALIZADA";
+        String novoStatus = todosRealizados ? "FINALIZADA" : "PARCIALMENTE_REALIZADA";
         String statusAnterior = guia.getStatus();
 
         if (!todosRealizados) {
