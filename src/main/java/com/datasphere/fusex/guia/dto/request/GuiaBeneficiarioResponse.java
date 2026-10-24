@@ -8,4 +8,4 @@ public record GuiaBeneficiarioResponse(
         String status,
         LocalDate dataEmissao,
         long diasRestantes,
-        List<ProcedimentoGuiaResponse> procedimAentos) {}
+        List<ProcedimentoGuiaResponse> procedimentos) {}

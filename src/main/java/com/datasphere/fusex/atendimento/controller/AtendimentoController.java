@@ -3,12 +3,12 @@ package com.datasphere.fusex.atendimento.controller;
 import com.datasphere.fusex.atendimento.service.ListarAtendimentosPorOcs;
 import com.datasphere.fusex.atendimento.service.RegistrarRealizacaoService;
 import com.datasphere.fusex.atendimento.service.RegistrarSessaoService;
+import com.datasphere.fusex.dto.request.AtendimentoResponse;
 import com.datasphere.fusex.dto.request.BaixaResponse;
 import com.datasphere.fusex.dto.request.ConferenciaQrResponse;
 import com.datasphere.fusex.dto.request.SessaoRequest;
 import com.datasphere.fusex.dto.request.SessaoResponse;
 import com.datasphere.fusex.dto.request.ValidarQrCodeRequest;
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import com.datasphere.fusex.service.ValidacaoQrService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,14 +62,7 @@ public class AtendimentoController {
     }
 
     @GetMapping("/ocs/{cnpj}/atendimentos")
-    public ResponseEntity<?> listarAtendimentosPorOcs(@PathVariable String cnpj) {
-        List<GuiaProcModel> guiaProcModelList = listarAtendimentosPorOcs.listarAtendimentosPorOcs(cnpj);
-
-        if (guiaProcModelList.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("nenhum atendimento encontrado");
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(guiaProcModelList);
+    public ResponseEntity<List<AtendimentoResponse>> listarAtendimentosPorOcs(@PathVariable String cnpj) {
+        return ResponseEntity.ok(listarAtendimentosPorOcs.listarAtendimentosPorOcs(cnpj));
     }
 }

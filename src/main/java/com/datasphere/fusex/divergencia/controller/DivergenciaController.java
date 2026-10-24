@@ -1,10 +1,11 @@
 package com.datasphere.fusex.divergencia.controller;
 
 import com.datasphere.fusex.divergencia.dto.DivergenciasResponse;
+import com.datasphere.fusex.domain.enums.ErrorCode;
+import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.divergencia.service.ConsolidarDivergenciasService;
 import com.datasphere.fusex.fatura.FaturaModel;
 import com.datasphere.fusex.fatura.service.BuscarFaturaPorIdService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,14 +24,13 @@ public class DivergenciaController {
     }
 
     @GetMapping("/faturas/{id}/divergencias")
-    public ResponseEntity<?> consultarDivergencias(@PathVariable Long id) {
+    public ResponseEntity<DivergenciasResponse> consultarDivergencias(@PathVariable Long id) {
         FaturaModel fatura = buscarFaturaPorIdService.buscarFaturaPorId(id);
 
         if (fatura == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("FATURA_NAO_ENCONTRADA");
+            throw new BusinessException(ErrorCode.FATURA_NAO_ENCONTRADA);
         }
 
-        DivergenciasResponse resposta = consolidarDivergenciasService.consolidarDivergencias(fatura);
-        return ResponseEntity.ok(resposta);
+        return ResponseEntity.ok(consolidarDivergenciasService.consolidarDivergencias(fatura));
     }
 }

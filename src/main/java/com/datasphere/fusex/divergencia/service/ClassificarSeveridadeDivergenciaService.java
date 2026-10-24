@@ -20,7 +20,9 @@ public class ClassificarSeveridadeDivergenciaService {
         this.limiteMedia = limiteMedia;
     }
 
-    public SeveridadeDivergencia classificarSeveridadeDivergencia(BigDecimal divergencia, BigDecimal valorContratado) {
+    public SeveridadeDivergencia classificarSeveridadeDivergencia(BigDecimal divergenciaComSinal, BigDecimal valorContratado) {
+        BigDecimal divergencia = divergenciaComSinal.abs();
+
         if (valorContratado.compareTo(BigDecimal.ZERO) <= 0) {
             if (divergencia.compareTo(BigDecimal.ZERO) > 0) {
                 return SeveridadeDivergencia.ALTA;

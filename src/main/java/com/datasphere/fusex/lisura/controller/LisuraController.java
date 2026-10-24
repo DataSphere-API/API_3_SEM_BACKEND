@@ -1,10 +1,11 @@
 package com.datasphere.fusex.lisura.controller;
 
+import com.datasphere.fusex.domain.enums.ErrorCode;
+import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.fatura.FaturaModel;
 import com.datasphere.fusex.fatura.service.BuscarFaturaPorIdService;
 import com.datasphere.fusex.lisura.dto.LisuraResponse;
 import com.datasphere.fusex.lisura.service.GerarLisuraDaFaturaService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,14 +24,13 @@ public class LisuraController {
     }
 
     @GetMapping("/faturas/{id}/lisura")
-    public ResponseEntity<?> consultarLisura(@PathVariable Long id) {
+    public ResponseEntity<LisuraResponse> consultarLisura(@PathVariable Long id) {
         FaturaModel fatura = buscarFaturaPorIdService.buscarFaturaPorId(id);
 
         if (fatura == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("FATURA_NAO_ENCONTRADA");
+            throw new BusinessException(ErrorCode.FATURA_NAO_ENCONTRADA);
         }
 
-        LisuraResponse resposta = gerarLisuraDaFaturaService.gerarLisuraDaFatura(fatura);
-        return ResponseEntity.ok(resposta);
+        return ResponseEntity.ok(gerarLisuraDaFaturaService.gerarLisuraDaFatura(fatura));
     }
 }

@@ -5,11 +5,13 @@ import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
 import com.datasphere.fusex.espelhoItem.EspelhoItemRepository;
 import com.datasphere.fusex.fatura.FaturaModel;
+import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import com.datasphere.fusex.lisura.dto.LisuraItemResponse;
 import com.datasphere.fusex.lisura.dto.LisuraResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,8 +43,17 @@ public class GerarLisuraDaFaturaService {
         List<LisuraItemResponse> itensAvaliados = new ArrayList<>();
 
         for (EspelhoItemModel item : itensDoEspelho) {
-            ContratoModel contrato = consultarContratoDoItemService.consultarContratoDoItem(item);
-            itensAvaliados.add(avaliarAutorizacaoDoItemService.avaliarAutorizacaoDoItem(item, contrato, ocsId));
+            GuiaProcModel atendimento = consultarContratoDoItemService.consultarAtendimentoDoItem(item);
+
+            ContratoModel contrato = null;
+            LocalDate dataValidade = null;
+            if (atendimento != null) {
+                contrato = atendimento.getContratoModel();
+                dataValidade = atendimento.getDataValidade();
+            }
+
+            itensAvaliados.add(avaliarAutorizacaoDoItemService
+                    .avaliarAutorizacaoDoItem(item, contrato, ocsId, dataValidade));
         }
 
         return new LisuraResponse(fatura.getId(), itensAvaliados);
