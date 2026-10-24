@@ -1,8 +1,10 @@
 package com.datasphere.fusex.preguia;
 
 public enum StatusPreGuia {
-    VALIDADA,
+    PRE_GUIA,
     COM_PENDENCIAS,
+    VALIDADA,
     APROVADA,
-    REPROVADA
+    REPROVADA,
+    EMITIDA
 }
