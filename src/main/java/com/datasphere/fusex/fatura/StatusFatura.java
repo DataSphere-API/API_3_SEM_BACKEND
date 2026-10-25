@@ -1,6 +1,7 @@
 package com.datasphere.fusex.fatura;
 
-    public enum StatusFatura {
-        ATIVA,
-        REGERADA
-    }
+public enum StatusFatura {
+    ATIVA,
+    REGERADA,
+    ENCAMINHADA_APROVACAO
+}

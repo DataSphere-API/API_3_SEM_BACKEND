@@ -2,6 +2,7 @@ package com.datasphere.fusex.fatura.service;
 
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import com.datasphere.fusex.guiaProc.GuiaProcRepository;
+import com.datasphere.fusex.guiaProc.StatusProcedimento;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,7 +15,7 @@ public class AtualizarStatusGuiaProcParaFaturadaService {
     }
 
     public GuiaProcModel atualizarStatusGuiaProcParaFaturada(GuiaProcModel procedimento) {
-        procedimento.setStatus("Faturada");
+        procedimento.setStatus(StatusProcedimento.FATURADA.name());
         return guiaProcRepository.save(procedimento);
     }
 }

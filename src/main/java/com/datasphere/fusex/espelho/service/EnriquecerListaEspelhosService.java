@@ -1,6 +1,7 @@
 package com.datasphere.fusex.espelho.service;
 
 import com.datasphere.fusex.espelho.EspelhoModel;
+import com.datasphere.fusex.espelho.dto.EspelhoResumoResponse;
 import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
 import com.datasphere.fusex.espelhoItem.EspelhoItemRepository;
 import com.datasphere.fusex.ocs.OcsModel;
@@ -8,6 +9,7 @@ import com.datasphere.fusex.ocs.OcsRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,10 +26,10 @@ public class EnriquecerListaEspelhosService {
         this.espelhoItemRepository = espelhoItemRepository;
     }
 
-    public void enriquecer(List<EspelhoModel> espelhos) {
+    public List<EspelhoResumoResponse> enriquecer(List<EspelhoModel> espelhos) {
 
         if (espelhos.isEmpty()) {
-            return;
+            return List.of();
         }
 
         Map<String, String> nomesPorCnpj = ocsRepository.findAllById(
@@ -40,11 +42,11 @@ public class EnriquecerListaEspelhosService {
                 OcsModel::getNome
         ));
 
+        List<EspelhoResumoResponse> resumos = new ArrayList<>();
+
         for (EspelhoModel espelho : espelhos) {
 
-            espelho.setOcsNome(
-                    nomesPorCnpj.get(espelho.getOcsId())
-            );
+            String ocsNome = nomesPorCnpj.get(espelho.getOcsId());
 
             List<EspelhoItemModel> itens =
                     espelhoItemRepository.findByEspelhoId(espelho.getId());
@@ -54,8 +56,9 @@ public class EnriquecerListaEspelhosService {
                     .filter(valor -> valor != null)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            espelho.setQuantidadeItens(itens.size());
-            espelho.setValorTotal(valorTotal);
+            resumos.add(EspelhoResumoResponse.from(espelho, ocsNome, itens.size(), valorTotal));
         }
+
+        return resumos;
     }
 }

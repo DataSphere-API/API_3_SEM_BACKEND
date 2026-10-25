@@ -14,7 +14,7 @@ public class BuscarBenificarioPorPrecCPService {
         this.beneficiarioRepository = beneficiarioRepository;
     }
 
-    public BeneficiarioModel buscarBeneficioarioPorPrecCP(Integer precCP){
+    public BeneficiarioModel buscarBeneficioarioPorPrecCP(String precCP){
         Optional<BeneficiarioModel> beneficiarioModelOptional = beneficiarioRepository.findByPrecCP(precCP);
         return beneficiarioModelOptional.orElse(null);
     }

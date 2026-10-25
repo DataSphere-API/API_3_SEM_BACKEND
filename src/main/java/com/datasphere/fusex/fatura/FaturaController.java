@@ -2,8 +2,8 @@ package com.datasphere.fusex.fatura;
 
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.service.BuscarEspelhoPorIdService;
-import com.datasphere.fusex.fatura.request.FaturaRequest;
-import com.datasphere.fusex.fatura.request.FaturaResponse;
+import com.datasphere.fusex.fatura.dto.FaturaRequest;
+import com.datasphere.fusex.fatura.dto.FaturaResponse;
 import com.datasphere.fusex.fatura.service.BuscarFaturaPorIdService;
 import com.datasphere.fusex.fatura.service.GerarFaturaDeEspelhoService;
 import com.datasphere.fusex.fatura.service.ListarFaturasPorStatusService;
