@@ -1,2 +1,3 @@
 [submodule "frontend"]
-	url = git@github.com:DataSphere-API/API_3_SEM_BACKEND.git
+	path = frontend
+	url = https://github.com/DataSphere-API/API_3_SEM_FRONTEND.git
