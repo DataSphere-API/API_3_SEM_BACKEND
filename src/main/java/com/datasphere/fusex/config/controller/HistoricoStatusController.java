@@ -1,8 +1,8 @@
-package com.datasphare.fusex.controller;
+package com.datasphere.fusex.controller;
 
-import com.datasphare.fusex.domain.enums.EntidadeTipo;
-import com.datasphare.fusex.dto.HistoricoStatusResponse;
-import com.datasphare.fusex.service.HistoricoStatusService;
+import com.datasphere.fusex.domain.enums.EntidadeTipo;
+import com.datasphere.fusex.dto.HistoricoStatusResponse;
+import com.datasphere.fusex.service.HistoricoStatusService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

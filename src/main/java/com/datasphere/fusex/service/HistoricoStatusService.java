@@ -1,8 +1,8 @@
-package com.datasphare.fusex.service;
+package com.datasphere.fusex.service;
 
-import com.datasphare.fusex.domain.HistoricoStatus;
-import com.datasphare.fusex.domain.enums.EntidadeTipo;
-import com.datasphare.fusex.repository.HistoricoStatusRepository;
+import com.datasphere.fusex.domain.HistoricoStatus;
+import com.datasphere.fusex.domain.enums.EntidadeTipo;
+import com.datasphere.fusex.repository.HistoricoStatusRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
