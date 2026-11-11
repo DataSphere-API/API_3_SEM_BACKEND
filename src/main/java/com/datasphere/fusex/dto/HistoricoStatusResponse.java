@@ -1,7 +1,7 @@
 package com.datasphere.fusex.dto;
 
 import com.datasphere.fusex.domain.HistoricoStatus;
-import com.datasphere.fusex.domain.enums.EntidadeTipo;
+import com.datasphere.fusex.historicoStatus.EntidadeTipo;
 import java.time.LocalDateTime;
 
 public record HistoricoStatusResponse(

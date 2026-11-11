@@ -94,10 +94,18 @@ public class MontarPacoteSireService {
         if (medico == null) {
             return new PacoteSireResponse.Medico(null, null);
         }
-        BeneficiarioModel pessoa = beneficiarioRepository.findByPrecCP(medico.getBenefId()).orElse(null);
         String nome = null;
-        if (pessoa != null) {
-            nome = pessoa.getNome();
+        if (medico.getBenefId() != null && !medico.getBenefId().isBlank()) {
+            try {
+                BeneficiarioModel pessoa = beneficiarioRepository
+                        .findByPrecCP(Integer.valueOf(medico.getBenefId().trim()))
+                        .orElse(null);
+                if (pessoa != null) {
+                    nome = pessoa.getNome();
+                }
+            } catch (NumberFormatException e) {
+                nome = null;
+            }
         }
         return new PacoteSireResponse.Medico(medico.getCrm(), nome);
     }

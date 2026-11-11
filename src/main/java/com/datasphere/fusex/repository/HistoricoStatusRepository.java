@@ -1,7 +1,7 @@
 package com.datasphere.fusex.repository;
 
 import com.datasphere.fusex.domain.HistoricoStatus;
-import com.datasphere.fusex.domain.enums.EntidadeTipo;
+import com.datasphere.fusex.historicoStatus.EntidadeTipo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

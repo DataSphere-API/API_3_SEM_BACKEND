@@ -7,7 +7,7 @@ import com.datasphere.fusex.guia.GuiaModel;
 import com.datasphere.fusex.guia.service.ValidadeGuiaService;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import com.datasphere.fusex.guiaProc.GuiaProcRepository;
-import ;
+import com.datasphere.fusex.historicoStatus.EntidadeTipo;
 import com.datasphere.fusex.historicoStatus.service.RegistrarMudancaStatusService;
 import com.datasphere.fusex.preguia.PreGuiaProcModel;
 import com.datasphere.fusex.preguia.PreGuiaProcRepository;

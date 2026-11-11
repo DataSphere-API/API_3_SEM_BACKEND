@@ -1,6 +1,6 @@
 package com.datasphere.fusex.domain;
 
-import com.datasphere.fusex.domain.enums.EntidadeTipo;
+import com.datasphere.fusex.historicoStatus.EntidadeTipo;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 

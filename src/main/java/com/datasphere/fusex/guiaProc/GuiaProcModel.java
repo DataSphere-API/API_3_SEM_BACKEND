@@ -1,52 +1,50 @@
 package com.datasphere.fusex.guiaProc;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.datasphere.fusex.contrato.ContratoModel;
+import com.datasphere.fusex.guia.GuiaModel;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
-
+@Table(name = "guia_proc")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class GuiaProcModel {
+
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long guiaId;
-    private Long contId;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "cont_id", nullable = false)
+    private ContratoModel contratoModel;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "guia_id")
+    private GuiaModel guiaModel;
+
     private String qr;
+
     private String status;
 
-    public GuiaProcModel() {
-    }
+    @Column(name = "qtd_autorizada", nullable = false)
+    private Integer qtdAutorizada;
 
-    public String getQr () {
-        return qr;
-    }
+    @Column(name = "qtd_realizada", nullable = false)
+    private Integer qtdRealizada;
 
-    public void setQr (String qr) {
-        this.qr = qr;
-    }
+    @Column(name = "data_validade")
+    private LocalDate dataValidade;
 
-    public Long getGuiaId() {
-        return guiaId;
-    }
-
-    public void setGuiaId (Long guiaId) {
-        this.guiaId = guiaId;
-    }
-
-    public Long getContId () {
-        return contId;
-    }
-
-    public void setContId (Long contId) {
-        this.contId = contId;
-    }
-
-    public String getStatus () {
-        return status;
-    }
-
-    public void setStatus (String status) {
-        this.status = status;
-    }
+    @Column(name = "data_validacao")
+    private LocalDateTime dataValidacao;
 }
