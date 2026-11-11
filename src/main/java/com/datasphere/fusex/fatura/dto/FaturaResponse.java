@@ -25,7 +25,7 @@ public record FaturaResponse(
 
         return new FaturaResponse(
                 fatura.getId(),
-                fatura.getGuiaProcModel().getGuiaId(),
+                fatura.getGuiaProcModel().getId(),
                 fatura.getEspelhoModel().getId(),
                 fatura.getEspelhoModel().getOcsId(),
                 ocsNome,
