@@ -21,6 +21,8 @@ public interface PreGuiaRepository extends JpaRepository<PreGuiaModel, Long> {
 
     List<PreGuiaModel> findByMedIdAndStatusOrderByIdAsc(Integer medId, StatusPreGuia status);
 
+    List<PreGuiaModel> findByGuiaIdOrderByIdAsc(Long guiaId);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select p from PreGuiaModel p where p.id = :id")
     Optional<PreGuiaModel> findByIdParaAtualizar(@Param("id") Long id);

@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GuiaProcRepository extends JpaRepository <GuiaProcModel, Long> {
     GuiaProcModel findByQr (String qr);
+
 }
