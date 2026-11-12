@@ -47,7 +47,7 @@ public class RegistrarSessaoService {
                 .map(max -> max + 1)
                 .orElse(1);
 
-        boolean primeiraSessao = !sessaoRepository.existsByGuiaProc_GuiaId(atendimentoId);
+        boolean primeiraSessao = !sessaoRepository.existsByGuiaProc_Id(atendimentoId);
 
         if (primeiraSessao) {
             atendimento.setStatus(STATUS_EM_ANDAMENTO);
@@ -69,7 +69,7 @@ public class RegistrarSessaoService {
         int saldo = atendimento.getQtdAutorizada() - novaQtdRealizada;
 
         return new SessaoResponse(
-                atendimento.getGuiaId(),
+                atendimento.getId(),
                 proximoNumero,
                 atendimento.getQtdAutorizada(),
                 novaQtdRealizada,

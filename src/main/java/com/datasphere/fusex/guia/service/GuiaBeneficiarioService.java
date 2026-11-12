@@ -58,7 +58,7 @@ public class GuiaBeneficiarioService {
         List<ProcedimentoGuiaResponse> procedimentos = new ArrayList<>();
         for (GuiaProcModel p : guiaProcRepository.findByGuiaModel_Id(guiaId)) {
             procedimentos.add(new ProcedimentoGuiaResponse(
-                    p.getGuiaId(),
+                    p.getId(),
                     p.getContratoModel().getProcedimentoModel().getNome(),
                     new ProcedimentoGuiaResponse.Ocs(
                             p.getContratoModel().getOcsModel().getCnpj(),

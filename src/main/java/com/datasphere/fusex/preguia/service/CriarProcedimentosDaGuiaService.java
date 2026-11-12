@@ -54,7 +54,7 @@ public class CriarProcedimentosDaGuiaService {
             procedimento.setDataValidade(validadeGuiaService.calcularDataValidade(dataEmissao));
             GuiaProcModel salvo = guiaProcRepository.save(procedimento);
 
-            registrarMudancaStatusService.executar(EntidadeTipo.GUIA_PROC, salvo.getGuiaId(),
+            registrarMudancaStatusService.executar(EntidadeTipo.GUIA_PROC, salvo.getId(),
                     null, StatusProcedimento.PENDENTE.name(), "emissao-da-guia");
             criados.add(salvo);
         }

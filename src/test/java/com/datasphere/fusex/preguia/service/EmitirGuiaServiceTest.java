@@ -79,7 +79,7 @@ class EmitirGuiaServiceTest {
         guia.setId(4L);
         guia.setStatus("EMITIDA");
         GuiaProcModel procedimento = new GuiaProcModel();
-        procedimento.setGuiaId(10L);
+        procedimento.setId(10L);
         LocalDate validoAte = LocalDate.now().plusDays(60);
 
         when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(p);

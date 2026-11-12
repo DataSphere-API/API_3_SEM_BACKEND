@@ -66,7 +66,7 @@ class ConferenciaQrServiceTest {
         setBeneficiario(guia, beneficiario);
 
         atendimento = new GuiaProcModel();
-        atendimento.setGuiaId(10L);
+        atendimento.setId(10L);
         atendimento.setContratoModel(contrato);
         atendimento.setGuiaModel(guia);
         atendimento.setQr(QR);
