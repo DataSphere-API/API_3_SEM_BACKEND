@@ -29,8 +29,9 @@ public enum ErrorCode {
 
     FATURA_NAO_ENCONTRADA("FATURA_NAO_ENCONTRADA", "Fatura não encontrada.", HttpStatus.NOT_FOUND),
     FATURA_NAO_ENCAMINHAVEL("FATURA_NAO_ENCAMINHAVEL", "A fatura não está em um status que permita o encaminhamento.", HttpStatus.BAD_REQUEST),
-    FATURA_TRANSICAO_INVALIDA("FATURA_TRANSICAO_INVALIDA", "O status atual da fatura não permite esta operação.", HttpStatus.CONFLICT),
     AUDITORIA_PENDENTE("AUDITORIA_PENDENTE", "Existem itens não autorizados na lisura. A fatura depende da auditoria.", HttpStatus.UNPROCESSABLE_ENTITY),
+
+    FATURA_TRANSICAO_INVALIDA("FATURA_TRANSICAO_INVALIDA", "O status atual da fatura não permite esta operação.", HttpStatus.CONFLICT),
 
     DADOS_INVALIDOS("DADOS_INVALIDOS", "Dados da requisição inválidos.", HttpStatus.BAD_REQUEST);
 
