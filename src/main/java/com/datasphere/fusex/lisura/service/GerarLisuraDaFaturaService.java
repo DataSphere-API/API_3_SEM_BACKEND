@@ -1,5 +1,6 @@
 package com.datasphere.fusex.lisura.service;
 
+import com.datasphere.fusex.atendimento.sessao.SessaoRepository;
 import com.datasphere.fusex.contrato.ContratoModel;
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
@@ -12,19 +13,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class GerarLisuraDaFaturaService {
 
+    private final SessaoRepository sessaoRepository;
     private final EspelhoItemRepository espelhoItemRepository;
     private final ConsultarContratoDoItemService consultarContratoDoItemService;
     private final AvaliarAutorizacaoDoItemService avaliarAutorizacaoDoItemService;
 
     public GerarLisuraDaFaturaService(EspelhoItemRepository espelhoItemRepository,
                                       ConsultarContratoDoItemService consultarContratoDoItemService,
-                                      AvaliarAutorizacaoDoItemService avaliarAutorizacaoDoItemService) {
+                                      AvaliarAutorizacaoDoItemService avaliarAutorizacaoDoItemService,
+                                      SessaoRepository sessaoRepository) {
+        this.sessaoRepository = sessaoRepository;
         this.espelhoItemRepository = espelhoItemRepository;
         this.consultarContratoDoItemService = consultarContratoDoItemService;
         this.avaliarAutorizacaoDoItemService = avaliarAutorizacaoDoItemService;
@@ -47,13 +52,19 @@ public class GerarLisuraDaFaturaService {
 
             ContratoModel contrato = null;
             LocalDate dataValidade = null;
+            LocalDate dataAtendimento = null;
             if (atendimento != null) {
                 contrato = atendimento.getContratoModel();
                 dataValidade = atendimento.getDataValidade();
+                LocalDateTime realizadaEm = sessaoRepository.findUltimaDataRealizacaoByGuiaProcId(item.getAtendimentoId())
+                        .orElseGet(atendimento::getDataValidacao);
+                if (realizadaEm != null) {
+                    dataAtendimento = realizadaEm.toLocalDate();
+                }
             }
 
             itensAvaliados.add(avaliarAutorizacaoDoItemService
-                    .avaliarAutorizacaoDoItem(item, contrato, ocsId, dataValidade));
+                    .avaliarAutorizacaoDoItem(item, contrato, ocsId, dataValidade, dataAtendimento));
         }
 
         return new LisuraResponse(fatura.getId(), itensAvaliados);
