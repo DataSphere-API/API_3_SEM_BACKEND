@@ -37,8 +37,6 @@ class MontarLinhaDoTempoDaGuiaServiceTest {
     private BuscarEventosDaPreGuiaService buscarEventosDaPreGuiaService;
     @Mock
     private BuscarEventosDaGuiaEAtendimentosService buscarEventosDaGuiaEAtendimentosService;
-    @Mock
-    private BuscarEventosDoFaturamentoService buscarEventosDoFaturamentoService;
 
     @InjectMocks
     private MontarLinhaDoTempoDaGuiaService service;
@@ -77,7 +75,6 @@ class MontarLinhaDoTempoDaGuiaServiceTest {
         when(buscarEventosDaGuiaEAtendimentosService.buscar(any(), any()))
                 .thenReturn(List.of(evento(EtapaLinhaDoTempo.ATENDIMENTO, EntidadeTipo.GUIA_PROC, t3),
                         evento(EtapaLinhaDoTempo.EMISSAO, EntidadeTipo.GUIA, t2)));
-        when(buscarEventosDoFaturamentoService.buscar(List.of(30L))).thenReturn(List.of());
 
         LinhaDoTempoResponse resposta = service.montar(3L);
 

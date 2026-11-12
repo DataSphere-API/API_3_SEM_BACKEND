@@ -22,18 +22,15 @@ public class MontarLinhaDoTempoDaGuiaService {
     private final GuiaProcRepository guiaProcRepository;
     private final BuscarEventosDaPreGuiaService buscarEventosDaPreGuiaService;
     private final BuscarEventosDaGuiaEAtendimentosService buscarEventosDaGuiaEAtendimentosService;
-    private final BuscarEventosDoFaturamentoService buscarEventosDoFaturamentoService;
 
     public MontarLinhaDoTempoDaGuiaService(GuiaRepository guiaRepository,
                                            GuiaProcRepository guiaProcRepository,
                                            BuscarEventosDaPreGuiaService buscarEventosDaPreGuiaService,
-                                           BuscarEventosDaGuiaEAtendimentosService buscarEventosDaGuiaEAtendimentosService,
-                                           BuscarEventosDoFaturamentoService buscarEventosDoFaturamentoService) {
+                                           BuscarEventosDaGuiaEAtendimentosService buscarEventosDaGuiaEAtendimentosService) {
         this.guiaRepository = guiaRepository;
         this.guiaProcRepository = guiaProcRepository;
         this.buscarEventosDaPreGuiaService = buscarEventosDaPreGuiaService;
         this.buscarEventosDaGuiaEAtendimentosService = buscarEventosDaGuiaEAtendimentosService;
-        this.buscarEventosDoFaturamentoService = buscarEventosDoFaturamentoService;
     }
 
     @Transactional(readOnly = true)
@@ -42,15 +39,10 @@ public class MontarLinhaDoTempoDaGuiaService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.GUIA_NAO_ENCONTRADA));
 
         List<GuiaProcModel> procedimentos = guiaProcRepository.findByGuiaModel_Id(guiaId);
-        List<Long> atendimentoIds = new ArrayList<>();
-        for (GuiaProcModel p : procedimentos) {
-            atendimentoIds.add(p.getGuiaId());
-        }
 
         List<EventoLinhaDoTempoResponse> eventos = new ArrayList<>();
         eventos.addAll(buscarEventosDaPreGuiaService.buscar(guiaId));
         eventos.addAll(buscarEventosDaGuiaEAtendimentosService.buscar(guiaId, procedimentos));
-        eventos.addAll(buscarEventosDoFaturamentoService.buscar(atendimentoIds));
 
         eventos.sort(Comparator
                 .comparing(EventoLinhaDoTempoResponse::data)
