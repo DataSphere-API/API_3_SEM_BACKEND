@@ -11,11 +11,11 @@ import java.util.Optional;
 @Repository
 public interface SessaoRepository extends JpaRepository<SessaoModel, Long> {
 
-    @Query("select max(s.numeroSessao) from SessaoModel s where s.guiaProc.guiaId = :guiaProcId")
+    @Query("select max(s.numeroSessao) from SessaoModel s where s.guiaProc.id = :guiaProcId")
     Optional<Integer> findMaxNumeroSessaoByGuiaProcId(@Param("guiaProcId") Long guiaProcId);
 
-    @Query("select max(s.dataRealizacao) from SessaoModel s where s.guiaProc.guiaId = :guiaProcId")
+    @Query("select max(s.dataRealizacao) from SessaoModel s where s.guiaProc.id = :guiaProcId")
     Optional<LocalDateTime> findUltimaDataRealizacaoByGuiaProcId(@Param("guiaProcId") Long guiaProcId);
 
-    boolean existsByGuiaProc_GuiaId(Long guiaProcId);
+    boolean existsByGuiaProc_Id(Long guiaProcId);
 }
