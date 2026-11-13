@@ -66,7 +66,7 @@ public class EmitirGuiaService {
 
         List<EmissaoProcedimentoResponse> procedimentosResponse = new ArrayList<>();
         for (GuiaProcModel procedimento : procedimentos) {
-            procedimentosResponse.add(new EmissaoProcedimentoResponse(procedimento.getGuiaId()));
+            procedimentosResponse.add(new EmissaoProcedimentoResponse(procedimento.getId()));
         }
 
         return new EmissaoResponse(
