@@ -54,6 +54,8 @@ docker compose -f compose.dev.yaml up -d
 
 A API ficará disponível em `http://localhost:8080`.
 
+Para testar os cadastros e buscas da **US000-17**, consulte o [guia com mocks locais e requisições para o IntelliJ](docs/US000-17.md).
+
 ---
 
 ## 🐳 Stack Completa (PostgreSQL + Backend + Frontend)
