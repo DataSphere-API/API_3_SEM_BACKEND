@@ -1,0 +1,15 @@
+@host = http://localhost:8080
+@atendimentoId = 1
+
+### 200: gera o QR se ainda não existe ou reaproveita o código salvo.
+# Executar novamente: codigo e imagemBase64 devem permanecer iguais.
+GET {{host}}/atendimentos/{{atendimentoId}}/qrcode
+
+### Outro procedimento da mesma guia tem seu próprio QR.
+GET {{host}}/atendimentos/2/qrcode
+
+### 422 GUIA_EXPIRADA: atendimento 3 do seed dev tem guia com mais de 60 dias.
+GET {{host}}/atendimentos/3/qrcode
+
+### 404 ATENDIMENTO_NAO_ENCONTRADO.
+GET {{host}}/atendimentos/999999999/qrcode
