@@ -11,6 +11,12 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(QrCodeIndisponivelException.class)
+    public ResponseEntity<ErrorResponse> handleQrIndisponivel(QrCodeIndisponivelException ex) {
+        return ResponseEntity.status(409).body(new ErrorResponse(ex.getErrorCode().getCodigo(),
+                ex.getErrorCode().getMensagem(), ex.getDetalhes()));
+    }
+
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusiness(BusinessException ex) {
         ErrorCode errorCode = ex.getErrorCode();

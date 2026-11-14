@@ -1,0 +1,31 @@
+@host = http://localhost:8080
+@dono = 00000000351
+@outro = 00000000352
+
+### Perfis locais: dev,qrconsulta-mock, com banco separado e seed V17 aplicado.
+# 200: somente {"codigo":"..."}; repetir mantém o código.
+GET {{host}}/atendimentos/4/qrcode
+X-Mock-Login: {{dono}}
+
+### 403: outro beneficiário não pode consultar o QR da mesma guia.
+GET {{host}}/atendimentos/4/qrcode
+X-Mock-Login: {{outro}}
+
+### 409 SESSOES_INCOMPLETAS: 1 de 2 sessões concluídas.
+GET {{host}}/atendimentos/5/qrcode
+X-Mock-Login: {{dono}}
+
+### 409 PROCEDIMENTO_JA_REALIZADO.
+GET {{host}}/atendimentos/6/qrcode
+X-Mock-Login: {{dono}}
+
+### 409 GUIA_EXPIRADA: guia antiga pertence ao segundo beneficiário.
+GET {{host}}/atendimentos/3/qrcode
+X-Mock-Login: {{outro}}
+
+### 401: sem identidade autenticada.
+GET {{host}}/atendimentos/4/qrcode
+
+### 404: atendimento inexistente, com beneficiário autenticado.
+GET {{host}}/atendimentos/999999999/qrcode
+X-Mock-Login: {{dono}}
