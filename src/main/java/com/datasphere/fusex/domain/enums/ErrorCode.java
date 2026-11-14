@@ -3,6 +3,9 @@ package com.datasphere.fusex.domain.enums;
 import org.springframework.http.HttpStatus;
 
 public enum ErrorCode {
+    AUTENTICACAO_OBRIGATORIA("AUTENTICACAO_OBRIGATORIA", "Autentique-se para realizar esta operação.", HttpStatus.UNAUTHORIZED),
+    BENEFICIARIO_SEM_PERMISSAO("BENEFICIARIO_SEM_PERMISSAO", "Apenas o beneficiário dono da guia pode consultar o QR Code.", HttpStatus.FORBIDDEN),
+    QR_NAO_GERADO("QR_NAO_GERADO", "O QR Code ainda não foi gerado na emissão da guia.", HttpStatus.CONFLICT),
     QR_NAO_ENCONTRADO("QR_NAO_ENCONTRADO", "QR Code não encontrado.", HttpStatus.NOT_FOUND),
     OCS_DIFERENTE_DO_CONTRATO("OCS_DIFERENTE_DO_CONTRATO", "OCS não corresponde ao contrato.", HttpStatus.UNPROCESSABLE_ENTITY),
     GUIA_EXPIRADA("GUIA_EXPIRADA", "A guia está vencida.", HttpStatus.UNPROCESSABLE_ENTITY),
