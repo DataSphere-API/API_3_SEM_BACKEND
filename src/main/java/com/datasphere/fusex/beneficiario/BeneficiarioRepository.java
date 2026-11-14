@@ -1,5 +1,6 @@
 package com.datasphere.fusex.beneficiario;
 
+import com.datasphere.fusex.usuario.UsuarioModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -10,6 +11,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface BeneficiarioRepository extends JpaRepository<BeneficiarioModel, String> {
+    boolean existsByLogin(String login);
+
+    Optional<UsuarioModel> findByLogin(String login);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT b FROM BeneficiarioModel b WHERE b.precCP = :precCp")
     Optional<BeneficiarioModel> buscarParaAtualizar(@Param("precCp") String precCp);
