@@ -1,12 +1,15 @@
 package com.datasphere.fusex.espelho.controller;
 
+import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.StatusEspelho;
 import com.datasphere.fusex.espelho.dto.*;
 import com.datasphere.fusex.espelho.service.*;
 import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
 import com.datasphere.fusex.espelhoItem.dto.EspelhoItemResponse;
+import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -60,17 +63,15 @@ public class EspelhoController {
     }
 
     @PostMapping("/espelhos")
-    public ResponseEntity<?> criarEspelho(@RequestBody EspelhoRequest request) {
+    public ResponseEntity<EspelhoResponse> criarEspelho(@Valid @RequestBody EspelhoRequest request) {
         GuiaProcModel atendimento = validarAtendimentoRealizadoService.validarAtendimentoRealizado(request.atendimentoId());
         if (atendimento == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("atendimento não encontrado ou ainda não realizado");
+            throw new BusinessException(ErrorCode.ATENDIMENTO_NAO_REALIZADO);
         }
 
         boolean naoDuplicado = validarEspelhoNaoDuplicadoPorAtendimentoService.validarEspelhoNaoDuplicadoPorAtendimento(request.atendimentoId());
         if (!naoDuplicado) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("já existe um espelho para este atendimento");
+            throw new BusinessException(ErrorCode.ATENDIMENTO_JA_EM_ESPELHO);
         }
 
         EspelhoResponse response = criarEspelhoComItensService.criarEspelhoComItens(request);
@@ -100,45 +101,43 @@ public class EspelhoController {
     }
 
     @GetMapping("/espelhos/{id}")
-    public ResponseEntity<?> buscarEspelho(@PathVariable Integer id) {
-        EspelhoModel espelho = buscarEspelhoPorIdService.buscarEspelhoPorId(id);
-        if (espelho == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("espelho não encontrado");
-        }
+    public ResponseEntity<EspelhoResumoResponse> buscarEspelho(@PathVariable Integer id) {
+        EspelhoModel espelho = buscarEspelhoOuFalhar(id);
         return ResponseEntity.ok(enriquecerListaEspelhosService.enriquecer(List.of(espelho)).get(0));
     }
 
     @GetMapping("/espelhos/{id}/itens")
-    public ResponseEntity<?> listarItens(@PathVariable Integer id) {
-        EspelhoModel espelho = buscarEspelhoPorIdService.buscarEspelhoPorId(id);
-        if (espelho == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("espelho não encontrado");
-        }
-
+    public ResponseEntity<List<EspelhoItemResponse>> listarItens(@PathVariable Integer id) {
+        buscarEspelhoOuFalhar(id);
         List<EspelhoItemResponse> itens = listarItensDoEspelhoService.listarItensDoEspelho(id).stream().map(EspelhoItemResponse::from).toList();
-
         return ResponseEntity.ok(itens);
     }
 
     @PatchMapping("/espelhos/{id}/itens/{itemId}")
-    public ResponseEntity<?> corrigirItem(@PathVariable Integer id,
-                                          @PathVariable Integer itemId,
-                                          @RequestBody EspelhoItemPatchRequest dados) {
+    public ResponseEntity<EspelhoItemResponse> corrigirItem(@PathVariable Integer id,
+                                                            @PathVariable Integer itemId,
+                                                            @Valid @RequestBody EspelhoItemPatchRequest dados) {
         EspelhoItemModel item = corrigirItemEspelhoService.corrigirItemEspelho(id, itemId, dados);
         if (item == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("não foi possível corrigir o item");
+            throw new BusinessException(ErrorCode.ITEM_ESPELHO_NAO_CORRIGIDO);
         }
         return ResponseEntity.ok(EspelhoItemResponse.from(item));
     }
 
     @DeleteMapping("/espelhos/{id}/itens/{itemId}")
-    public ResponseEntity<?> removerItem(@PathVariable Integer id, @PathVariable Integer itemId) {
+    public ResponseEntity<Void> removerItem(@PathVariable Integer id, @PathVariable Integer itemId) {
         boolean removido = removerItemDoEspelhoService.removerItemDoEspelho(id, itemId);
         if (!removido) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("não foi possível remover o item");
+            throw new BusinessException(ErrorCode.ITEM_ESPELHO_NAO_REMOVIDO);
         }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.noContent().build();
+    }
+
+    private EspelhoModel buscarEspelhoOuFalhar(Integer id) {
+        EspelhoModel espelho = buscarEspelhoPorIdService.buscarEspelhoPorId(id);
+        if (espelho == null) {
+            throw new BusinessException(ErrorCode.ESPELHO_NAO_ENCONTRADO);
+        }
+        return espelho;
     }
 }
