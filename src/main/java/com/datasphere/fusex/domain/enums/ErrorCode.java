@@ -3,6 +3,19 @@ package com.datasphere.fusex.domain.enums;
 import org.springframework.http.HttpStatus;
 
 public enum ErrorCode {
+    AUTENTICACAO_OBRIGATORIA("AUTENTICACAO_OBRIGATORIA", "Autentique-se para realizar esta operação.", HttpStatus.UNAUTHORIZED),
+    CADASTRO_RESTRITO_AO_CHEFE("CADASTRO_RESTRITO_AO_CHEFE", "Apenas o chefe do FUSEx pode cadastrar.", HttpStatus.FORBIDDEN),
+    OCS_JA_CADASTRADA("OCS_JA_CADASTRADA", "Já existe uma OCS com este CNPJ.", HttpStatus.CONFLICT),
+    PROCEDIMENTO_JA_CADASTRADO("PROCEDIMENTO_JA_CADASTRADO", "Já existe um procedimento com esse nome.", HttpStatus.CONFLICT),
+    VALOR_INVALIDO("VALOR_INVALIDO", "O valor do contrato precisa ser maior que zero.", HttpStatus.UNPROCESSABLE_ENTITY),
+    CONTRATO_DUPLICADO("CONTRATO_DUPLICADO", "Já existe contrato desse procedimento com essa OCS.", HttpStatus.CONFLICT),
+    CPF_JA_CADASTRADO("CPF_JA_CADASTRADO", "Já existe um usuário com este CPF.", HttpStatus.CONFLICT),
+    PRIMEIRO_ACESSO_PENDENTE("PRIMEIRO_ACESSO_PENDENTE", "O militar precisa realizar o autocadastro primeiro.", HttpStatus.UNPROCESSABLE_ENTITY),
+    PERFIL_OBRIGATORIO("PERFIL_OBRIGATORIO", "Informe pelo menos um perfil militar válido.", HttpStatus.UNPROCESSABLE_ENTITY),
+    MEDICO_SEM_CRM("MEDICO_SEM_CRM", "Médico precisa de CRM.", HttpStatus.UNPROCESSABLE_ENTITY),
+    CRM_JA_CADASTRADO("CRM_JA_CADASTRADO", "Já existe médico com este CRM.", HttpStatus.CONFLICT),
+    OCS_NAO_ENCONTRADA("OCS_NAO_ENCONTRADA", "OCS não encontrada.", HttpStatus.UNPROCESSABLE_ENTITY),
+    PROCEDIMENTO_NAO_ENCONTRADO("PROCEDIMENTO_NAO_ENCONTRADO", "Procedimento não encontrado.", HttpStatus.NOT_FOUND),
     QR_NAO_ENCONTRADO("QR_NAO_ENCONTRADO", "QR Code não encontrado.", HttpStatus.NOT_FOUND),
     OCS_DIFERENTE_DO_CONTRATO("OCS_DIFERENTE_DO_CONTRATO", "OCS não corresponde ao contrato.", HttpStatus.UNPROCESSABLE_ENTITY),
     GUIA_EXPIRADA("GUIA_EXPIRADA", "A guia está vencida.", HttpStatus.UNPROCESSABLE_ENTITY),
