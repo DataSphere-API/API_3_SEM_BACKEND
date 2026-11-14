@@ -1,3 +1,4 @@
+# Histórico da US003-1. Nesta branch o contrato mudou: usar us0035.http com identidade e sessões completas.
 @host = http://localhost:8080
 @atendimentoId = 1
 

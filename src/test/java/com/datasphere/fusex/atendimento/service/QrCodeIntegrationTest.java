@@ -1,9 +1,7 @@
 package com.datasphere.fusex.atendimento.service;
 
-import com.datasphere.fusex.atendimento.controller.QrCodeController;
-import com.datasphere.fusex.exception.GlobalExceptionHandler;
-import com.jayway.jsonpath.JsonPath;
-import org.junit.jupiter.api.BeforeEach;
+import com.datasphere.fusex.domain.enums.ErrorCode;
+import com.datasphere.fusex.exception.BusinessException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,9 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(properties = {
         "spring.docker.compose.enabled=false",
@@ -46,17 +39,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 class QrCodeIntegrationTest {
 
-    @Autowired private QrCodeController controller;
     @Autowired private GarantirQrDoProcedimentoService garantirQrDoProcedimentoService;
-    @Autowired private GlobalExceptionHandler exceptionHandler;
     @Autowired private JdbcTemplate jdbc;
-
-    private MockMvc mvc;
-
-    @BeforeEach
-    void configurar() {
-        mvc = MockMvcBuilders.standaloneSetup(controller).setControllerAdvice(exceptionHandler).build();
-    }
 
     private Long criarGuia(String status, LocalDate emissao) {
         return jdbc.queryForObject("""
@@ -76,17 +60,10 @@ class QrCodeIntegrationTest {
     void geraUuidGravaNoProcedimentoEASegundaChamadaReaproveita() throws Exception {
         Long guiaId = criarGuia("EMITIDA", LocalDate.now());
         Long id = criarProcedimento(guiaId, "PENDENTE", null);
-        String resposta = mvc.perform(get("/atendimentos/{id}/qrcode", id))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.atendimentoId").value(id))
-                .andExpect(jsonPath("$.imagemBase64").value(org.hamcrest.Matchers.startsWith("data:image/png;base64,")))
-                .andReturn().getResponse().getContentAsString();
-        String codigo = JsonPath.read(resposta, "$.codigo");
+        String codigo = garantirQrDoProcedimentoService.garantirQrDoProcedimento(id);
         assertNotNull(UUID.fromString(codigo));
         assertEquals(codigo, jdbc.queryForObject("SELECT qr FROM guia_proc WHERE id=?", String.class, id));
-        mvc.perform(get("/atendimentos/{id}/qrcode", id)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigo").value(codigo))
-                .andExpect(jsonPath("$.imagemBase64").value((String) JsonPath.read(resposta, "$.imagemBase64")));
+        assertEquals(codigo, garantirQrDoProcedimentoService.garantirQrDoProcedimento(id));
     }
 
     @Test
@@ -102,16 +79,16 @@ class QrCodeIntegrationTest {
     void qrJaPersistidoEReutilizadoSemExigirFormatoUuid() throws Exception {
         Long guiaId = criarGuia("EMITIDA", LocalDate.now());
         Long id = criarProcedimento(guiaId, "PENDENTE", "QR-LEGADO-US003-1");
-        mvc.perform(get("/atendimentos/{id}/qrcode", id)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigo").value("QR-LEGADO-US003-1"));
+        assertEquals("QR-LEGADO-US003-1", garantirQrDoProcedimentoService.garantirQrDoProcedimento(id));
     }
 
     @Test
     void guiaMaisAntigaQueSessentaDiasNaoGeraQrMesmoSemValidadeNoProcedimento() throws Exception {
         Long guiaId = criarGuia("EMITIDA", LocalDate.now().minusDays(61));
         Long id = criarProcedimento(guiaId, "PENDENTE", null);
-        mvc.perform(get("/atendimentos/{id}/qrcode", id)).andExpect(status().isUnprocessableContent())
-                .andExpect(jsonPath("$.codigo").value("GUIA_EXPIRADA"));
+        var erro = assertThrows(BusinessException.class,
+                () -> garantirQrDoProcedimentoService.garantirQrDoProcedimento(id));
+        assertEquals(ErrorCode.GUIA_EXPIRADA, erro.getErrorCode());
         assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM guia_proc WHERE id=? AND qr IS NOT NULL", Integer.class, id));
     }
 
@@ -119,14 +96,16 @@ class QrCodeIntegrationTest {
     void procedimentoRealizadoNaoReaproveitaQr() throws Exception {
         Long guiaId = criarGuia("EMITIDA", LocalDate.now());
         Long id = criarProcedimento(guiaId, "REALIZADA", "QR-REALIZADO-US003-1");
-        mvc.perform(get("/atendimentos/{id}/qrcode", id)).andExpect(status().isUnprocessableContent())
-                .andExpect(jsonPath("$.codigo").value("PROCEDIMENTO_JA_REALIZADO"));
+        var erro = assertThrows(BusinessException.class,
+                () -> garantirQrDoProcedimentoService.garantirQrDoProcedimento(id));
+        assertEquals(ErrorCode.PROCEDIMENTO_JA_REALIZADO, erro.getErrorCode());
     }
 
     @Test
     void atendimentoInexistenteRetorna404() throws Exception {
-        mvc.perform(get("/atendimentos/999999999/qrcode")).andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.codigo").value("ATENDIMENTO_NAO_ENCONTRADO"));
+        var erro = assertThrows(BusinessException.class,
+                () -> garantirQrDoProcedimentoService.garantirQrDoProcedimento(999999999L));
+        assertEquals(ErrorCode.ATENDIMENTO_NAO_ENCONTRADO, erro.getErrorCode());
     }
 
     @Test
