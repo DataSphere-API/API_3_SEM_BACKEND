@@ -1,3 +1,5 @@
 package com.datasphere.fusex.fatura.dto;
 
-public record FaturaRequest(Integer espelhoId) {}
+import jakarta.validation.constraints.NotNull;
+
+public record FaturaRequest(@NotNull(message = "é obrigatório") Integer espelhoId) {}
