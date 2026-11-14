@@ -76,11 +76,14 @@ public class SecurityConfig {
                         // Faturas
                         .requestMatchers("/faturas", "/faturas/**").hasRole("AUDITOR")
 
-                        // Cadastros do chefe (US000-17): leitura também para quem monta pré-guia
+                        // Cadastros: leitura para quem monta pré-guia, escrita só para o chefe
                         .requestMatchers(HttpMethod.GET, "/ocs", "/procedimentos", "/contratos", "/medicos")
                         .hasAnyRole("CHEFE", "EMISSOR", "MEDICO")
                         .requestMatchers("/ocs", "/procedimentos", "/contratos", "/usuarios", "/usuarios/**")
                         .hasRole("CHEFE")
+
+                        // Administração
+                        .requestMatchers("/admin/**").hasRole("CHEFE")
 
                         // Qualquer outra rota: basta estar logado
                         .anyRequest().authenticated());
