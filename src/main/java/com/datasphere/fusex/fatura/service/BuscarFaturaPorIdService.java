@@ -4,6 +4,8 @@ import com.datasphere.fusex.fatura.FaturaModel;
 import com.datasphere.fusex.fatura.FaturaRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class BuscarFaturaPorIdService {
 
@@ -16,4 +18,4 @@ public class BuscarFaturaPorIdService {
     public FaturaModel buscarFaturaPorId(Long id) {
         return faturaRepository.findById(id).orElse(null);
     }
-}
+}q
