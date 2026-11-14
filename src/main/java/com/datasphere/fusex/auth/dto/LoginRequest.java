@@ -1,3 +1,7 @@
 package com.datasphere.fusex.auth.dto;
 
-public record LoginRequest(String cpf, String senha) {}
+import jakarta.validation.constraints.NotBlank;
+
+public record LoginRequest(
+        @NotBlank(message = "é obrigatório") String cpf,
+        @NotBlank(message = "é obrigatória") String senha) {}
