@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.security.Principal;
 
 @RestController
 public class BeneficiarioGuiaController {
@@ -19,7 +20,7 @@ public class BeneficiarioGuiaController {
     }
 
     @GetMapping("/beneficiarios/{precCp}/guias")
-    public ResponseEntity<List<GuiaBeneficiarioResponse>> listar(@PathVariable String precCp) {
-        return ResponseEntity.ok(guiaBeneficiarioService.listarGuiasPorBeneficiario(precCp));
+    public ResponseEntity<List<GuiaBeneficiarioResponse>> listar(@PathVariable String precCp, Principal principal) {
+        return ResponseEntity.ok(guiaBeneficiarioService.listarGuiasPorBeneficiario(precCp, principal));
     }
 }

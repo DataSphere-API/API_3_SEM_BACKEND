@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.security.Principal;
 
 @Service
 public class GuiaBeneficiarioService {
@@ -22,25 +23,30 @@ public class GuiaBeneficiarioService {
     private final GuiaRepository guiaRepository;
     private final GuiaProcRepository guiaProcRepository;
     private final ValidadeGuiaService validadeGuiaService;
+    private final ValidarConsultaGuiasService validarConsultaGuiasService;
 
     public GuiaBeneficiarioService(BeneficiarioRepository beneficiarioRepository,
                                    GuiaRepository guiaRepository,
                                    GuiaProcRepository guiaProcRepository,
-                                   ValidadeGuiaService validadeGuiaService) {
+                                   ValidadeGuiaService validadeGuiaService,
+                                   ValidarConsultaGuiasService validarConsultaGuiasService) {
         this.beneficiarioRepository = beneficiarioRepository;
         this.guiaRepository = guiaRepository;
         this.guiaProcRepository = guiaProcRepository;
         this.validadeGuiaService = validadeGuiaService;
+        this.validarConsultaGuiasService = validarConsultaGuiasService;
     }
 
     @Transactional(readOnly = true)
-    public List<GuiaBeneficiarioResponse> listarGuiasPorBeneficiario(String precCp) {
+    public List<GuiaBeneficiarioResponse> listarGuiasPorBeneficiario(String precCp, Principal principal) {
+        validarConsultaGuiasService.validarConsultaGuias(precCp, principal);
         buscarBeneficiarioPorPrecCp(precCp);
 
         List<GuiaBeneficiarioResponse> respostas = new ArrayList<>();
         for (GuiaModel guia : guiaRepository.findByBenfIdOrderByIdDesc(precCp)) {
             respostas.add(new GuiaBeneficiarioResponse(
                     guia.getId(),
+                    guia.getNumero(),
                     guia.getStatus(),
                     guia.getDataEmissao(),
                     validadeGuiaService.calcularDiasRestantes(guia.getDataEmissao()),
