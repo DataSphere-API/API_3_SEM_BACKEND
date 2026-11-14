@@ -44,6 +44,18 @@ public enum ErrorCode {
     FATURA_NAO_ENCAMINHAVEL("FATURA_NAO_ENCAMINHAVEL", "A fatura não está em um status que permita o encaminhamento.", HttpStatus.BAD_REQUEST),
     AUDITORIA_PENDENTE("AUDITORIA_PENDENTE", "Existem itens não autorizados na lisura. A fatura depende da auditoria.", HttpStatus.UNPROCESSABLE_ENTITY),
 
+    // US000-16: login, autocadastro e segurança (CPF_JA_CADASTRADO já existe acima)
+    CREDENCIAIS_INVALIDAS("CREDENCIAIS_INVALIDAS", "CPF ou senha incorretos.", HttpStatus.UNAUTHORIZED),
+    NAO_AUTENTICADO("NAO_AUTENTICADO", "Faça login para continuar.", HttpStatus.UNAUTHORIZED),
+    ACESSO_NEGADO("ACESSO_NEGADO", "Seu perfil não tem acesso a esta operação.", HttpStatus.FORBIDDEN),
+    PREC_CP_INVALIDO("PREC_CP_INVALIDO", "O Prec-CP precisa ter o formato 123456789-00.", HttpStatus.BAD_REQUEST),
+    PREC_CP_TITULAR_INVALIDO("PREC_CP_TITULAR_INVALIDO", "O Prec-CP do beneficiário principal termina em -00.", HttpStatus.UNPROCESSABLE_ENTITY),
+    PREC_CP_DEPENDENTE_INVALIDO("PREC_CP_DEPENDENTE_INVALIDO", "O Prec-CP do dependente não pode terminar em -00.", HttpStatus.UNPROCESSABLE_ENTITY),
+    RESPONSAVEL_NAO_ENCONTRADO("RESPONSAVEL_NAO_ENCONTRADO", "Não encontramos um beneficiário principal com esse CPF.", HttpStatus.UNPROCESSABLE_ENTITY),
+    PREC_CP_NAO_CONFERE("PREC_CP_NAO_CONFERE", "O Prec-CP não bate com o do responsável: o início precisa ser o mesmo.", HttpStatus.UNPROCESSABLE_ENTITY),
+    BENEFICIARIO_NAO_CONFERE("BENEFICIARIO_NAO_CONFERE", "Este Prec-CP já está cadastrado com outra data de nascimento.", HttpStatus.UNPROCESSABLE_ENTITY),
+    BENEFICIARIO_JA_CADASTRADO("BENEFICIARIO_JA_CADASTRADO", "Este Prec-CP já tem acesso. Entre com seu CPF e senha.", HttpStatus.CONFLICT),
+
     DADOS_INVALIDOS("DADOS_INVALIDOS", "Dados da requisição inválidos.", HttpStatus.BAD_REQUEST);
 
     private final String codigo;
