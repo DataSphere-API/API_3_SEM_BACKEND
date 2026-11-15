@@ -1,4 +1,6 @@
 -- US000-16: um usuário de teste para cada perfil. Login = CPF, senha de todos = fusex123 (BCrypt).
+-- Versão exclusiva: V15 já pertence ao QR por procedimento.
+-- Executar antes dos seeds opcionais de consulta QR (V17).
 -- Fica em db/dev (só carrega com o perfil dev). Sem IDs fixos: o seed do perfil cadastros-mock também insere usuários.
 INSERT INTO Usuario (Login, Senha) VALUES
                                        ('52601815906', '$2a$10$nB/cKLQjqlQqZVheNQrkOO66i9qAzvN0nmY5.yYBFyt3t.aK/u/8a'), -- CHEFE + BENEFICIARIO

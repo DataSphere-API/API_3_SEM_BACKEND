@@ -7,7 +7,7 @@ public enum ErrorCode {
     BENEFICIARIO_SEM_PERMISSAO("BENEFICIARIO_SEM_PERMISSAO", "Usuário sem permissão para consultar os dados desta guia.", HttpStatus.FORBIDDEN),
     QR_NAO_GERADO("QR_NAO_GERADO", "O QR Code ainda não foi gerado na emissão da guia.", HttpStatus.CONFLICT),
     QR_NAO_ENCONTRADO("QR_NAO_ENCONTRADO", "QR Code não encontrado.", HttpStatus.NOT_FOUND),
-    OCS_DIFERENTE_DO_CONTRATO("OCS_DIFERENTE_DO_CONTRATO", "OCS não corresponde ao contrato.", HttpStatus.UNPROCESSABLE_ENTITY),
+    OCS_DIFERENTE_DO_CONTRATO("OCS_DIFERENTE_DO_CONTRATO", "OCS não corresponde ao contrato.", HttpStatus.FORBIDDEN),
     GUIA_EXPIRADA("GUIA_EXPIRADA", "A guia está vencida.", HttpStatus.UNPROCESSABLE_ENTITY),
     PROCEDIMENTO_JA_REALIZADO("PROCEDIMENTO_JA_REALIZADO", "Procedimento já realizado.", HttpStatus.UNPROCESSABLE_ENTITY),
     SESSOES_INCOMPLETAS("SESSOES_INCOMPLETAS", "Sessões incompletas.", HttpStatus.UNPROCESSABLE_ENTITY),
@@ -57,6 +57,18 @@ public enum ErrorCode {
     ESPELHO_NAO_FATURAVEL("ESPELHO_NAO_FATURAVEL", "O espelho já foi faturado ou está cancelado.", HttpStatus.CONFLICT),
     FATURA_NAO_REGERAVEL("FATURA_NAO_REGERAVEL", "A fatura já foi regerada ou o espelho não mudou depois da geração.", HttpStatus.CONFLICT),
 
+    OCS_JA_CADASTRADA("OCS_JA_CADASTRADA", "Já existe uma OCS com este CNPJ.", HttpStatus.CONFLICT),
+    PROCEDIMENTO_JA_CADASTRADO("PROCEDIMENTO_JA_CADASTRADO", "Já existe um procedimento com esse nome.", HttpStatus.CONFLICT),
+    PROCEDIMENTO_NAO_ENCONTRADO("PROCEDIMENTO_NAO_ENCONTRADO", "Procedimento não encontrado.", HttpStatus.NOT_FOUND),
+    VALOR_INVALIDO("VALOR_INVALIDO", "O valor do contrato precisa ser maior que zero.", HttpStatus.UNPROCESSABLE_ENTITY),
+    CONTRATO_DUPLICADO("CONTRATO_DUPLICADO", "Já existe contrato desse procedimento com essa OCS.", HttpStatus.CONFLICT),
+    PRIMEIRO_ACESSO_PENDENTE("PRIMEIRO_ACESSO_PENDENTE", "O militar precisa realizar o autocadastro primeiro.", HttpStatus.UNPROCESSABLE_ENTITY),
+    PERFIL_OBRIGATORIO("PERFIL_OBRIGATORIO", "Informe pelo menos um perfil militar válido.", HttpStatus.UNPROCESSABLE_ENTITY),
+    MEDICO_SEM_CRM("MEDICO_SEM_CRM", "Médico precisa de CRM.", HttpStatus.UNPROCESSABLE_ENTITY),
+    CPF_JA_CADASTRADO("CPF_JA_CADASTRADO", "Já existe um usuário com este CPF.", HttpStatus.CONFLICT),
+    CRM_JA_CADASTRADO("CRM_JA_CADASTRADO", "Já existe médico com este CRM.", HttpStatus.CONFLICT),
+    OCS_NAO_ENCONTRADA("OCS_NAO_ENCONTRADA", "OCS não encontrada.", HttpStatus.UNPROCESSABLE_ENTITY),
+    CADASTRO_RESTRITO_AO_CHEFE("CADASTRO_RESTRITO_AO_CHEFE", "Apenas o chefe do FUSEx pode cadastrar.", HttpStatus.FORBIDDEN),
     DADOS_INVALIDOS("DADOS_INVALIDOS", "Dados da requisição inválidos.", HttpStatus.BAD_REQUEST);
 
     private final String codigo;

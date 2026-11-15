@@ -18,4 +18,4 @@ public class BuscarFaturaPorIdService {
     public FaturaModel buscarFaturaPorId(Long id) {
         return faturaRepository.findById(id).orElse(null);
     }
-}q
+}
