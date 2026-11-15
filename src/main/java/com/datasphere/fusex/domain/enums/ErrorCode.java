@@ -34,6 +34,29 @@ public enum ErrorCode {
     FATURA_NAO_ENCAMINHAVEL("FATURA_NAO_ENCAMINHAVEL", "A fatura não está em um status que permita o encaminhamento.", HttpStatus.BAD_REQUEST),
     AUDITORIA_PENDENTE("AUDITORIA_PENDENTE", "Existem itens não autorizados na lisura. A fatura depende da auditoria.", HttpStatus.UNPROCESSABLE_ENTITY),
 
+    CREDENCIAIS_INVALIDAS("CREDENCIAIS_INVALIDAS", "CPF ou senha incorretos.", HttpStatus.UNAUTHORIZED),
+    NAO_AUTENTICADO("NAO_AUTENTICADO", "Faça login para continuar.", HttpStatus.UNAUTHORIZED),
+    ACESSO_NEGADO("ACESSO_NEGADO", "Seu perfil não tem acesso a esta operação.", HttpStatus.FORBIDDEN),
+    PREC_CP_INVALIDO("PREC_CP_INVALIDO", "O Prec-CP precisa ter o formato 123456789-00.", HttpStatus.BAD_REQUEST),
+    PREC_CP_TITULAR_INVALIDO("PREC_CP_TITULAR_INVALIDO", "O Prec-CP do beneficiário principal termina em -00.", HttpStatus.UNPROCESSABLE_ENTITY),
+    PREC_CP_DEPENDENTE_INVALIDO("PREC_CP_DEPENDENTE_INVALIDO", "O Prec-CP do dependente não pode terminar em -00.", HttpStatus.UNPROCESSABLE_ENTITY),
+    RESPONSAVEL_NAO_ENCONTRADO("RESPONSAVEL_NAO_ENCONTRADO", "Não encontramos um beneficiário principal com esse CPF.", HttpStatus.UNPROCESSABLE_ENTITY),
+    PREC_CP_NAO_CONFERE("PREC_CP_NAO_CONFERE", "O Prec-CP não bate com o do responsável: o início precisa ser o mesmo.", HttpStatus.UNPROCESSABLE_ENTITY),
+    BENEFICIARIO_NAO_CONFERE("BENEFICIARIO_NAO_CONFERE", "Este Prec-CP já está cadastrado com outra data de nascimento.", HttpStatus.UNPROCESSABLE_ENTITY),
+    BENEFICIARIO_JA_CADASTRADO("BENEFICIARIO_JA_CADASTRADO", "Este Prec-CP já tem acesso. Entre com seu CPF e senha.", HttpStatus.CONFLICT),
+
+    VALIDACAO("VALIDACAO", "Dados inválidos", HttpStatus.BAD_REQUEST),
+    RECURSO_NAO_ENCONTRADO("RECURSO_NAO_ENCONTRADO", "Recurso não encontrado.", HttpStatus.NOT_FOUND),
+    METODO_NAO_PERMITIDO("METODO_NAO_PERMITIDO", "Método HTTP não permitido para esta rota.", HttpStatus.METHOD_NOT_ALLOWED),
+    ERRO_INTERNO("ERRO_INTERNO", "Erro inesperado no servidor. Tente novamente.", HttpStatus.INTERNAL_SERVER_ERROR),
+    ESPELHO_NAO_ENCONTRADO("ESPELHO_NAO_ENCONTRADO", "Espelho não encontrado.", HttpStatus.NOT_FOUND),
+    ATENDIMENTO_NAO_REALIZADO("ATENDIMENTO_NAO_REALIZADO", "Atendimento não encontrado ou ainda não realizado.", HttpStatus.UNPROCESSABLE_ENTITY),
+    ATENDIMENTO_JA_EM_ESPELHO("ATENDIMENTO_JA_EM_ESPELHO", "Já existe um espelho para este atendimento.", HttpStatus.CONFLICT),
+    ITEM_ESPELHO_NAO_CORRIGIDO("ITEM_ESPELHO_NAO_CORRIGIDO", "Não foi possível corrigir o item do espelho.", HttpStatus.UNPROCESSABLE_ENTITY),
+    ITEM_ESPELHO_NAO_REMOVIDO("ITEM_ESPELHO_NAO_REMOVIDO", "Não foi possível remover o item do espelho.", HttpStatus.UNPROCESSABLE_ENTITY),
+    ESPELHO_NAO_FATURAVEL("ESPELHO_NAO_FATURAVEL", "O espelho já foi faturado ou está cancelado.", HttpStatus.CONFLICT),
+    FATURA_NAO_REGERAVEL("FATURA_NAO_REGERAVEL", "A fatura já foi regerada ou o espelho não mudou depois da geração.", HttpStatus.CONFLICT),
+
     DADOS_INVALIDOS("DADOS_INVALIDOS", "Dados da requisição inválidos.", HttpStatus.BAD_REQUEST);
 
     private final String codigo;

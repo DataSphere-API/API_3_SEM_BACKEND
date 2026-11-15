@@ -8,4 +8,6 @@ import java.util.List;
 @Repository
 public interface ItemFaturaRepository extends JpaRepository<ItemFaturaModel, Integer> {
     List<ItemFaturaModel> findByFaturaId(Long faturaId);
+
+    void deleteByFaturaIdAndEspelhoItemIdIn(Long faturaId, List<Integer> espelhoItemIds);
 }

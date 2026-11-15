@@ -3,50 +3,43 @@ package com.datasphere.fusex.fatura;
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "fatura")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "Fatura")
+@Data
 public class FaturaModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "guia_proc_id", nullable = false)
-    private GuiaProcModel guiaProcModel;
+    @Column(name = "ocs_id", length = 14)
+    private String ocsId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "esp_fat", nullable = false)
-    private EspelhoModel espelhoModel;
+    @Column(name = "competencia", length = 7)
+    private String competencia;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 30)
-    private StatusFatura status = StatusFatura.ATIVA;
+    @Column(name = "status")
+    private StatusFatura status;
 
-    @Column(name = "data_geracao", nullable = false)
+    @Column(name = "data_encaminhamento")
+    private LocalDateTime dataEncaminhamento;
+
+    @Column(name = "data_geracao")
     private LocalDateTime dataGeracao;
 
     @Column(name = "fatura_origem_id")
     private Long faturaOrigemId;
 
-    @Column(name = "data_encaminhamento")
-    private LocalDateTime dataEncaminhamento;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "esp_fat", nullable = true)
+    private EspelhoModel espelhoModel;
 
-    @PrePersist
-    private void preencherDataGeracao() {
-        if (dataGeracao == null) {
-            dataGeracao = LocalDateTime.now();
-        }
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "guia_proc_id", nullable = true)
+    private GuiaProcModel guiaProcModel;
 }
