@@ -1,5 +1,6 @@
 package com.datasphere.fusex.atendimento.controller;
 
+import jakarta.validation.Valid;
 import com.datasphere.fusex.atendimento.service.ListarAtendimentosPorOcs;
 import com.datasphere.fusex.atendimento.service.RegistrarRealizacaoService;
 import com.datasphere.fusex.atendimento.service.RegistrarSessaoService;
@@ -40,14 +41,14 @@ public class AtendimentoController {
     }
 
     @PostMapping("/atendimentos/validar-qrcode")
-    public ResponseEntity<BaixaResponse> validarQrCode(@RequestBody ValidarQrCodeRequest request) {
+    public ResponseEntity<BaixaResponse> validarQrCode(@Valid @RequestBody ValidarQrCodeRequest request) {
         return ResponseEntity.ok(registrarRealizacaoService.registrarRealizacao(request));
     }
 
     @PostMapping("/atendimentos/{id}/sessoes")
     public ResponseEntity<SessaoResponse> registrarSessao(
             @PathVariable Long id,
-            @RequestBody SessaoRequest request) {
+            @Valid @RequestBody SessaoRequest request) {
 
         SessaoResponse response = registrarSessaoService.registrarSessao(id, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

@@ -51,7 +51,7 @@ class RegistrarRealizacaoServiceTest {
         guia.setId(4L);
 
         GuiaProcModel p = new GuiaProcModel();
-        p.setGuiaId(10L);
+        p.setId(10L);
         p.setGuiaModel(guia);
         p.setQr(QR);
         p.setStatus("Pendente");

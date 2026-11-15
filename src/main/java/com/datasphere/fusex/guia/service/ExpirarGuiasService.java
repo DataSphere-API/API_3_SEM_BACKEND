@@ -63,7 +63,7 @@ public class ExpirarGuiasService {
                 String statusAnterior = procedimento.getStatus();
                 procedimento.setStatus(StatusProcedimento.EXPIRADA.name());
                 guiaProcRepository.save(procedimento);
-                registrarMudancaStatusService.executar(EntidadeTipo.GUIA_PROC, procedimento.getGuiaId(),
+                registrarMudancaStatusService.executar(EntidadeTipo.GUIA_PROC, procedimento.getId(),
                         statusAnterior, StatusProcedimento.EXPIRADA.name(), ORIGEM);
                 expirados++;
             }

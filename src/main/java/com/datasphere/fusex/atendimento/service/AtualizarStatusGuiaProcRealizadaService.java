@@ -28,7 +28,7 @@ public class AtualizarStatusGuiaProcRealizadaService {
         procedimento.setDataValidacao(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         GuiaProcModel salvo = guiaProcRepository.save (procedimento);
 
-        registrarMudancaStatusService.executar(EntidadeTipo.GUIA_PROC, salvo.getGuiaId(),
+        registrarMudancaStatusService.executar(EntidadeTipo.GUIA_PROC, salvo.getId(),
                 statusAnterior, StatusProcedimento.REALIZADA.name(), "validacao-qrcode");
         return salvo;
     }

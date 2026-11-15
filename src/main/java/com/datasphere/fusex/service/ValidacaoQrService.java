@@ -88,7 +88,7 @@ public class ValidacaoQrService {
         boolean prontoParaBaixa = qtdAutorizada > 0 && qtdRealizada >= qtdAutorizada;
 
         return new ConferenciaQrResponse(
-                p.getGuiaId(),
+                p.getId(),
                 guia.getId(),
                 new ConferenciaQrResponse.Beneficiario(beneficiario.getPrecCP(), beneficiario.getNome()),
                 contrato.getProcedimentoModel().getNome(),

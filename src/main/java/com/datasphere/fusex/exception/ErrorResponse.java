@@ -1,5 +1,4 @@
 package com.datasphere.fusex.exception;
 
-import java.util.Map;
-
-public record ErrorResponse(String codigo, String mensagem, Map<String, Object> detalhes) {}
+// detalhes: lista na validação, mapa nas regras de negócio.
+public record ErrorResponse(String codigo, String mensagem, Object detalhes) {}

@@ -63,7 +63,7 @@ public class RegistrarRealizacaoService {
         String statusGuia = guiaId != null ? recalcularStatusDaGuia.recalcularStatusDaGuia(guiaId) : null;
 
         return new BaixaResponse(
-                atualizado.getGuiaId(),
+                atualizado.getId(),
                 atualizado.getStatus(),
                 qtdAutorizada,
                 qtdRealizada,

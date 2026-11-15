@@ -38,7 +38,7 @@ class ExpirarGuiasServiceTest {
 
     private GuiaProcModel procedimento(Long id, String status) {
         GuiaProcModel p = new GuiaProcModel();
-        p.setGuiaId(id);
+        p.setId(id);
         p.setStatus(status);
         return p;
     }

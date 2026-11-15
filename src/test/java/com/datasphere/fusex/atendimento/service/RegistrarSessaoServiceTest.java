@@ -60,7 +60,7 @@ class RegistrarSessaoServiceTest {
         when(guiaProcRepository.findById(atendimentoId)).thenReturn(Optional.of(atendimento));
         when(sessaoRepository.findMaxNumeroSessaoByGuiaProcId(atendimentoId))
                 .thenReturn(Optional.empty());
-        when(sessaoRepository.existsByGuiaProc_GuiaId(atendimentoId)).thenReturn(false);
+        when(sessaoRepository.existsByGuiaProc_Id(atendimentoId)).thenReturn(false);
         when(sessaoRepository.save(any(SessaoModel.class))).thenAnswer(i -> i.getArgument(0));
 
         SessaoResponse response = registrarSessaoService.registrarSessao(
@@ -100,7 +100,7 @@ class RegistrarSessaoServiceTest {
         when(guiaProcRepository.findById(atendimentoId)).thenReturn(Optional.of(atendimento));
         when(sessaoRepository.findMaxNumeroSessaoByGuiaProcId(atendimentoId))
                 .thenReturn(Optional.of(2));
-        when(sessaoRepository.existsByGuiaProc_GuiaId(atendimentoId)).thenReturn(true);
+        when(sessaoRepository.existsByGuiaProc_Id(atendimentoId)).thenReturn(true);
         when(sessaoRepository.save(any(SessaoModel.class))).thenAnswer(i -> i.getArgument(0));
 
         SessaoResponse response = registrarSessaoService.registrarSessao(
@@ -167,7 +167,7 @@ class RegistrarSessaoServiceTest {
         guia.setStatus("EMITIDA");
 
         GuiaProcModel atendimento = new GuiaProcModel();
-        atendimento.setGuiaId(10L);
+        atendimento.setId(10L);
         atendimento.setGuiaModel(guia);
         atendimento.setStatus("EMITIDA");
         atendimento.setDataValidade(LocalDate.now().plusDays(30));
