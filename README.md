@@ -58,6 +58,8 @@ Para gerar e testar o QR Code por procedimento da **US003-1**, consulte o [guia 
 
 A **US003-5** evolui esse fluxo: QR na emissão e consulta exclusiva do beneficiário com sessões completas. Consulte o [guia atualizado e a ordem de integração](docs/US003-5.md).
 
+A **US003-6** adiciona número anual às guias e restringe sua listagem ao dono, chefe ou emissor. Consulte o [guia e as requisições de teste](docs/US003-6.md).
+
 ---
 
 ## 🐳 Stack Completa (PostgreSQL + Backend + Frontend)
