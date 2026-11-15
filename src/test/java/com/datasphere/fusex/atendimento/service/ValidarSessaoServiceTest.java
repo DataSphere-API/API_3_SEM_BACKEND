@@ -71,14 +71,12 @@ class ValidarSessaoServiceTest {
     }
 
     @Test
-    @DisplayName("validarGuiaEmitida: deve rejeitar com guia PARCIALMENTE_REALIZADA")
-    void rejeitaComGuiaParcialmenteRealizada() {
+    @DisplayName("validarGuiaEmitida: deve passar com guia PARCIALMENTE_REALIZADA")
+    void permiteGuiaParcialmenteRealizada() {
         GuiaProcModel atendimento = atendimentoComStatusGuia("PARCIALMENTE_REALIZADA");
 
-        assertThatThrownBy(() -> validarSessaoService.validarGuiaEmitida(atendimento))
-                .isInstanceOf(BusinessException.class)
-                .extracting("errorCode")
-                .isEqualTo(ErrorCode.GUIA_NAO_EMITIDA);
+        assertThatCode(() -> validarSessaoService.validarGuiaEmitida(atendimento))
+                .doesNotThrowAnyException();
     }
 
     @Test

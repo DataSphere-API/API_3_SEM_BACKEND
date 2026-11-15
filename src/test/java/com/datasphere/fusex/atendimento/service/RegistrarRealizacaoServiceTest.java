@@ -32,7 +32,7 @@ class RegistrarRealizacaoServiceTest {
 
     private static final String QR = "QR1";
     private static final String CNPJ = "12345678000101";
-    private static final ValidarQrCodeRequest REQUEST = new ValidarQrCodeRequest(QR, CNPJ);
+    private static final ValidarQrCodeRequest REQUEST = new ValidarQrCodeRequest(QR);
 
     @Mock
     private GuiaProcRepository guiaProcRepository;
@@ -42,6 +42,14 @@ class RegistrarRealizacaoServiceTest {
     private AtualizarStatusGuiaProcRealizadaService atualizarStatus;
     @Mock
     private RecalcularStatusDaGuiaService recalcularStatusDaGuia;
+
+    @Mock private BuscarOcsAutenticadaService ocsAutenticada;
+    @Mock private com.datasphere.fusex.atendimento.sessao.SessaoRepository sessaoRepository;
+
+    @org.junit.jupiter.api.BeforeEach
+    void autenticar() {
+        org.mockito.Mockito.lenient().when(ocsAutenticada.buscarOcsAutenticada()).thenReturn(CNPJ);
+    }
 
     @InjectMocks
     private RegistrarRealizacaoService service;
