@@ -53,4 +53,11 @@ public class GuiaModel {
     private LocalDate dataEmissao;
 
     private String status;
+
+    // Sem @Lob: no PostgreSQL, @Lob em byte[] vira OID em vez de BYTEA.
+    @Column(name = "documento")
+    private byte[] documento;
+
+    @Column(name = "hash_pacote", length = 64)
+    private String hashPacote;
 }
