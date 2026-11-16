@@ -69,6 +69,10 @@ public enum ErrorCode {
     CRM_JA_CADASTRADO("CRM_JA_CADASTRADO", "Já existe médico com este CRM.", HttpStatus.CONFLICT),
     OCS_NAO_ENCONTRADA("OCS_NAO_ENCONTRADA", "OCS não encontrada.", HttpStatus.UNPROCESSABLE_ENTITY),
     CADASTRO_RESTRITO_AO_CHEFE("CADASTRO_RESTRITO_AO_CHEFE", "Apenas o chefe do FUSEx pode cadastrar.", HttpStatus.FORBIDDEN),
+    GUIA_NAO_ENCONTRADA("GUIA_NAO_ENCONTRADA", "Guia não encontrada.", HttpStatus.NOT_FOUND),
+    DOCUMENTO_GUIA_INDISPONIVEL("DOCUMENTO_GUIA_INDISPONIVEL", "Esta guia foi emitida antes do registro do documento.", HttpStatus.NOT_FOUND),
+    DOCUMENTO_GUIA_JA_GRAVADO("DOCUMENTO_GUIA_JA_GRAVADO", "O documento desta guia já foi gravado e não pode mudar.", HttpStatus.CONFLICT),
+
     DADOS_INVALIDOS("DADOS_INVALIDOS", "Dados da requisição inválidos.", HttpStatus.BAD_REQUEST);
 
     private final String codigo;
