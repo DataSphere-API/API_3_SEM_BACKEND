@@ -1,0 +1,1 @@
+ALTER TABLE Espelho ADD COLUMN IF NOT EXISTS Motivo_Reprovacao VARCHAR(500);
