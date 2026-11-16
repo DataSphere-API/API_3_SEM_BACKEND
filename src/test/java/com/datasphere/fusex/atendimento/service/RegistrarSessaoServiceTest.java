@@ -42,6 +42,15 @@ class RegistrarSessaoServiceTest {
     @Mock
     private ValidarSessaoService validarSessaoService;
 
+    @Mock private BuscarOcsAutenticadaService ocsAutenticada;
+    @Mock private com.datasphere.fusex.service.ValidacaoQrService validacaoQrService;
+    @Mock private com.datasphere.fusex.historicoStatus.service.RegistrarMudancaStatusService historico;
+
+    @org.junit.jupiter.api.BeforeEach
+    void autenticar() {
+        org.mockito.Mockito.lenient().when(ocsAutenticada.buscarOcsAutenticada()).thenReturn("12345678000199");
+    }
+
     @InjectMocks
     private RegistrarSessaoService registrarSessaoService;
 
@@ -55,9 +64,9 @@ class RegistrarSessaoServiceTest {
         GuiaProcModel atendimento = atendimentoValido();
         atendimento.setQtdAutorizada(10);
         atendimento.setQtdRealizada(0);
-        atendimento.setStatus("EMITIDA");
+        atendimento.setStatus("PENDENTE");
 
-        when(guiaProcRepository.findById(atendimentoId)).thenReturn(Optional.of(atendimento));
+        when(guiaProcRepository.findByIdParaSessao(atendimentoId)).thenReturn(Optional.of(atendimento));
         when(sessaoRepository.findMaxNumeroSessaoByGuiaProcId(atendimentoId))
                 .thenReturn(Optional.empty());
         when(sessaoRepository.existsByGuiaProc_Id(atendimentoId)).thenReturn(false);
@@ -83,6 +92,8 @@ class RegistrarSessaoServiceTest {
         verify(validarSessaoService).validarSaldoDeSessoes(atendimento);
         verify(sessaoRepository).save(any(SessaoModel.class));
         verify(guiaProcRepository).save(atendimento);
+        verify(historico).executar(com.datasphere.fusex.historicoStatus.EntidadeTipo.GUIA_PROC,
+                atendimentoId, "PENDENTE", "EM_ANDAMENTO", "registro-sessao");
     }
 
     // ============================================================
@@ -97,7 +108,7 @@ class RegistrarSessaoServiceTest {
         atendimento.setQtdRealizada(2);
         atendimento.setStatus("EM_ANDAMENTO");
 
-        when(guiaProcRepository.findById(atendimentoId)).thenReturn(Optional.of(atendimento));
+        when(guiaProcRepository.findByIdParaSessao(atendimentoId)).thenReturn(Optional.of(atendimento));
         when(sessaoRepository.findMaxNumeroSessaoByGuiaProcId(atendimentoId))
                 .thenReturn(Optional.of(2));
         when(sessaoRepository.existsByGuiaProc_Id(atendimentoId)).thenReturn(true);
@@ -122,7 +133,7 @@ class RegistrarSessaoServiceTest {
     @Test
     @DisplayName("Deve lançar ATENDIMENTO_NAO_ENCONTRADO quando id não existe")
     void deveLancarErroQuandoAtendimentoNaoExiste() {
-        when(guiaProcRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(guiaProcRepository.findByIdParaSessao(anyLong())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> registrarSessaoService.registrarSessao(
                 999L, new SessaoRequest("12345678000199")))
@@ -145,7 +156,7 @@ class RegistrarSessaoServiceTest {
         atendimento.setQtdAutorizada(3);
         atendimento.setQtdRealizada(3);
 
-        when(guiaProcRepository.findById(atendimentoId)).thenReturn(Optional.of(atendimento));
+        when(guiaProcRepository.findByIdParaSessao(atendimentoId)).thenReturn(Optional.of(atendimento));
         doThrow(new BusinessException(ErrorCode.SESSOES_ESGOTADAS))
                 .when(validarSessaoService).validarSaldoDeSessoes(atendimento);
 

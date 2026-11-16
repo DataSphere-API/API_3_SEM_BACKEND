@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface FaturaRepository extends JpaRepository<FaturaModel, Long> {
+    Optional<FaturaModel> findByOcsIdAndCompetenciaAndStatus(String ocsId, String competencia, StatusFatura status);
     List<FaturaModel> findByStatus(StatusFatura status);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

@@ -70,7 +70,7 @@ class ConferenciaQrControllerTest {
                 LocalDate.of(2026, 12, 19),
                 "EM_ANDAMENTO");
 
-        when(validacaoQrService.montarDadosConferenciaQr("QR123", CNPJ)).thenReturn(resposta);
+        when(validacaoQrService.montarDadosConferenciaQr("QR123")).thenReturn(resposta);
 
         mockMvc.perform(get("/atendimentos/qrcode/QR123").param("cnpj", CNPJ))
                 .andExpect(status().isOk())
@@ -90,7 +90,7 @@ class ConferenciaQrControllerTest {
 
     @Test
     void qrInexistente_retorna404() throws Exception {
-        when(validacaoQrService.montarDadosConferenciaQr("NAOEXISTE", CNPJ))
+        when(validacaoQrService.montarDadosConferenciaQr("NAOEXISTE"))
                 .thenThrow(new BusinessException(ErrorCode.QR_NAO_ENCONTRADO));
 
         mockMvc.perform(get("/atendimentos/qrcode/NAOEXISTE").param("cnpj", CNPJ))
@@ -99,28 +99,28 @@ class ConferenciaQrControllerTest {
     }
 
     @Test
-    void ocsDiferente_retorna422() throws Exception {
-        when(validacaoQrService.montarDadosConferenciaQr("QR123", "99999999000100"))
+    void ocsDiferente_retorna403() throws Exception {
+        when(validacaoQrService.montarDadosConferenciaQr("QR123"))
                 .thenThrow(new BusinessException(ErrorCode.OCS_DIFERENTE_DO_CONTRATO));
 
         mockMvc.perform(get("/atendimentos/qrcode/QR123").param("cnpj", "99999999000100"))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.codigo").value("OCS_DIFERENTE_DO_CONTRATO"));
     }
 
     @Test
-    void guiaExpirada_retorna422() throws Exception {
-        when(validacaoQrService.montarDadosConferenciaQr("QR123", CNPJ))
-                .thenThrow(new BusinessException(ErrorCode.GUIA_EXPIRADA));
+    void guiaExpirada_retorna409() throws Exception {
+        when(validacaoQrService.montarDadosConferenciaQr("QR123"))
+                .thenThrow(new com.datasphere.fusex.exception.QrCodeIndisponivelException(ErrorCode.GUIA_EXPIRADA));
 
         mockMvc.perform(get("/atendimentos/qrcode/QR123").param("cnpj", CNPJ))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.codigo").value("GUIA_EXPIRADA"));
     }
 
     @Test
-    void semCnpj_retorna400() throws Exception {
+    void semCnpj_retorna200() throws Exception {
         mockMvc.perform(get("/atendimentos/qrcode/QR123"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isOk());
     }
 }

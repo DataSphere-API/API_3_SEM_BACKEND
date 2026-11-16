@@ -15,6 +15,8 @@ public interface PreGuiaRepository extends JpaRepository<PreGuiaModel, Long> {
 
     List<PreGuiaModel> findAllByOrderByIdAsc();
 
+    List<PreGuiaModel> findByBenfIdAndGuiaIdIsNullAndStatusNotOrderByIdDesc(String benfId, StatusPreGuia status);
+
     List<PreGuiaModel> findByStatusOrderByIdAsc(StatusPreGuia status);
 
     List<PreGuiaModel> findByMedIdOrderByIdAsc(Integer medId);
