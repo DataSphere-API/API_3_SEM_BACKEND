@@ -1,14 +1,16 @@
 package com.datasphere.fusex.espelho.controller;
-import com.datasphere.fusex.exception.BusinessException;
 
+import com.datasphere.fusex.auditor.service.IdentificarAuditorService;
 import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.StatusEspelho;
 import com.datasphere.fusex.espelho.dto.*;
+import com.datasphere.fusex.espelho.request.DecisaoEspelhoResponse;
+import com.datasphere.fusex.espelho.request.ReprovacaoEspelhoRequest;
 import com.datasphere.fusex.espelho.service.*;
 import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
 import com.datasphere.fusex.espelhoItem.dto.EspelhoItemResponse;
-import com.datasphere.fusex.fatura.service.AlimentarFaturaNaAprovacaoService;
+import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -32,7 +34,10 @@ public class EspelhoController {
     private final CorrigirItemEspelhoService corrigirItemEspelhoService;
     private final RemoverItemDoEspelhoService removerItemDoEspelhoService;
     private final EnriquecerListaEspelhosService enriquecerListaEspelhosService;
-    private final AlimentarFaturaNaAprovacaoService alimentarFaturaNaAprovacaoService;
+    private final AprovarEspelhoService aprovarEspelhoService;
+    private final ReprovarEspelhoService reprovarEspelhoService;
+    private final ReenviarEspelhoService reenviarEspelhoService;
+    private final IdentificarAuditorService identificarAuditorService;
 
     public EspelhoController(ValidarAtendimentoRealizadoService validarAtendimentoRealizadoService,
                              ValidarEspelhoNaoDuplicadoPorAtendimentoService validarEspelhoNaoDuplicadoPorAtendimentoService,
@@ -45,7 +50,10 @@ public class EspelhoController {
                              CorrigirItemEspelhoService corrigirItemEspelhoService,
                              RemoverItemDoEspelhoService removerItemDoEspelhoService,
                              EnriquecerListaEspelhosService enriquecerListaEspelhosService,
-                             AlimentarFaturaNaAprovacaoService alimentarFaturaNaAprovacaoService) {
+                             AprovarEspelhoService aprovarEspelhoService,
+                             ReprovarEspelhoService reprovarEspelhoService,
+                             ReenviarEspelhoService reenviarEspelhoService,
+                             IdentificarAuditorService identificarAuditorService) {
         this.validarAtendimentoRealizadoService = validarAtendimentoRealizadoService;
         this.validarEspelhoNaoDuplicadoPorAtendimentoService = validarEspelhoNaoDuplicadoPorAtendimentoService;
         this.criarEspelhoComItensService = criarEspelhoComItensService;
@@ -57,7 +65,10 @@ public class EspelhoController {
         this.corrigirItemEspelhoService = corrigirItemEspelhoService;
         this.removerItemDoEspelhoService = removerItemDoEspelhoService;
         this.enriquecerListaEspelhosService = enriquecerListaEspelhosService;
-        this.alimentarFaturaNaAprovacaoService = alimentarFaturaNaAprovacaoService;
+        this.aprovarEspelhoService = aprovarEspelhoService;
+        this.reprovarEspelhoService = reprovarEspelhoService;
+        this.reenviarEspelhoService = reenviarEspelhoService;
+        this.identificarAuditorService = identificarAuditorService;
     }
 
     @PostMapping("/espelhos")
@@ -140,22 +151,31 @@ public class EspelhoController {
     }
 
     @PatchMapping("/espelhos/{id}/aprovar")
-    public ResponseEntity<?> aprovarEspelho(@PathVariable Integer id) {
-        EspelhoModel espelho = buscarEspelhoPorIdService.buscarEspelhoPorId(id);
-        if (espelho == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("espelho não encontrado");
-        }
-        alimentarFaturaNaAprovacaoService.processarAprovacaoEspelho(espelho);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<DecisaoEspelhoResponse> aprovarEspelho(
+            @PathVariable Integer id,
+            @RequestHeader(value = "X-Auditor-Id", required = false) Integer headerAuditorId) {
+        buscarEspelhoOuFalhar(id);
+        Integer auditorId = identificarAuditorService.identificarAuditor(headerAuditorId);
+        DecisaoEspelhoResponse response = aprovarEspelhoService.aprovarEspelho(id, auditorId);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/espelhos/{id}/reprovar")
-    public ResponseEntity<?> reprovarEspelho(@PathVariable Integer id) {
-        EspelhoModel espelho = buscarEspelhoPorIdService.buscarEspelhoPorId(id);
-        if (espelho == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("espelho não encontrado");
-        }
-        alimentarFaturaNaAprovacaoService.processarReprovacaoEspelho(espelho);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<DecisaoEspelhoResponse> reprovarEspelho(
+            @PathVariable Integer id,
+            @RequestHeader(value = "X-Auditor-Id", required = false) Integer headerAuditorId,
+            @RequestBody(required = false) ReprovacaoEspelhoRequest request) {
+        buscarEspelhoOuFalhar(id);
+        Integer auditorId = identificarAuditorService.identificarAuditor(headerAuditorId);
+        String motivo = request != null ? request.motivo() : null;
+        DecisaoEspelhoResponse response = reprovarEspelhoService.reprovarEspelho(id, auditorId, motivo);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/espelhos/{id}/reenviar")
+    public ResponseEntity<DecisaoEspelhoResponse> reenviarEspelho(@PathVariable Integer id) {
+        buscarEspelhoOuFalhar(id);
+        DecisaoEspelhoResponse response = reenviarEspelhoService.reenviarEspelho(id);
+        return ResponseEntity.ok(response);
     }
 }
