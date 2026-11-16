@@ -29,6 +29,7 @@ import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(QrCodeIndisponivelException.class)
     public ResponseEntity<ErrorResponse> handleQrIndisponivel(QrCodeIndisponivelException ex) {

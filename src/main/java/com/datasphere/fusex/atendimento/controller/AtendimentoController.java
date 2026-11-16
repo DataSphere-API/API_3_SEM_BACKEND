@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -56,10 +55,9 @@ public class AtendimentoController {
 
     @GetMapping("/atendimentos/qrcode/{codigo}")
     public ResponseEntity<ConferenciaQrResponse> conferirQrCode(
-            @PathVariable String codigo,
-            @RequestParam String cnpj) {
+            @PathVariable String codigo) {
 
-        return ResponseEntity.ok(validacaoQrService.montarDadosConferenciaQr(codigo, cnpj));
+        return ResponseEntity.ok(validacaoQrService.montarDadosConferenciaQr(codigo));
     }
 
     @GetMapping("/ocs/{cnpj}/atendimentos")

@@ -1,3 +1,4 @@
+-- Versão exclusiva: V13 já pertence ao cadastro do chefe.
 ALTER TABLE Fatura ADD COLUMN IF NOT EXISTS ocs_id VARCHAR(14);
 ALTER TABLE Fatura ADD COLUMN IF NOT EXISTS competencia VARCHAR(7); -- Formato: 'YYYY-MM'
 

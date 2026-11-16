@@ -155,7 +155,17 @@ class ConsultaQrIntegrationTest {
     @Test
     void aposBaixaFinalOCodigoNaoPodeSerReutilizado() throws Exception {
         String codigo = jdbc.queryForObject("SELECT qr FROM guia_proc WHERE id=4", String.class);
-        registrarRealizacaoService.registrarRealizacao(new ValidarQrCodeRequest(codigo, "12345678000199"));
+        var usuario = new com.datasphere.fusex.auth.UsuarioLogado(1, "62819482112", "OCS",
+                java.util.Set.of(com.datasphere.fusex.auth.Perfil.OCS), null, null, null, null, null,
+                null, "12345678000199", "Recepção");
+        var contexto = org.springframework.security.core.context.SecurityContextHolder.getContext();
+        contexto.setAuthentication(new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                usuario, null, java.util.List.of()));
+        try {
+            registrarRealizacaoService.registrarRealizacao(new ValidarQrCodeRequest(codigo));
+        } finally {
+            org.springframework.security.core.context.SecurityContextHolder.clearContext();
+        }
         mvc.perform(get("/atendimentos/4/qrcode").header("X-Mock-Login", "00000000351"))
                 .andExpect(status().isConflict()).andExpect(jsonPath("$.codigo").value("PROCEDIMENTO_JA_REALIZADO"));
     }

@@ -1,4 +1,5 @@
 package com.datasphere.fusex.espelho.controller;
+import com.datasphere.fusex.exception.BusinessException;
 
 import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.espelho.EspelhoModel;
