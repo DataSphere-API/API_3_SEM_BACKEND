@@ -15,6 +15,10 @@ public interface GuiaProcRepository extends JpaRepository<GuiaProcModel, Long> {
 
     GuiaProcModel findByQr(String qr);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select g from GuiaProcModel g where g.id = :id")
+    Optional<GuiaProcModel> findByIdParaQr(@Param("id") Long id);
+
     List<GuiaProcModel> findByContratoModel_OcsModel_Cnpj(String cnpj);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
@@ -24,6 +28,6 @@ public interface GuiaProcRepository extends JpaRepository<GuiaProcModel, Long> {
     List<GuiaProcModel> findByGuiaModel_Id(Long guiaId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select g from GuiaProcModel g where g.guiaId = :id")
+    @Query("select g from GuiaProcModel g where g.id = :id")
     Optional<GuiaProcModel> findByIdParaSessao(@Param("id") Long id);
 }

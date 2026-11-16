@@ -3,16 +3,14 @@ package com.datasphere.fusex.guiaProc;
 import com.datasphere.fusex.contrato.ContratoModel;
 import com.datasphere.fusex.guia.GuiaModel;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "guia_proc")
+@Data
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,7 +20,7 @@ public class GuiaProcModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long guiaId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cont_id", nullable = false)

@@ -34,7 +34,7 @@ public class ListarAtendimentosPorOcs {
         BeneficiarioModel beneficiario = guia.getBeneficiarioModel();
 
         return new AtendimentoResponse(
-                atendimento.getGuiaId(),
+                atendimento.getId(),
                 guia.getId(),
                 new AtendimentoResponse.Beneficiario(beneficiario.getPrecCP(), beneficiario.getNome()),
                 atendimento.getContratoModel().getProcedimentoModel().getNome(),

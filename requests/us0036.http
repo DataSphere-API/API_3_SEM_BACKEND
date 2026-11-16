@@ -1,0 +1,30 @@
+@host = http://localhost:8080
+@beneficiario = 123456789-00
+
+### Perfis locais: dev,qrconsulta-mock,guias-mock, com os seeds aplicados.
+# 200: dono vê suas guias; cada guia deve incluir numero, inclusive as antigas.
+GET {{host}}/beneficiarios/{{beneficiario}}/guias
+X-Mock-Login: 00000000351
+
+### 403: outro beneficiário.
+GET {{host}}/beneficiarios/{{beneficiario}}/guias
+X-Mock-Login: 00000000352
+
+### 200: chefe pode consultar qualquer beneficiário.
+GET {{host}}/beneficiarios/{{beneficiario}}/guias
+X-Mock-Login: 00000000353
+
+### 200: emissor pode consultar qualquer beneficiário.
+GET {{host}}/beneficiarios/{{beneficiario}}/guias
+X-Mock-Login: 00000000354
+
+### 403: médico sem perfil de chefe/emissor não consulta outro beneficiário.
+GET {{host}}/beneficiarios/{{beneficiario}}/guias
+X-Mock-Login: 00000000355
+
+### 401: sem autenticação.
+GET {{host}}/beneficiarios/{{beneficiario}}/guias
+
+### 404: chefe pode consultar, mas o beneficiário não existe.
+GET {{host}}/beneficiarios/inexistente/guias
+X-Mock-Login: 00000000353

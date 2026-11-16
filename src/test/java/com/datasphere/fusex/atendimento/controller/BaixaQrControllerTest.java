@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class BaixaQrControllerTest {
 
-    private static final String BODY = "{\"qr\":\"QR1\",\"cnpj\":\"12345678000101\"}";
+    private static final String BODY = "{\"qr\":\"QR1\"}";
 
     @Mock
     private RegistrarRealizacaoService registrarRealizacaoService;
@@ -91,14 +91,14 @@ class BaixaQrControllerTest {
     }
 
     @Test
-    void procedimentoJaRealizado_retorna422() throws Exception {
+    void procedimentoJaRealizado_retorna409() throws Exception {
         when(registrarRealizacaoService.registrarRealizacao(any(ValidarQrCodeRequest.class)))
-                .thenThrow(new BusinessException(ErrorCode.PROCEDIMENTO_JA_REALIZADO));
+                .thenThrow(new com.datasphere.fusex.exception.QrCodeIndisponivelException(ErrorCode.PROCEDIMENTO_JA_REALIZADO));
 
         mockMvc.perform(post("/atendimentos/validar-qrcode")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(BODY))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.codigo").value("PROCEDIMENTO_JA_REALIZADO"));
     }
 

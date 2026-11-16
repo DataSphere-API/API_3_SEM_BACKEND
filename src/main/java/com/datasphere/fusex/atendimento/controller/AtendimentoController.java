@@ -1,5 +1,6 @@
 package com.datasphere.fusex.atendimento.controller;
 
+import jakarta.validation.Valid;
 import com.datasphere.fusex.atendimento.service.ListarAtendimentosPorOcs;
 import com.datasphere.fusex.atendimento.service.RegistrarRealizacaoService;
 import com.datasphere.fusex.atendimento.service.RegistrarSessaoService;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -40,14 +40,14 @@ public class AtendimentoController {
     }
 
     @PostMapping("/atendimentos/validar-qrcode")
-    public ResponseEntity<BaixaResponse> validarQrCode(@RequestBody ValidarQrCodeRequest request) {
+    public ResponseEntity<BaixaResponse> validarQrCode(@Valid @RequestBody ValidarQrCodeRequest request) {
         return ResponseEntity.ok(registrarRealizacaoService.registrarRealizacao(request));
     }
 
     @PostMapping("/atendimentos/{id}/sessoes")
     public ResponseEntity<SessaoResponse> registrarSessao(
             @PathVariable Long id,
-            @RequestBody SessaoRequest request) {
+            @Valid @RequestBody SessaoRequest request) {
 
         SessaoResponse response = registrarSessaoService.registrarSessao(id, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -55,10 +55,9 @@ public class AtendimentoController {
 
     @GetMapping("/atendimentos/qrcode/{codigo}")
     public ResponseEntity<ConferenciaQrResponse> conferirQrCode(
-            @PathVariable String codigo,
-            @RequestParam String cnpj) {
+            @PathVariable String codigo) {
 
-        return ResponseEntity.ok(validacaoQrService.montarDadosConferenciaQr(codigo, cnpj));
+        return ResponseEntity.ok(validacaoQrService.montarDadosConferenciaQr(codigo));
     }
 
     @GetMapping("/ocs/{cnpj}/atendimentos")

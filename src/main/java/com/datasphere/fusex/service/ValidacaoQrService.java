@@ -5,7 +5,10 @@ import com.datasphere.fusex.contrato.ContratoModel;
 import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.dto.request.ConferenciaQrResponse;
 import com.datasphere.fusex.exception.BusinessException;
+import com.datasphere.fusex.exception.QrCodeIndisponivelException;
+import com.datasphere.fusex.atendimento.service.BuscarOcsAutenticadaService;
 import com.datasphere.fusex.guia.GuiaModel;
+import com.datasphere.fusex.guia.service.ValidadeGuiaService;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import com.datasphere.fusex.guiaProc.GuiaProcRepository;
 import org.springframework.stereotype.Service;
@@ -19,9 +22,15 @@ public class ValidacaoQrService {
 
     private static final Set<String> STATUS_JA_REALIZADO = Set.of("REALIZADO", "REALIZADA", "FATURADA");
     private final GuiaProcRepository guiaProcRepository;
+    private final BuscarOcsAutenticadaService buscarOcsAutenticadaService;
+    private final ValidadeGuiaService validadeGuiaService;
 
-    public ValidacaoQrService(GuiaProcRepository guiaProcRepository) {
+    public ValidacaoQrService(GuiaProcRepository guiaProcRepository,
+                             BuscarOcsAutenticadaService buscarOcsAutenticadaService,
+                             ValidadeGuiaService validadeGuiaService) {
         this.guiaProcRepository = guiaProcRepository;
+        this.buscarOcsAutenticadaService = buscarOcsAutenticadaService;
+        this.validadeGuiaService = validadeGuiaService;
     }
 
     /** Erro: QR_NAO_ENCONTRADO */
@@ -52,20 +61,30 @@ public class ValidacaoQrService {
         }
     }
 
-    /** Erro: GUIA_EXPIRADA. Sem data de validade = sem prazo. */
+    /** Considera tanto o vencimento do procedimento quanto o prazo da emissão da guia. */
     public void validarGuiaDentroDaValidade(GuiaProcModel p) {
         LocalDate validade = p.getDataValidade();
-        if (validade != null && LocalDate.now().isAfter(validade)) {
-            throw new BusinessException(ErrorCode.GUIA_EXPIRADA);
+        GuiaModel guia = p.getGuiaModel();
+        LocalDate emissao = guia == null ? null : guia.getDataEmissao();
+        if (emissao != null && (LocalDate.now().isBefore(emissao)
+                || LocalDate.now().isAfter(validadeGuiaService.calcularDataValidade(emissao)))) {
+            throw new QrCodeIndisponivelException(ErrorCode.GUIA_EXPIRADA);
+        }
+        if ((validade != null && LocalDate.now().isAfter(validade))
+                || (p.getGuiaModel() != null && "EXPIRADA".equalsIgnoreCase(p.getGuiaModel().getStatus()))) {
+            throw new QrCodeIndisponivelException(ErrorCode.GUIA_EXPIRADA);
         }
     }
 
     /** Erro: PROCEDIMENTO_JA_REALIZADO */
     public void validarProcedimentoNaoRealizado(GuiaProcModel p) {
+        if ("EXPIRADA".equalsIgnoreCase(p.getStatus()) || "EXPIRADO".equalsIgnoreCase(p.getStatus())) {
+            throw new QrCodeIndisponivelException(ErrorCode.GUIA_EXPIRADA);
+        }
         boolean jaRealizado = STATUS_JA_REALIZADO.stream()
                 .anyMatch(s -> s.equalsIgnoreCase(p.getStatus()));
         if (jaRealizado) {
-            throw new BusinessException(ErrorCode.PROCEDIMENTO_JA_REALIZADO);
+            throw new QrCodeIndisponivelException(ErrorCode.PROCEDIMENTO_JA_REALIZADO);
         }
     }
 
@@ -74,10 +93,12 @@ public class ValidacaoQrService {
      * Somente leitura: aplica validações de QR, OCS e validade, mas NÃO altera status.
      */
     @Transactional(readOnly = true)
-    public ConferenciaQrResponse montarDadosConferenciaQr(String codigo, String cnpj) {
+    public ConferenciaQrResponse montarDadosConferenciaQr(String codigo) {
+        String cnpj = buscarOcsAutenticadaService.buscarOcsAutenticada();
         GuiaProcModel p = buscarProcedimentoPorQrCode(codigo);
         validarQrCodeDaOcs(p, cnpj);
         validarGuiaDentroDaValidade(p);
+        validarProcedimentoNaoRealizado(p);
 
         ContratoModel contrato = p.getContratoModel();
         GuiaModel guia = p.getGuiaModel();
@@ -85,10 +106,11 @@ public class ValidacaoQrService {
 
         int qtdAutorizada = p.getQtdAutorizada() == null ? 0 : p.getQtdAutorizada();
         int qtdRealizada = p.getQtdRealizada() == null ? 0 : p.getQtdRealizada();
-        boolean prontoParaBaixa = qtdAutorizada > 0 && qtdRealizada >= qtdAutorizada;
+        boolean prontoParaBaixa = qtdAutorizada > 0
+                && (qtdRealizada >= qtdAutorizada || (qtdAutorizada == 1 && qtdRealizada == 0));
 
         return new ConferenciaQrResponse(
-                p.getGuiaId(),
+                p.getId(),
                 guia.getId(),
                 new ConferenciaQrResponse.Beneficiario(beneficiario.getPrecCP(), beneficiario.getNome()),
                 contrato.getProcedimentoModel().getNome(),

@@ -13,7 +13,8 @@ import java.util.Set;
 @Service
 public class ValidarSessaoService {
 
-    private static final Set<String> STATUS_GUIA_PERMITIDOS = Set.of(StatusGuia.EMITIDA.name());
+    private static final Set<String> STATUS_GUIA_PERMITIDOS = Set.of(
+            StatusGuia.EMITIDA.name(), StatusGuia.PARCIALMENTE_REALIZADA.name());
 
     public void validarOcsDoContrato(GuiaProcModel atendimento, String cnpjRequest) {
         if (cnpjRequest == null || cnpjRequest.isBlank()) {

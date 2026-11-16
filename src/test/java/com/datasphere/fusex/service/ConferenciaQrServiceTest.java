@@ -36,6 +36,8 @@ class ConferenciaQrServiceTest {
     @Mock
     private GuiaProcRepository guiaProcRepository;
 
+    @Mock private com.datasphere.fusex.atendimento.service.BuscarOcsAutenticadaService ocsAutenticada;
+
     @InjectMocks
     private ValidacaoQrService service;
 
@@ -43,6 +45,7 @@ class ConferenciaQrServiceTest {
 
     @BeforeEach
     void setUp() {
+        when(ocsAutenticada.buscarOcsAutenticada()).thenReturn(CNPJ);
         OcsModel ocs = new OcsModel();
         ocs.setCnpj(CNPJ);
         ocs.setNome("Clínica X");
@@ -66,7 +69,7 @@ class ConferenciaQrServiceTest {
         setBeneficiario(guia, beneficiario);
 
         atendimento = new GuiaProcModel();
-        atendimento.setGuiaId(10L);
+        atendimento.setId(10L);
         atendimento.setContratoModel(contrato);
         atendimento.setGuiaModel(guia);
         atendimento.setQr(QR);
@@ -80,8 +83,8 @@ class ConferenciaQrServiceTest {
     void montaDadosCorretamenteSemAlterarNada() {
         when(guiaProcRepository.findByQr(QR)).thenReturn(atendimento);
 
-        ConferenciaQrResponse r1 = service.montarDadosConferenciaQr(QR, CNPJ);
-        ConferenciaQrResponse r2 = service.montarDadosConferenciaQr(QR, "12.345.678/0001-99");
+        ConferenciaQrResponse r1 = service.montarDadosConferenciaQr(QR);
+        ConferenciaQrResponse r2 = service.montarDadosConferenciaQr(QR);
 
         assertEquals(10L, r1.atendimentoId());
         assertEquals(4L, r1.guiaId());
@@ -112,17 +115,18 @@ class ConferenciaQrServiceTest {
         when(guiaProcRepository.findByQr("INEXISTENTE")).thenReturn(null);
 
         BusinessException ex = assertThrows(BusinessException.class,
-                () -> service.montarDadosConferenciaQr("INEXISTENTE", CNPJ));
+                () -> service.montarDadosConferenciaQr("INEXISTENTE"));
 
         assertEquals(ErrorCode.QR_NAO_ENCONTRADO, ex.getErrorCode());
     }
 
     @Test
     void ocsDiferente_lancaOcsDiferenteDoContrato() {
+        when(ocsAutenticada.buscarOcsAutenticada()).thenReturn("99999999000100");
         when(guiaProcRepository.findByQr(QR)).thenReturn(atendimento);
 
         BusinessException ex = assertThrows(BusinessException.class,
-                () -> service.montarDadosConferenciaQr(QR, "99999999000100"));
+                () -> service.montarDadosConferenciaQr(QR));
 
         assertEquals(ErrorCode.OCS_DIFERENTE_DO_CONTRATO, ex.getErrorCode());
     }
@@ -133,7 +137,7 @@ class ConferenciaQrServiceTest {
         when(guiaProcRepository.findByQr(QR)).thenReturn(atendimento);
 
         BusinessException ex = assertThrows(BusinessException.class,
-                () -> service.montarDadosConferenciaQr(QR, CNPJ));
+                () -> service.montarDadosConferenciaQr(QR));
 
         assertEquals(ErrorCode.GUIA_EXPIRADA, ex.getErrorCode());
     }

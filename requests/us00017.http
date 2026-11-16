@@ -1,0 +1,115 @@
+@host = http://localhost:8080
+@chefe = 00000000001
+
+### Executar com os perfis dev,cadastros-mock. Consultas de apoio.
+GET {{host}}/ocs
+
+###
+GET {{host}}/procedimentos
+
+###
+GET {{host}}/contratos
+
+###
+GET {{host}}/medicos
+
+### Busca por nome ou Prec-CP; retorna no máximo 20 beneficiários.
+GET {{host}}/beneficiarios?busca=US17
+
+### Usuários: apenas o chefe. A resposta não inclui senhas.
+GET {{host}}/usuarios
+X-Mock-Login: {{chefe}}
+
+### 201 na primeira execução; 409 OCS_JA_CADASTRADA ao repetir.
+POST {{host}}/ocs
+Content-Type: application/json
+X-Mock-Login: {{chefe}}
+
+{
+  "cnpj": "55443322000188",
+  "nome": "OCS de teste US000-17"
+}
+
+### 201 na primeira execução; 409 PROCEDIMENTO_JA_CADASTRADO ao repetir.
+POST {{host}}/procedimentos
+Content-Type: application/json
+X-Mock-Login: {{chefe}}
+
+{
+  "nome": "Procedimento de teste US000-17"
+}
+
+### Usa o procedimento 6 do seed dev e a OCS criada acima.
+POST {{host}}/contratos
+Content-Type: application/json
+X-Mock-Login: {{chefe}}
+
+{
+  "ocsCnpj": "55443322000188",
+  "procedimentoId": 6,
+  "valor": 720.49
+}
+
+### 422 VALOR_INVALIDO.
+POST {{host}}/contratos
+Content-Type: application/json
+X-Mock-Login: {{chefe}}
+
+{
+  "ocsCnpj": "55443322000188",
+  "procedimentoId": 6,
+  "valor": 0
+}
+
+### Acrescenta perfis a quem já tem autocadastro simulado; repetir não duplica perfis.
+POST {{host}}/usuarios
+Content-Type: application/json
+X-Mock-Login: {{chefe}}
+
+{
+  "tipo": "MILITAR",
+  "precCp": "US17-MILITAR",
+  "perfis": ["EMISSOR", "MEDICO"],
+  "crm": "US17-12345"
+}
+
+### 422 PRIMEIRO_ACESSO_PENDENTE.
+POST {{host}}/usuarios
+Content-Type: application/json
+X-Mock-Login: {{chefe}}
+
+{
+  "tipo": "MILITAR",
+  "precCp": "US17-PENDENTE",
+  "perfis": ["AUDITOR"]
+}
+
+### Cria login OCS e vínculo FunOcs. CPF fictício; senha de exemplo apenas local.
+POST {{host}}/usuarios
+Content-Type: application/json
+X-Mock-Login: {{chefe}}
+
+{
+  "tipo": "OCS",
+  "cpf": "99988877766",
+  "senha": "Teste-US17!",
+  "ocsCnpj": "55443322000188",
+  "cargo": "Recepção"
+}
+
+### 403: militar autenticado sem perfil de chefe.
+POST {{host}}/procedimentos
+Content-Type: application/json
+X-Mock-Login: 00000000002
+
+{
+  "nome": "Cadastro sem permissão"
+}
+
+### 401: ausência de identificação.
+POST {{host}}/procedimentos
+Content-Type: application/json
+
+{
+  "nome": "Cadastro sem autenticação"
+}

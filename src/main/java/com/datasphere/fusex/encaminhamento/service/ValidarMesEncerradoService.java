@@ -11,9 +11,12 @@ import java.time.YearMonth;
 public class ValidarMesEncerradoService {
 
     public void validarMesEncerrado(YearMonth competencia, LocalDate dataAtual) {
-        LocalDate primeiroDiaDeEncaminhamento = competencia.plusMonths(1).atDay(6);
-        if (dataAtual.isBefore(primeiroDiaDeEncaminhamento)) {
+        if (!podeEncaminhar(competencia, dataAtual)) {
             throw new BusinessException(ErrorCode.MES_NAO_ENCERRADO);
         }
+    }
+
+    public static boolean podeEncaminhar(YearMonth competencia, LocalDate dataAtual) {
+        return !dataAtual.isBefore(competencia.plusMonths(1).atDay(6));
     }
 }
