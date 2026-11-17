@@ -4,5 +4,6 @@ public enum StatusEspelho {
     EM_ABERTO,
     FATURADO,
     CANCELADO,
+    APROVADO,
     REPROVADO
 }

@@ -27,19 +27,22 @@ public class EmitirGuiaService {
     private final CriarProcedimentosDaGuiaService criarProcedimentosDaGuiaService;
     private final RegistrarStatusPreGuiaService registrarStatusPreGuiaService;
     private final ValidadeGuiaService validadeGuiaService;
+    private final GuardarDocumentoDaGuiaService guardarDocumentoDaGuiaService;
 
     public EmitirGuiaService(BuscarPreGuiaPorIdService buscarPreGuiaPorIdService,
                              PreGuiaProcRepository preGuiaProcRepository,
                              CriarGuiaDaPreGuiaService criarGuiaDaPreGuiaService,
                              CriarProcedimentosDaGuiaService criarProcedimentosDaGuiaService,
                              RegistrarStatusPreGuiaService registrarStatusPreGuiaService,
-                             ValidadeGuiaService validadeGuiaService) {
+                             ValidadeGuiaService validadeGuiaService,
+                             GuardarDocumentoDaGuiaService guardarDocumentoDaGuiaService) {
         this.buscarPreGuiaPorIdService = buscarPreGuiaPorIdService;
         this.preGuiaProcRepository = preGuiaProcRepository;
         this.criarGuiaDaPreGuiaService = criarGuiaDaPreGuiaService;
         this.criarProcedimentosDaGuiaService = criarProcedimentosDaGuiaService;
         this.registrarStatusPreGuiaService = registrarStatusPreGuiaService;
         this.validadeGuiaService = validadeGuiaService;
+        this.guardarDocumentoDaGuiaService = guardarDocumentoDaGuiaService;
     }
 
     @Transactional
@@ -63,6 +66,9 @@ public class EmitirGuiaService {
 
         preGuia.setGuiaId(guia.getId());
         registrarStatusPreGuiaService.atualizarStatus(preGuia, StatusPreGuia.EMITIDA, "emissao-da-guia");
+
+        // Depois do status EMITIDA para o PDF registrar a situação final.
+        guardarDocumentoDaGuiaService.guardarDocumentoDaGuia(guia, preGuiaId);
 
         List<EmissaoProcedimentoResponse> procedimentosResponse = new ArrayList<>();
         for (GuiaProcModel procedimento : procedimentos) {

@@ -5,7 +5,6 @@ import com.datasphere.fusex.espelho.dto.EspelhoRequest;
 import com.datasphere.fusex.espelho.service.*;
 import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.exception.GlobalExceptionHandler;
-import com.datasphere.fusex.fatura.service.AlimentarFaturaNaAprovacaoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,7 +42,10 @@ class EspelhoControllerErrosTest {
     @Mock private CorrigirItemEspelhoService corrigirItemEspelhoService;
     @Mock private RemoverItemDoEspelhoService removerItemDoEspelhoService;
     @Mock private EnriquecerListaEspelhosService enriquecerListaEspelhosService;
-    @Mock private AlimentarFaturaNaAprovacaoService alimentarFaturaNaAprovacaoService;
+    @Mock private AprovarEspelhoService aprovarEspelhoService;
+    @Mock private ReprovarEspelhoService reprovarEspelhoService;
+    @Mock private ReenviarEspelhoService reenviarEspelhoService;
+    @Mock private com.datasphere.fusex.auditor.service.IdentificarAuditorService identificarAuditorService;
 
     private MockMvc mockMvc;
 
@@ -53,7 +55,8 @@ class EspelhoControllerErrosTest {
                 validarEspelhoNaoDuplicadoPorAtendimentoService, criarEspelhoComItensService, listarEspelhosService,
                 listarEspelhosPorOcsService, listarEspelhosPorStatusService, buscarEspelhoPorIdService,
                 listarItensDoEspelhoService, corrigirItemEspelhoService, removerItemDoEspelhoService,
-                enriquecerListaEspelhosService, alimentarFaturaNaAprovacaoService);
+                enriquecerListaEspelhosService, aprovarEspelhoService, reprovarEspelhoService, reenviarEspelhoService,
+                identificarAuditorService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();

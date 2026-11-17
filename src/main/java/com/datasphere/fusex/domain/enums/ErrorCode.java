@@ -61,6 +61,10 @@ public enum ErrorCode {
     ITEM_ESPELHO_NAO_CORRIGIDO("ITEM_ESPELHO_NAO_CORRIGIDO", "Não foi possível corrigir o item do espelho.", HttpStatus.UNPROCESSABLE_ENTITY),
     ITEM_ESPELHO_NAO_REMOVIDO("ITEM_ESPELHO_NAO_REMOVIDO", "Não foi possível remover o item do espelho.", HttpStatus.UNPROCESSABLE_ENTITY),
     ESPELHO_NAO_FATURAVEL("ESPELHO_NAO_FATURAVEL", "O espelho já foi faturado ou está cancelado.", HttpStatus.CONFLICT),
+    ESPELHO_JA_AUDITADO("ESPELHO_JA_AUDITADO", "O espelho já foi auditado.", HttpStatus.CONFLICT),
+    ESPELHO_NAO_REPROVADO("ESPELHO_NAO_REPROVADO", "Apenas espelhos reprovados podem ser reenviados.", HttpStatus.CONFLICT),
+    FATURA_JA_ENCAMINHADA("FATURA_JA_ENCAMINHADA", "Fatura já encaminhada não aceita mais alterações.", HttpStatus.CONFLICT),
+    AUDITOR_INVALIDO("AUDITOR_INVALIDO", "Auditor não encontrado ou sem permissão.", HttpStatus.FORBIDDEN),
     FATURA_NAO_REGERAVEL("FATURA_NAO_REGERAVEL", "A fatura já foi regerada ou o espelho não mudou depois da geração.", HttpStatus.CONFLICT),
 
     OCS_JA_CADASTRADA("OCS_JA_CADASTRADA", "Já existe uma OCS com este CNPJ.", HttpStatus.CONFLICT),
@@ -75,6 +79,10 @@ public enum ErrorCode {
     CRM_JA_CADASTRADO("CRM_JA_CADASTRADO", "Já existe médico com este CRM.", HttpStatus.CONFLICT),
     OCS_NAO_ENCONTRADA("OCS_NAO_ENCONTRADA", "OCS não encontrada.", HttpStatus.UNPROCESSABLE_ENTITY),
     CADASTRO_RESTRITO_AO_CHEFE("CADASTRO_RESTRITO_AO_CHEFE", "Apenas o chefe do FUSEx pode cadastrar.", HttpStatus.FORBIDDEN),
+    GUIA_NAO_ENCONTRADA("GUIA_NAO_ENCONTRADA", "Guia não encontrada.", HttpStatus.NOT_FOUND),
+    DOCUMENTO_GUIA_INDISPONIVEL("DOCUMENTO_GUIA_INDISPONIVEL", "Esta guia foi emitida antes do registro do documento.", HttpStatus.NOT_FOUND),
+    DOCUMENTO_GUIA_JA_GRAVADO("DOCUMENTO_GUIA_JA_GRAVADO", "O documento desta guia já foi gravado e não pode mudar.", HttpStatus.CONFLICT),
+
     DADOS_INVALIDOS("DADOS_INVALIDOS", "Dados da requisição inválidos.", HttpStatus.BAD_REQUEST);
 
     private final String codigo;

@@ -46,6 +46,12 @@ public class EspelhoModel {
     @Column(name = "status", nullable = false, length = 20)
     private StatusEspelho status;
 
+    @Column(name = "auditor_id")
+    private Integer auditorId;
+
+    @Column(name = "motivo_reprovacao", length = 500)
+    private String motivoReprovacao;
+
     @Column(name = "data_atualizacao")
     private LocalDateTime dataAtualizacao;
 
