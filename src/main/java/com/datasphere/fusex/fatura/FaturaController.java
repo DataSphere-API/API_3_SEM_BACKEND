@@ -6,7 +6,6 @@ import com.datasphere.fusex.fatura.dto.FaturaResponse;
 import com.datasphere.fusex.fatura.dto.ItemFaturaResponse;
 import com.datasphere.fusex.fatura.service.BuscarFaturaPorIdService;
 import com.datasphere.fusex.fatura.service.ListarFaturasPorStatusService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -73,16 +73,6 @@ public class EspelhoController {
 
     @PostMapping("/espelhos")
     public ResponseEntity<EspelhoResponse> criarEspelho(@Valid @RequestBody EspelhoRequest request) {
-        GuiaProcModel atendimento = validarAtendimentoRealizadoService.validarAtendimentoRealizado(request.atendimentoId());
-        if (atendimento == null) {
-            throw new BusinessException(ErrorCode.ATENDIMENTO_NAO_REALIZADO);
-        }
-
-        boolean naoDuplicado = validarEspelhoNaoDuplicadoPorAtendimentoService.validarEspelhoNaoDuplicadoPorAtendimento(request.atendimentoId());
-        if (!naoDuplicado) {
-            throw new BusinessException(ErrorCode.ATENDIMENTO_JA_EM_ESPELHO);
-        }
-
         EspelhoResponse response = criarEspelhoComItensService.criarEspelhoComItens(request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -127,18 +117,12 @@ public class EspelhoController {
                                                             @PathVariable Integer itemId,
                                                             @Valid @RequestBody EspelhoItemPatchRequest dados) {
         EspelhoItemModel item = corrigirItemEspelhoService.corrigirItemEspelho(id, itemId, dados);
-        if (item == null) {
-            throw new BusinessException(ErrorCode.ITEM_ESPELHO_NAO_CORRIGIDO);
-        }
         return ResponseEntity.ok(EspelhoItemResponse.from(item));
     }
 
     @DeleteMapping("/espelhos/{id}/itens/{itemId}")
     public ResponseEntity<Void> removerItem(@PathVariable Integer id, @PathVariable Integer itemId) {
-        boolean removido = removerItemDoEspelhoService.removerItemDoEspelho(id, itemId);
-        if (!removido) {
-            throw new BusinessException(ErrorCode.ITEM_ESPELHO_NAO_REMOVIDO);
-        }
+        removerItemDoEspelhoService.removerItemDoEspelho(id, itemId);
         return ResponseEntity.noContent().build();
     }
 

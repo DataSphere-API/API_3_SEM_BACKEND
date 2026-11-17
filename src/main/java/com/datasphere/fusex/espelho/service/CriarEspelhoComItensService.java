@@ -1,5 +1,6 @@
 package com.datasphere.fusex.espelho.service;
 
+import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.EspelhoRepository;
 import com.datasphere.fusex.espelho.StatusEspelho;
@@ -8,7 +9,12 @@ import com.datasphere.fusex.espelho.dto.EspelhoResponse;
 import com.datasphere.fusex.espelho.dto.ItemEspelhoRequest;
 import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
 import com.datasphere.fusex.espelhoItem.EspelhoItemRepository;
+import com.datasphere.fusex.exception.BusinessException;
+import com.datasphere.fusex.guiaProc.GuiaProcModel;
+import com.datasphere.fusex.historicoStatus.EntidadeTipo;
+import com.datasphere.fusex.historicoStatus.service.RegistrarMudancaStatusService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -21,18 +27,52 @@ public class CriarEspelhoComItensService {
     private final EspelhoItemRepository espelhoItemRepository;
     private final VincularItemAoAtendimentoService vincularItemAoAtendimentoService;
     private final VincularItemAoBeneficiarioService vincularItemAoBeneficiarioService;
+    private final ValidarAtendimentoRealizadoService validarAtendimentoRealizadoService;
+    private final ValidarEspelhoNaoDuplicadoPorAtendimentoService validarEspelhoNaoDuplicadoPorAtendimentoService;
+    private final ValidarOcsDoAtendimentoService validarOcsDoAtendimentoService;
+    private final ValidarBeneficiarioDaGuiaService validarBeneficiarioDaGuiaService;
+    private final RegistrarMudancaStatusService registrarMudancaStatusService;
 
     public CriarEspelhoComItensService(EspelhoRepository espelhoRepository,
                                        EspelhoItemRepository espelhoItemRepository,
                                        VincularItemAoAtendimentoService vincularItemAoAtendimentoService,
-                                       VincularItemAoBeneficiarioService vincularItemAoBeneficiarioService) {
+                                       VincularItemAoBeneficiarioService vincularItemAoBeneficiarioService,
+                                       ValidarAtendimentoRealizadoService validarAtendimentoRealizadoService,
+                                       ValidarEspelhoNaoDuplicadoPorAtendimentoService validarEspelhoNaoDuplicadoPorAtendimentoService,
+                                       ValidarOcsDoAtendimentoService validarOcsDoAtendimentoService,
+                                       ValidarBeneficiarioDaGuiaService validarBeneficiarioDaGuiaService,
+                                       RegistrarMudancaStatusService registrarMudancaStatusService) {
         this.espelhoRepository = espelhoRepository;
         this.espelhoItemRepository = espelhoItemRepository;
         this.vincularItemAoAtendimentoService = vincularItemAoAtendimentoService;
         this.vincularItemAoBeneficiarioService = vincularItemAoBeneficiarioService;
+        this.validarAtendimentoRealizadoService = validarAtendimentoRealizadoService;
+        this.validarEspelhoNaoDuplicadoPorAtendimentoService = validarEspelhoNaoDuplicadoPorAtendimentoService;
+        this.validarOcsDoAtendimentoService = validarOcsDoAtendimentoService;
+        this.validarBeneficiarioDaGuiaService = validarBeneficiarioDaGuiaService;
+        this.registrarMudancaStatusService = registrarMudancaStatusService;
     }
 
+    @Transactional
     public EspelhoResponse criarEspelhoComItens(EspelhoRequest request) {
+        if (request.itens() == null || request.itens().isEmpty()) {
+            throw new BusinessException(ErrorCode.ESPELHO_SEM_ITENS, List.of("itens: o espelho deve conter pelo menos um item"));
+        }
+
+        GuiaProcModel atendimento = validarAtendimentoRealizadoService.validarAtendimentoRealizado(request.atendimentoId());
+        if (atendimento == null) {
+            throw new BusinessException(ErrorCode.ATENDIMENTO_NAO_REALIZADO);
+        }
+
+        validarOcsDoAtendimentoService.validarOcs(request.ocsId(), atendimento);
+
+        boolean naoDuplicado = validarEspelhoNaoDuplicadoPorAtendimentoService.validarEspelhoNaoDuplicadoPorAtendimento(request.atendimentoId());
+        if (!naoDuplicado) {
+            throw new BusinessException(ErrorCode.ATENDIMENTO_JA_EM_ESPELHO);
+        }
+
+        validarBeneficiarioDaGuiaService.validarBeneficiarios(request.atendimentoId(), request.itens());
+
         EspelhoModel espelho = new EspelhoModel();
         espelho.setAtendimentoId(request.atendimentoId());
         espelho.setOcsId(request.ocsId());
@@ -54,6 +94,14 @@ public class CriarEspelhoComItensService {
             item = espelhoItemRepository.save(item);
             itens.add(item);
         }
+
+        registrarMudancaStatusService.executar(
+                EntidadeTipo.ESPELHO,
+                espelho.getId().longValue(),
+                null,
+                StatusEspelho.EM_ABERTO.name(),
+                "criacao-espelho"
+        );
 
         return EspelhoResponse.from(espelho, itens);
     }

@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface EspelhoItemRepository extends JpaRepository<EspelhoItemModel, Integer> {
     List<EspelhoItemModel> findByEspelhoId(Integer espelhoId);
     Optional<EspelhoItemModel> findByIdAndEspelhoId(Integer id, Integer espelhoId);
+    long countByEspelhoId(Integer espelhoId);
 }
