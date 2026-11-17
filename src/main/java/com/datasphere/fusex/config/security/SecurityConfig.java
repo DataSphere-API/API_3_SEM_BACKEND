@@ -55,8 +55,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/pre-guias/*/validar", "/pre-guias/*/emitir").hasRole("EMISSOR")
                         .requestMatchers(HttpMethod.POST, "/pre-guias").hasRole("EMISSOR")
                         .requestMatchers(HttpMethod.PUT, "/pre-guias/*").hasRole("EMISSOR")
-                        .requestMatchers(HttpMethod.GET, "/pre-guias", "/pre-guias/**")
-                        .hasAnyRole("MEDICO", "CHEFE", "EMISSOR")
+                        .requestMatchers(HttpMethod.GET, "/pre-guias").hasAnyRole("MEDICO", "CHEFE", "EMISSOR", "AUDITOR")
+                        .requestMatchers(HttpMethod.GET, "/pre-guias/**").hasAnyRole("MEDICO", "CHEFE", "EMISSOR")
 
                         // Guias e beneficiário
                         .requestMatchers(HttpMethod.GET, "/guias/*/documento").hasAnyRole("EMISSOR", "CHEFE", "BENEFICIARIO")
