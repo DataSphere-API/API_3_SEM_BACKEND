@@ -1,27 +1,24 @@
 package com.datasphere.fusex.exception;
 
-import com.datasphere.fusex.domain.enums.ErrorCode;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Map;
-
-@RestControllerAdvice
+@ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ErrorResponse> handleBusiness(BusinessException ex) {
-        ErrorCode errorCode = ex.getErrorCode();
-        ErrorResponse corpo = new ErrorResponse(errorCode.getCodigo(), errorCode.getMensagem(), ex.getDetalhes());
-        return ResponseEntity.status(errorCode.getStatus()).body(corpo);
+    @ExceptionHandler(BusinessRuleException.class)
+    public ProblemDetail handleBusinessRule(BusinessRuleException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+        problem.setTitle("Violação de Regra de Negócio");
+        return problem;
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleCorpoInvalido(HttpMessageNotReadableException ex) {
-        ErrorCode errorCode = ErrorCode.DADOS_INVALIDOS;
-        ErrorResponse corpo = new ErrorResponse(errorCode.getCodigo(), errorCode.getMensagem(), Map.of());
-        return ResponseEntity.status(errorCode.getStatus()).body(corpo);
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ProblemDetail handleNotFound(ResourceNotFoundException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Recurso Não Encontrado");
+        return problem;
     }
 }
