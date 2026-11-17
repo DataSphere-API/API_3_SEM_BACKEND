@@ -98,6 +98,7 @@ public class ListarPreGuiasService {
                 preGuia.getDataCriacao(),
                 preGuia.getDataAprovacaoMedico() != null,
                 preGuia.getDataAprovacaoChefe() != null,
-                buscarDataEmissaoDaPreGuiaService.buscarDataEmissao(preGuia));
+                buscarDataEmissaoDaPreGuiaService.buscarDataEmissao(preGuia),
+                preGuia.getGuiaId());
     }
 }

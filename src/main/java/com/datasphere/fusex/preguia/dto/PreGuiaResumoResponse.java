@@ -14,4 +14,5 @@ public record PreGuiaResumoResponse(
         LocalDate dataCriacao,
         boolean medicoAprovou,
         boolean chefeAprovou,
-        LocalDate dataEmissao) {}
+        LocalDate dataEmissao,
+        Long guiaId) {}
