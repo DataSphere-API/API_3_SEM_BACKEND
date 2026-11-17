@@ -30,4 +30,7 @@ public interface GuiaProcRepository extends JpaRepository<GuiaProcModel, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select g from GuiaProcModel g where g.id = :id")
     Optional<GuiaProcModel> findByIdParaSessao(@Param("id") Long id);
+
+    @Query(value = "SELECT g.benf_id FROM guia g JOIN guia_proc gp ON gp.guia_id = g.id WHERE gp.id = :atendimentoId", nativeQuery = true)
+    Optional<String> findBeneficiarioIdPorAtendimentoId(@Param("atendimentoId") Long atendimentoId);
 }
