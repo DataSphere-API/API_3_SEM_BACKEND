@@ -61,6 +61,8 @@ public class SecurityConfig {
                         // Guias e beneficiário
                         .requestMatchers(HttpMethod.GET, "/guias/*/documento").hasAnyRole("EMISSOR", "CHEFE", "BENEFICIARIO")
                         .requestMatchers(HttpMethod.GET, "/guias/*/historico").hasAnyRole("AUDITOR", "EMISSOR", "CHEFE")
+                        .requestMatchers(HttpMethod.GET, "/guias/*/linha-do-tempo")
+                        .hasAnyRole("AUDITOR", "EMISSOR", "CHEFE", "BENEFICIARIO")
                         .requestMatchers(HttpMethod.GET, "/beneficiarios/*/guias").hasAnyRole("BENEFICIARIO", "EMISSOR", "CHEFE")
                         .requestMatchers(HttpMethod.GET, "/beneficiarios").hasAnyRole("CHEFE", "EMISSOR", "MEDICO")
 
