@@ -12,6 +12,7 @@ import com.datasphere.fusex.preguia.StatusPreGuia;
 import com.datasphere.fusex.preguia.dto.EmissaoResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,6 +23,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -41,6 +43,8 @@ class EmitirGuiaServiceTest {
     private RegistrarStatusPreGuiaService registrarStatusPreGuiaService;
     @Mock
     private ValidadeGuiaService validadeGuiaService;
+    @Mock
+    private GuardarDocumentoDaGuiaService guardarDocumentoDaGuiaService;
 
     @InjectMocks
     private EmitirGuiaService service;
@@ -59,7 +63,7 @@ class EmitirGuiaServiceTest {
         BusinessException ex = assertThrows(BusinessException.class, () -> service.emitir(7L));
 
         assertEquals(ErrorCode.PRE_GUIA_JA_EMITIDA, ex.getErrorCode());
-        verifyNoInteractions(criarGuiaDaPreGuiaService, criarProcedimentosDaGuiaService);
+        verifyNoInteractions(criarGuiaDaPreGuiaService, criarProcedimentosDaGuiaService, guardarDocumentoDaGuiaService);
     }
 
     @Test
@@ -69,7 +73,7 @@ class EmitirGuiaServiceTest {
         BusinessException ex = assertThrows(BusinessException.class, () -> service.emitir(7L));
 
         assertEquals(ErrorCode.PRE_GUIA_NAO_APROVADA, ex.getErrorCode());
-        verifyNoInteractions(criarGuiaDaPreGuiaService, criarProcedimentosDaGuiaService);
+        verifyNoInteractions(criarGuiaDaPreGuiaService, criarProcedimentosDaGuiaService, guardarDocumentoDaGuiaService);
     }
 
     @Test
@@ -98,5 +102,9 @@ class EmitirGuiaServiceTest {
         assertEquals(10L, resposta.procedimentos().get(0).atendimentoId());
         assertEquals(4L, p.getGuiaId());
         verify(registrarStatusPreGuiaService).atualizarStatus(p, StatusPreGuia.EMITIDA, "emissao-da-guia");
+
+        InOrder ordem = inOrder(registrarStatusPreGuiaService, guardarDocumentoDaGuiaService);
+        ordem.verify(registrarStatusPreGuiaService).atualizarStatus(p, StatusPreGuia.EMITIDA, "emissao-da-guia");
+        ordem.verify(guardarDocumentoDaGuiaService).guardarDocumentoDaGuia(guia, 7L);
     }
 }

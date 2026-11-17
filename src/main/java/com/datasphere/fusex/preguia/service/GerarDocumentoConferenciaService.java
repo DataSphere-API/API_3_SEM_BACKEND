@@ -17,7 +17,10 @@ public class GerarDocumentoConferenciaService {
     }
 
     public byte[] gerarDocumento(Long preGuiaId) {
-        PacoteSireResponse pacote = montarPacoteSireService.montarPacote(preGuiaId);
+        return gerarDocumento(montarPacoteSireService.montarPacote(preGuiaId));
+    }
+
+    public byte[] gerarDocumento(PacoteSireResponse pacote) {
         return GeradorPdfSimples.gerar(montarLinhas(pacote));
     }
 

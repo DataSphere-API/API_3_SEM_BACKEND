@@ -1,4 +1,4 @@
-package com.datasphere.fusex.guia.dto.request;
+package com.datasphere.fusex.guia.dto;
 
 import java.time.LocalDate;
 import java.util.List;
