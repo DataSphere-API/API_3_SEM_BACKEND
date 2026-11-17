@@ -1,6 +1,6 @@
 package com.datasphere.fusex.guia.controller;
 
-import com.datasphere.fusex.guia.dto.request.ExpiracaoResponse;
+import com.datasphere.fusex.guia.dto.ExpiracaoResponse;
 import com.datasphere.fusex.guia.service.ExpirarGuiasService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

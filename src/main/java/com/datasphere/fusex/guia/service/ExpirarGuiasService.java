@@ -3,7 +3,7 @@ package com.datasphere.fusex.guia.service;
 import com.datasphere.fusex.guia.GuiaModel;
 import com.datasphere.fusex.guia.GuiaRepository;
 import com.datasphere.fusex.guia.StatusGuia;
-import com.datasphere.fusex.guia.dto.request.ExpiracaoResponse;
+import com.datasphere.fusex.guia.dto.ExpiracaoResponse;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import com.datasphere.fusex.guiaProc.GuiaProcRepository;
 import com.datasphere.fusex.guiaProc.StatusProcedimento;
