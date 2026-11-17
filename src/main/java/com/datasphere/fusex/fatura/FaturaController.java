@@ -1,5 +1,7 @@
 package com.datasphere.fusex.fatura;
 
+import com.datasphere.fusex.domain.enums.ErrorCode;
+import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.fatura.dto.FaturaResponse;
 import com.datasphere.fusex.fatura.dto.ItemFaturaResponse;
 import com.datasphere.fusex.fatura.service.BuscarFaturaPorIdService;
@@ -36,7 +38,7 @@ public class FaturaController {
     public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
         FaturaModel fatura = buscarFaturaPorIdService.buscarFaturaPorId(id);
         if (fatura == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("fatura não encontrada");
+            throw new BusinessException(ErrorCode.FATURA_NAO_ENCONTRADA);
         }
 
         List<ItemFaturaModel> itens = itemFaturaRepository.findByFaturaId(id);

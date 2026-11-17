@@ -55,6 +55,10 @@ public enum ErrorCode {
     ITEM_ESPELHO_NAO_CORRIGIDO("ITEM_ESPELHO_NAO_CORRIGIDO", "Não foi possível corrigir o item do espelho.", HttpStatus.UNPROCESSABLE_ENTITY),
     ITEM_ESPELHO_NAO_REMOVIDO("ITEM_ESPELHO_NAO_REMOVIDO", "Não foi possível remover o item do espelho.", HttpStatus.UNPROCESSABLE_ENTITY),
     ESPELHO_NAO_FATURAVEL("ESPELHO_NAO_FATURAVEL", "O espelho já foi faturado ou está cancelado.", HttpStatus.CONFLICT),
+    ESPELHO_JA_AUDITADO("ESPELHO_JA_AUDITADO", "O espelho já foi auditado.", HttpStatus.CONFLICT),
+    ESPELHO_NAO_REPROVADO("ESPELHO_NAO_REPROVADO", "Apenas espelhos reprovados podem ser reenviados.", HttpStatus.CONFLICT),
+    FATURA_JA_ENCAMINHADA("FATURA_JA_ENCAMINHADA", "Fatura já encaminhada não aceita mais alterações.", HttpStatus.CONFLICT),
+    AUDITOR_INVALIDO("AUDITOR_INVALIDO", "Auditor não encontrado ou sem permissão.", HttpStatus.FORBIDDEN),
     FATURA_NAO_REGERAVEL("FATURA_NAO_REGERAVEL", "A fatura já foi regerada ou o espelho não mudou depois da geração.", HttpStatus.CONFLICT),
 
     OCS_JA_CADASTRADA("OCS_JA_CADASTRADA", "Já existe uma OCS com este CNPJ.", HttpStatus.CONFLICT),

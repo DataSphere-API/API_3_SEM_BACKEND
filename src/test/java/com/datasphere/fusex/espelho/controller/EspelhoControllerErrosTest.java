@@ -37,6 +37,10 @@ class EspelhoControllerErrosTest {
     @Mock private CorrigirItemEspelhoService corrigirItemEspelhoService;
     @Mock private RemoverItemDoEspelhoService removerItemDoEspelhoService;
     @Mock private EnriquecerListaEspelhosService enriquecerListaEspelhosService;
+    @Mock private AprovarEspelhoService aprovarEspelhoService;
+    @Mock private ReprovarEspelhoService reprovarEspelhoService;
+    @Mock private ReenviarEspelhoService reenviarEspelhoService;
+    @Mock private com.datasphere.fusex.auditor.service.IdentificarAuditorService identificarAuditorService;
 
     private MockMvc mockMvc;
 
@@ -46,7 +50,8 @@ class EspelhoControllerErrosTest {
                 validarEspelhoNaoDuplicadoPorAtendimentoService, criarEspelhoComItensService, listarEspelhosService,
                 listarEspelhosPorOcsService, listarEspelhosPorStatusService, buscarEspelhoPorIdService,
                 listarItensDoEspelhoService, corrigirItemEspelhoService, removerItemDoEspelhoService,
-                enriquecerListaEspelhosService);
+                enriquecerListaEspelhosService, aprovarEspelhoService, reprovarEspelhoService, reenviarEspelhoService,
+                identificarAuditorService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
