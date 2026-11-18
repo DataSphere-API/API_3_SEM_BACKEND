@@ -2,11 +2,11 @@ package com.datasphere.fusex.fatura;
 
 import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.exception.BusinessException;
-import com.datasphere.fusex.fatura.dto.FaturaResponse;
-import com.datasphere.fusex.fatura.dto.ItemFaturaResponse;
+import com.datasphere.fusex.fatura.dto.FaturaMensalDetalheResponse;
+import com.datasphere.fusex.fatura.dto.FaturaMensalResumoResponse;
 import com.datasphere.fusex.fatura.service.BuscarFaturaPorIdService;
-import com.datasphere.fusex.fatura.service.ListarFaturasPorStatusService;
-import org.springframework.http.ResponseEntity;
+import com.datasphere.fusex.fatura.service.ListarFaturasMensaisService;
+import com.datasphere.fusex.fatura.service.MontarFaturaMensalService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,36 +15,31 @@ import java.util.List;
 @RequestMapping("/faturas")
 public class FaturaController {
 
-    private final ListarFaturasPorStatusService listarFaturasPorStatusService;
+    private final ListarFaturasMensaisService listarFaturasMensaisService;
     private final BuscarFaturaPorIdService buscarFaturaPorIdService;
-    private final ItemFaturaRepository itemFaturaRepository;
+    private final MontarFaturaMensalService montarFaturaMensalService;
 
-    public FaturaController(ListarFaturasPorStatusService listarFaturasPorStatusService,
+    public FaturaController(ListarFaturasMensaisService listarFaturasMensaisService,
                             BuscarFaturaPorIdService buscarFaturaPorIdService,
-                            ItemFaturaRepository itemFaturaRepository) {
-        this.listarFaturasPorStatusService = listarFaturasPorStatusService;
+                            MontarFaturaMensalService montarFaturaMensalService) {
+        this.listarFaturasMensaisService = listarFaturasMensaisService;
         this.buscarFaturaPorIdService = buscarFaturaPorIdService;
-        this.itemFaturaRepository = itemFaturaRepository;
+        this.montarFaturaMensalService = montarFaturaMensalService;
     }
 
     @GetMapping
-    public ResponseEntity<List<FaturaResponse>> listarPorStatus(@RequestParam(required = false) StatusFatura status) {
-        List<FaturaResponse> faturas = listarFaturasPorStatusService.listar(status);
-        return ResponseEntity.ok(faturas);
+    public List<FaturaMensalResumoResponse> listar(@RequestParam(required = false) String cnpj,
+                                                   @RequestParam(required = false) String competencia,
+                                                   @RequestParam(required = false) StatusFatura status) {
+        return listarFaturasMensaisService.listar(cnpj, competencia, status);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
+    public FaturaMensalDetalheResponse buscarPorId(@PathVariable Long id) {
         FaturaModel fatura = buscarFaturaPorIdService.buscarFaturaPorId(id);
         if (fatura == null) {
             throw new BusinessException(ErrorCode.FATURA_NAO_ENCONTRADA);
         }
-
-        List<ItemFaturaModel> itens = itemFaturaRepository.findByFaturaId(id);
-        List<ItemFaturaResponse> itensResponse = itens.stream()
-                .map(ItemFaturaResponse::from)
-                .toList();
-
-        return ResponseEntity.ok(FaturaResponse.from(fatura, itens, null));
+        return montarFaturaMensalService.montarDetalhe(fatura);
     }
 }
