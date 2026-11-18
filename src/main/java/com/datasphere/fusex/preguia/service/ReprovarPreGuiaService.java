@@ -29,9 +29,9 @@ public class ReprovarPreGuiaService {
     }
 
     @Transactional
-    public AprovacaoResponse reprovar(Long id, String precCpAprovador, String motivo) {
+    public AprovacaoResponse reprovar(Long id, String motivo) {
         PreGuiaModel preGuia = buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(id);
-        Aprovador aprovador = identificarAprovadorService.identificar(precCpAprovador, preGuia);
+        Aprovador aprovador = identificarAprovadorService.identificar(preGuia);
 
         if (motivo == null || motivo.isBlank()) {
             throw new BusinessException(ErrorCode.MOTIVO_OBRIGATORIO);
