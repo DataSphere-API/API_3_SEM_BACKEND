@@ -19,7 +19,7 @@ class CalcularHashPacoteServiceTest {
             "123456789-00", "Fulano", LocalDate.of(1986, 3, 10), false, "Titular", "UG");
     private final PacoteSireResponse.Medico medico = new PacoteSireResponse.Medico("SP123456", "Carlos");
     private final PacoteSireResponse.AprovadoPor aprovadoPor = new PacoteSireResponse.AprovadoPor(
-            1, LocalDateTime.of(2026, 10, 12, 9, 0), LocalDateTime.of(2026, 10, 11, 9, 0));
+            2, "Carlos Medeiros", "MEDICO", LocalDateTime.of(2026, 10, 12, 9, 0));
 
     private List<PacoteSireResponse.Procedimento> procedimentos(int sessoes) {
         return List.of(new PacoteSireResponse.Procedimento(
@@ -41,5 +41,16 @@ class CalcularHashPacoteServiceTest {
         String alterado = service.calcularHash(7L, beneficiario, medico, aprovadoPor, procedimentos(2));
 
         assertFalse(original.equals(alterado));
+    }
+
+    @Test
+    void outraAssinatura_geraOutroHash() {
+        PacoteSireResponse.AprovadoPor chefe = new PacoteSireResponse.AprovadoPor(
+                1, "Roberto Lima", "CHEFE", LocalDateTime.of(2026, 10, 12, 9, 0));
+
+        String doMedico = service.calcularHash(7L, beneficiario, medico, aprovadoPor, procedimentos(1));
+        String doChefe = service.calcularHash(7L, beneficiario, medico, chefe, procedimentos(1));
+
+        assertFalse(doMedico.equals(doChefe));
     }
 }
