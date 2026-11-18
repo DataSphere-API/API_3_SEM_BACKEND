@@ -42,9 +42,9 @@ class ReprovarPreGuiaServiceTest {
     void semMotivo_lancaMotivoObrigatorio() {
         PreGuiaModel p = preGuiaValidada();
         when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(p);
-        when(identificarAprovadorService.identificar("444", p)).thenReturn(new Aprovador(Papel.CHEFE, 1));
+        when(identificarAprovadorService.identificar(p)).thenReturn(new Aprovador(Papel.CHEFE, 1, 1, "Teste"));
 
-        BusinessException ex = assertThrows(BusinessException.class, () -> service.reprovar(7L, "444", "  "));
+        BusinessException ex = assertThrows(BusinessException.class, () -> service.reprovar(7L, "  "));
 
         assertEquals(ErrorCode.MOTIVO_OBRIGATORIO, ex.getErrorCode());
         verifyNoInteractions(registrarStatusPreGuiaService);
@@ -54,9 +54,9 @@ class ReprovarPreGuiaServiceTest {
     void comMotivo_reprovaEGuardaOMotivo() {
         PreGuiaModel p = preGuiaValidada();
         when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(p);
-        when(identificarAprovadorService.identificar("222", p)).thenReturn(new Aprovador(Papel.MEDICO, 1));
+        when(identificarAprovadorService.identificar(p)).thenReturn(new Aprovador(Papel.MEDICO, 1, 1, "Teste"));
 
-        service.reprovar(7L, "222", " Procedimento sem justificativa ");
+        service.reprovar(7L, " Procedimento sem justificativa ");
 
         assertEquals("Procedimento sem justificativa", p.getMotivoReprovacao());
         verify(registrarStatusPreGuiaService).atualizarStatus(p, StatusPreGuia.REPROVADA, "reprovacao-pre-guia");
