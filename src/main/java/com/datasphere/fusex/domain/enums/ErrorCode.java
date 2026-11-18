@@ -24,7 +24,6 @@ public enum ErrorCode {
     PRE_GUIA_JA_EMITIDA("PRE_GUIA_JA_EMITIDA", "A guia desta pré-guia já foi emitida.", HttpStatus.CONFLICT),
     STATUS_INVALIDO("STATUS_INVALIDO", "Status inválido.", HttpStatus.BAD_REQUEST),
     MOTIVO_OBRIGATORIO("MOTIVO_OBRIGATORIO", "O motivo da reprovação é obrigatório.", HttpStatus.BAD_REQUEST),
-    APROVADOR_NAO_IDENTIFICADO("APROVADOR_NAO_IDENTIFICADO", "Informe o Prec-CP de quem está aprovando.", HttpStatus.UNAUTHORIZED),
     PERFIL_SEM_PERMISSAO("PERFIL_SEM_PERMISSAO", "Apenas o médico responsável ou o chefe do FUSEx podem fazer esta operação.", HttpStatus.FORBIDDEN),
     MEDICO_NAO_RESPONSAVEL("MEDICO_NAO_RESPONSAVEL", "Este médico não é o responsável pela pré-guia.", HttpStatus.FORBIDDEN),
     APROVACAO_MEDICO_PENDENTE("APROVACAO_MEDICO_PENDENTE", "O médico precisa aprovar antes do chefe do FUSEx.", HttpStatus.CONFLICT),
@@ -104,3 +103,4 @@ public enum ErrorCode {
     public String getMensagem() { return mensagem; }
     public HttpStatus getStatus() { return status; }
 }
+

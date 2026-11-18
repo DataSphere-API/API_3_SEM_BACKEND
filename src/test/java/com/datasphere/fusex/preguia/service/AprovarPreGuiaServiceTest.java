@@ -50,9 +50,9 @@ class AprovarPreGuiaServiceTest {
     void medicoAprova_registraADataEMantemValidada() {
         PreGuiaModel p = preGuia(StatusPreGuia.VALIDADA);
         when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(p);
-        when(identificarAprovadorService.identificar("222", p)).thenReturn(new Aprovador(Papel.MEDICO, 1));
+        when(identificarAprovadorService.identificar(p)).thenReturn(new Aprovador(Papel.MEDICO, 1, 1, "Teste"));
 
-        AprovacaoResponse resposta = service.aprovar(7L, "222");
+        AprovacaoResponse resposta = service.aprovar(7L);
 
         assertNotNull(resposta.dataAprovacaoMedico());
         assertNull(resposta.dataAprovacaoChefe());
@@ -65,9 +65,9 @@ class AprovarPreGuiaServiceTest {
     void chefeAntesDoMedico_lancaAprovacaoMedicoPendente() {
         PreGuiaModel p = preGuia(StatusPreGuia.VALIDADA);
         when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(p);
-        when(identificarAprovadorService.identificar("444", p)).thenReturn(new Aprovador(Papel.CHEFE, 1));
+        when(identificarAprovadorService.identificar(p)).thenReturn(new Aprovador(Papel.CHEFE, 1, 1, "Teste"));
 
-        BusinessException ex = assertThrows(BusinessException.class, () -> service.aprovar(7L, "444"));
+        BusinessException ex = assertThrows(BusinessException.class, () -> service.aprovar(7L));
 
         assertEquals(ErrorCode.APROVACAO_MEDICO_PENDENTE, ex.getErrorCode());
         verifyNoInteractions(registrarStatusPreGuiaService);
@@ -78,9 +78,9 @@ class AprovarPreGuiaServiceTest {
         PreGuiaModel p = preGuia(StatusPreGuia.VALIDADA);
         p.setDataAprovacaoMedico(LocalDateTime.now());
         when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(p);
-        when(identificarAprovadorService.identificar("444", p)).thenReturn(new Aprovador(Papel.CHEFE, 1));
+        when(identificarAprovadorService.identificar(p)).thenReturn(new Aprovador(Papel.CHEFE, 1, 1, "Teste"));
 
-        service.aprovar(7L, "444");
+        service.aprovar(7L);
 
         assertEquals(1, p.getChefeId());
         assertNotNull(p.getDataAprovacaoChefe());
@@ -92,9 +92,9 @@ class AprovarPreGuiaServiceTest {
         PreGuiaModel p = preGuia(StatusPreGuia.VALIDADA);
         p.setDataAprovacaoMedico(LocalDateTime.now());
         when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(p);
-        when(identificarAprovadorService.identificar("222", p)).thenReturn(new Aprovador(Papel.MEDICO, 1));
+        when(identificarAprovadorService.identificar(p)).thenReturn(new Aprovador(Papel.MEDICO, 1, 1, "Teste"));
 
-        BusinessException ex = assertThrows(BusinessException.class, () -> service.aprovar(7L, "222"));
+        BusinessException ex = assertThrows(BusinessException.class, () -> service.aprovar(7L));
 
         assertEquals(ErrorCode.APROVACAO_JA_REGISTRADA, ex.getErrorCode());
     }
@@ -103,9 +103,9 @@ class AprovarPreGuiaServiceTest {
     void preGuiaComPendencias_lancaPreGuiaNaoValidada() {
         PreGuiaModel p = preGuia(StatusPreGuia.COM_PENDENCIAS);
         when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(p);
-        when(identificarAprovadorService.identificar("222", p)).thenReturn(new Aprovador(Papel.MEDICO, 1));
+        when(identificarAprovadorService.identificar(p)).thenReturn(new Aprovador(Papel.MEDICO, 1, 1, "Teste"));
 
-        BusinessException ex = assertThrows(BusinessException.class, () -> service.aprovar(7L, "222"));
+        BusinessException ex = assertThrows(BusinessException.class, () -> service.aprovar(7L));
 
         assertEquals(ErrorCode.PRE_GUIA_NAO_VALIDADA, ex.getErrorCode());
         verifyNoInteractions(registrarStatusPreGuiaService);

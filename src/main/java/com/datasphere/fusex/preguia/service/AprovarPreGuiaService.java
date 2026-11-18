@@ -33,9 +33,9 @@ public class AprovarPreGuiaService {
     }
 
     @Transactional
-    public AprovacaoResponse aprovar(Long id, String precCpAprovador) {
+    public AprovacaoResponse aprovar(Long id) {
         PreGuiaModel preGuia = buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(id);
-        Aprovador aprovador = identificarAprovadorService.identificar(precCpAprovador, preGuia);
+        Aprovador aprovador = identificarAprovadorService.identificar(preGuia);
 
         if (preGuia.getStatus() != StatusPreGuia.VALIDADA) {
             throw new BusinessException(ErrorCode.PRE_GUIA_NAO_VALIDADA);
