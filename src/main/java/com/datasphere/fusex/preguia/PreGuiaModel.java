@@ -67,4 +67,16 @@ public class PreGuiaModel {
 
     @Column(name = "guia_id")
     private Long guiaId;
+
+    @Column(name = "assinatura_usuario_id")
+    private Integer assinaturaUsuarioId;
+
+    @Column(name = "assinatura_nome", length = 150)
+    private String assinaturaNome;
+
+    @Column(name = "assinatura_perfil", length = 10)
+    private String assinaturaPerfil;
+
+    @Column(name = "assinatura_data")
+    private LocalDateTime assinaturaData;
 }
