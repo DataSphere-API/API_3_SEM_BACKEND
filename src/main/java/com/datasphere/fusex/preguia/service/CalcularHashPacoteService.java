@@ -18,9 +18,9 @@ public class CalcularHashPacoteService {
         conteudo.append(preGuiaId).append("|");
         conteudo.append(beneficiario.precCp()).append("|");
         conteudo.append(medico.crm()).append("|");
-        conteudo.append(aprovadoPor.chefeId()).append("|");
-        conteudo.append(aprovadoPor.dataAprovacaoMedico()).append("|");
-        conteudo.append(aprovadoPor.dataAprovacaoChefe()).append("|");
+        conteudo.append(aprovadoPor.usuarioId()).append("|");
+        conteudo.append(aprovadoPor.perfil()).append("|");
+        conteudo.append(aprovadoPor.dataHora()).append("|");
         for (PacoteSireResponse.Procedimento procedimento : procedimentos) {
             conteudo.append(procedimento.atendimentoId()).append(":");
             conteudo.append(procedimento.ocsCnpj()).append(":");

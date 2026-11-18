@@ -59,7 +59,8 @@ public class MontarPacoteSireService {
         }
 
         PacoteSireResponse.AprovadoPor aprovadoPor = new PacoteSireResponse.AprovadoPor(
-                preGuia.getChefeId(), preGuia.getDataAprovacaoChefe(), preGuia.getDataAprovacaoMedico());
+                preGuia.getAssinaturaUsuarioId(), preGuia.getAssinaturaNome(),
+                preGuia.getAssinaturaPerfil(), preGuia.getAssinaturaData());
         PacoteSireResponse.Beneficiario beneficiario = montarBeneficiario(preGuia);
         PacoteSireResponse.Medico medico = montarMedico(preGuia);
 
