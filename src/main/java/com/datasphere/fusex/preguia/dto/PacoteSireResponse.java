@@ -18,7 +18,7 @@ public record PacoteSireResponse(
         long validadeDias,
         String hash) {
 
-    public record AprovadoPor(Integer chefeId, LocalDateTime dataAprovacaoChefe, LocalDateTime dataAprovacaoMedico) {}
+    public record AprovadoPor(Integer usuarioId, String nome, String perfil, LocalDateTime dataHora) {}
 
     public record Beneficiario(String precCp, String nome, LocalDate dataNascimento,
                                boolean dependente, String grupo, String ug) {}
