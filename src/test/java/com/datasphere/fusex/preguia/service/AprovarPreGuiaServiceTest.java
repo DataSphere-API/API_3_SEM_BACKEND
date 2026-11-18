@@ -3,14 +3,13 @@ package com.datasphere.fusex.preguia.service;
 import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.preguia.PreGuiaModel;
-import com.datasphere.fusex.preguia.PreGuiaRepository;
 import com.datasphere.fusex.preguia.StatusPreGuia;
 import com.datasphere.fusex.preguia.dto.AprovacaoResponse;
 import com.datasphere.fusex.preguia.service.IdentificarAprovadorService.Aprovador;
 import com.datasphere.fusex.preguia.service.IdentificarAprovadorService.Papel;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -32,82 +31,85 @@ class AprovarPreGuiaServiceTest {
     @Mock
     private IdentificarAprovadorService identificarAprovadorService;
     @Mock
-    private PreGuiaRepository preGuiaRepository;
-    @Mock
     private RegistrarStatusPreGuiaService registrarStatusPreGuiaService;
 
-    @InjectMocks
     private AprovarPreGuiaService service;
+
+    private final Aprovador medico = new Aprovador(Papel.MEDICO, 1, 2, "Carlos Medeiros");
+    private final Aprovador chefe = new Aprovador(Papel.CHEFE, 3, 1, "Roberto Lima");
+
+    @BeforeEach
+    void preparar() {
+        service = new AprovarPreGuiaService(
+                buscarPreGuiaPorIdService,
+                identificarAprovadorService,
+                new ValidarPreGuiaAguardandoDecisaoService(),
+                new AssinarDecisaoDaPreGuiaService(),
+                registrarStatusPreGuiaService,
+                new MontarAssinaturaService());
+    }
 
     private PreGuiaModel preGuia(StatusPreGuia status) {
         PreGuiaModel p = new PreGuiaModel();
         p.setId(7L);
         p.setStatus(status);
+        p.setMedId(1);
+        when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(p);
         return p;
     }
 
     @Test
-    void medicoAprova_registraADataEMantemValidada() {
+    void medicoAprovaSozinho_preGuiaFicaAprovadaComAssinatura() {
         PreGuiaModel p = preGuia(StatusPreGuia.VALIDADA);
-        when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(p);
-        when(identificarAprovadorService.identificar(p)).thenReturn(new Aprovador(Papel.MEDICO, 1, 1, "Teste"));
+        when(identificarAprovadorService.identificar(p)).thenReturn(medico);
 
         AprovacaoResponse resposta = service.aprovar(7L);
 
         assertNotNull(resposta.dataAprovacaoMedico());
         assertNull(resposta.dataAprovacaoChefe());
-        assertEquals(StatusPreGuia.VALIDADA, resposta.status());
-        verify(preGuiaRepository).save(p);
-        verifyNoInteractions(registrarStatusPreGuiaService);
+        assertEquals(2, resposta.assinatura().usuarioId());
+        assertEquals("Carlos Medeiros", resposta.assinatura().nome());
+        assertEquals("MEDICO", resposta.assinatura().perfil());
+        assertEquals(resposta.dataAprovacaoMedico(), resposta.assinatura().dataHora());
+        verify(registrarStatusPreGuiaService).atualizarStatus(p, StatusPreGuia.APROVADA, "aprovacao-medico");
     }
 
     @Test
-    void chefeAntesDoMedico_lancaAprovacaoMedicoPendente() {
+    void chefeAprovaSemOMedico_preGuiaFicaAprovadaComAssinatura() {
         PreGuiaModel p = preGuia(StatusPreGuia.VALIDADA);
-        when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(p);
-        when(identificarAprovadorService.identificar(p)).thenReturn(new Aprovador(Papel.CHEFE, 1, 1, "Teste"));
+        when(identificarAprovadorService.identificar(p)).thenReturn(chefe);
 
-        BusinessException ex = assertThrows(BusinessException.class, () -> service.aprovar(7L));
+        AprovacaoResponse resposta = service.aprovar(7L);
 
-        assertEquals(ErrorCode.APROVACAO_MEDICO_PENDENTE, ex.getErrorCode());
-        verifyNoInteractions(registrarStatusPreGuiaService);
-    }
-
-    @Test
-    void chefeDepoisDoMedico_aprovaAPreGuia() {
-        PreGuiaModel p = preGuia(StatusPreGuia.VALIDADA);
-        p.setDataAprovacaoMedico(LocalDateTime.now());
-        when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(p);
-        when(identificarAprovadorService.identificar(p)).thenReturn(new Aprovador(Papel.CHEFE, 1, 1, "Teste"));
-
-        service.aprovar(7L);
-
-        assertEquals(1, p.getChefeId());
+        assertEquals(3, p.getChefeId());
         assertNotNull(p.getDataAprovacaoChefe());
+        assertNull(p.getDataAprovacaoMedico());
+        assertEquals("CHEFE", resposta.assinatura().perfil());
+        assertEquals("Roberto Lima", p.getAssinaturaNome());
         verify(registrarStatusPreGuiaService).atualizarStatus(p, StatusPreGuia.APROVADA, "aprovacao-chefe");
     }
 
     @Test
-    void medicoAprovandoDeNovo_lancaAprovacaoJaRegistrada() {
-        PreGuiaModel p = preGuia(StatusPreGuia.VALIDADA);
-        p.setDataAprovacaoMedico(LocalDateTime.now());
-        when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(p);
-        when(identificarAprovadorService.identificar(p)).thenReturn(new Aprovador(Papel.MEDICO, 1, 1, "Teste"));
+    void preGuiaJaAprovada_lancaAprovacaoJaRegistrada() {
+        PreGuiaModel p = preGuia(StatusPreGuia.APROVADA);
+        p.setAssinaturaData(LocalDateTime.now());
+        when(identificarAprovadorService.identificar(p)).thenReturn(chefe);
 
         BusinessException ex = assertThrows(BusinessException.class, () -> service.aprovar(7L));
 
         assertEquals(ErrorCode.APROVACAO_JA_REGISTRADA, ex.getErrorCode());
+        verifyNoInteractions(registrarStatusPreGuiaService);
     }
 
     @Test
     void preGuiaComPendencias_lancaPreGuiaNaoValidada() {
         PreGuiaModel p = preGuia(StatusPreGuia.COM_PENDENCIAS);
-        when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(p);
-        when(identificarAprovadorService.identificar(p)).thenReturn(new Aprovador(Papel.MEDICO, 1, 1, "Teste"));
+        when(identificarAprovadorService.identificar(p)).thenReturn(medico);
 
         BusinessException ex = assertThrows(BusinessException.class, () -> service.aprovar(7L));
 
         assertEquals(ErrorCode.PRE_GUIA_NAO_VALIDADA, ex.getErrorCode());
+        assertNull(p.getAssinaturaData());
         verifyNoInteractions(registrarStatusPreGuiaService);
     }
 }

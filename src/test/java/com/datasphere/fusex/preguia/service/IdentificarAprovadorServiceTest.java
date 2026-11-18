@@ -14,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.EnumSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,13 +42,14 @@ class IdentificarAprovadorServiceTest {
     }
 
     @Test
-    void medicoResponsavel_aprovaComoMedico() {
+    void medicoResponsavel_assinaComoMedico() {
         logar(EnumSet.of(Perfil.MEDICO), 1, null);
 
         Aprovador aprovador = service.identificar(preGuiaDoMedico(1));
 
         assertEquals(Papel.MEDICO, aprovador.papel());
         assertEquals(10, aprovador.usuarioId());
+        assertEquals("Carlos Medeiros", aprovador.nome());
     }
 
     @Test
@@ -62,7 +62,7 @@ class IdentificarAprovadorServiceTest {
     }
 
     @Test
-    void chefe_aprovaComoChefe() {
+    void chefe_assinaComoChefe() {
         logar(EnumSet.of(Perfil.CHEFE), null, 3);
 
         Aprovador aprovador = service.identificar(preGuiaDoMedico(1));
@@ -72,12 +72,10 @@ class IdentificarAprovadorServiceTest {
     }
 
     @Test
-    void medicoEChefe_depoisDaAprovacaoMedica_aprovaComoChefe() {
-        logar(EnumSet.of(Perfil.MEDICO, Perfil.CHEFE), 1, 3);
-        PreGuiaModel preGuia = preGuiaDoMedico(1);
-        preGuia.setDataAprovacaoMedico(LocalDateTime.now());
+    void medicoQueTambemEChefe_naoResponsavel_assinaComoChefe() {
+        logar(EnumSet.of(Perfil.MEDICO, Perfil.CHEFE), 2, 3);
 
-        Aprovador aprovador = service.identificar(preGuia);
+        Aprovador aprovador = service.identificar(preGuiaDoMedico(1));
 
         assertEquals(Papel.CHEFE, aprovador.papel());
     }
@@ -91,4 +89,3 @@ class IdentificarAprovadorServiceTest {
         assertEquals(ErrorCode.PERFIL_SEM_PERMISSAO, ex.getErrorCode());
     }
 }
-
