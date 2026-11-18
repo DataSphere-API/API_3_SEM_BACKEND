@@ -4,15 +4,17 @@ import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.preguia.PreGuiaModel;
 import com.datasphere.fusex.preguia.StatusPreGuia;
+import com.datasphere.fusex.preguia.dto.AprovacaoResponse;
 import com.datasphere.fusex.preguia.service.IdentificarAprovadorService.Aprovador;
 import com.datasphere.fusex.preguia.service.IdentificarAprovadorService.Papel;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -28,21 +30,31 @@ class ReprovarPreGuiaServiceTest {
     @Mock
     private RegistrarStatusPreGuiaService registrarStatusPreGuiaService;
 
-    @InjectMocks
     private ReprovarPreGuiaService service;
 
-    private PreGuiaModel preGuiaValidada() {
+    @BeforeEach
+    void preparar() {
+        service = new ReprovarPreGuiaService(
+                buscarPreGuiaPorIdService,
+                identificarAprovadorService,
+                new ValidarPreGuiaAguardandoDecisaoService(),
+                new AssinarDecisaoDaPreGuiaService(),
+                registrarStatusPreGuiaService,
+                new MontarAssinaturaService());
+    }
+
+    private PreGuiaModel preGuia(StatusPreGuia status) {
         PreGuiaModel p = new PreGuiaModel();
         p.setId(7L);
-        p.setStatus(StatusPreGuia.VALIDADA);
+        p.setStatus(status);
+        when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(p);
         return p;
     }
 
     @Test
     void semMotivo_lancaMotivoObrigatorio() {
-        PreGuiaModel p = preGuiaValidada();
-        when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(p);
-        when(identificarAprovadorService.identificar(p)).thenReturn(new Aprovador(Papel.CHEFE, 1, 1, "Teste"));
+        PreGuiaModel p = preGuia(StatusPreGuia.VALIDADA);
+        when(identificarAprovadorService.identificar(p)).thenReturn(new Aprovador(Papel.CHEFE, 3, 1, "Roberto Lima"));
 
         BusinessException ex = assertThrows(BusinessException.class, () -> service.reprovar(7L, "  "));
 
@@ -51,14 +63,27 @@ class ReprovarPreGuiaServiceTest {
     }
 
     @Test
-    void comMotivo_reprovaEGuardaOMotivo() {
-        PreGuiaModel p = preGuiaValidada();
-        when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(p);
-        when(identificarAprovadorService.identificar(p)).thenReturn(new Aprovador(Papel.MEDICO, 1, 1, "Teste"));
+    void comMotivo_reprovaGuardaOMotivoEAssina() {
+        PreGuiaModel p = preGuia(StatusPreGuia.VALIDADA);
+        when(identificarAprovadorService.identificar(p)).thenReturn(new Aprovador(Papel.MEDICO, 1, 2, "Carlos Medeiros"));
 
-        service.reprovar(7L, " Procedimento sem justificativa ");
+        AprovacaoResponse resposta = service.reprovar(7L, " Procedimento sem justificativa ");
 
         assertEquals("Procedimento sem justificativa", p.getMotivoReprovacao());
+        assertEquals("MEDICO", resposta.assinatura().perfil());
+        assertEquals(p.getDataReprovacao(), resposta.assinatura().dataHora());
         verify(registrarStatusPreGuiaService).atualizarStatus(p, StatusPreGuia.REPROVADA, "reprovacao-pre-guia");
+    }
+
+    @Test
+    void preGuiaJaAprovada_naoPodeSerReprovada() {
+        PreGuiaModel p = preGuia(StatusPreGuia.APROVADA);
+        when(identificarAprovadorService.identificar(p)).thenReturn(new Aprovador(Papel.CHEFE, 3, 1, "Roberto Lima"));
+
+        BusinessException ex = assertThrows(BusinessException.class, () -> service.reprovar(7L, "Fora do prazo"));
+
+        assertEquals(ErrorCode.APROVACAO_JA_REGISTRADA, ex.getErrorCode());
+        assertNull(p.getMotivoReprovacao());
+        verifyNoInteractions(registrarStatusPreGuiaService);
     }
 }
