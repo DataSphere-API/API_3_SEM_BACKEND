@@ -10,4 +10,5 @@ public record AprovacaoResponse(
         Integer chefeId,
         LocalDateTime dataAprovacaoMedico,
         LocalDateTime dataAprovacaoChefe,
-        String motivo) {}
+        String motivo,
+        AssinaturaResponse assinatura) {}

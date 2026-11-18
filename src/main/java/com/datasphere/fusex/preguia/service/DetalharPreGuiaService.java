@@ -29,6 +29,7 @@ public class DetalharPreGuiaService {
     private final PreGuiaValidacaoService preGuiaValidacaoService;
     private final BuscarDataEmissaoDaPreGuiaService buscarDataEmissaoDaPreGuiaService;
     private final ValidadeGuiaService validadeGuiaService;
+    private final MontarAssinaturaService montarAssinaturaService;
 
     public DetalharPreGuiaService(BuscarPreGuiaPorIdService buscarPreGuiaPorIdService,
                                   PreGuiaProcRepository preGuiaProcRepository,
@@ -38,7 +39,8 @@ public class DetalharPreGuiaService {
                                   CalcularValorTotalPreGuiaService calcularValorTotalPreGuiaService,
                                   PreGuiaValidacaoService preGuiaValidacaoService,
                                   BuscarDataEmissaoDaPreGuiaService buscarDataEmissaoDaPreGuiaService,
-                                  ValidadeGuiaService validadeGuiaService) {
+                                  ValidadeGuiaService validadeGuiaService,
+                                  MontarAssinaturaService montarAssinaturaService) {
         this.buscarPreGuiaPorIdService = buscarPreGuiaPorIdService;
         this.preGuiaProcRepository = preGuiaProcRepository;
         this.medicoRepository = medicoRepository;
@@ -48,6 +50,7 @@ public class DetalharPreGuiaService {
         this.preGuiaValidacaoService = preGuiaValidacaoService;
         this.buscarDataEmissaoDaPreGuiaService = buscarDataEmissaoDaPreGuiaService;
         this.validadeGuiaService = validadeGuiaService;
+        this.montarAssinaturaService = montarAssinaturaService;
     }
 
     @Transactional(readOnly = true)
@@ -76,7 +79,8 @@ public class DetalharPreGuiaService {
                 preGuia.getDataAprovacaoChefe(),
                 preGuia.getMotivoReprovacao(),
                 dataEmissao,
-                validoAte);
+                validoAte,
+                montarAssinaturaService.montar(preGuia));
     }
 
     private PreGuiaDetalheResponse.Beneficiario montarBeneficiario(PreGuiaModel preGuia) {
