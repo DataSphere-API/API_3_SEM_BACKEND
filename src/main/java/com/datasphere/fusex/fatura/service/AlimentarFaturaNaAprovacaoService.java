@@ -10,6 +10,7 @@ import com.datasphere.fusex.guiaProc.GuiaProcRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -59,6 +60,7 @@ public class AlimentarFaturaNaAprovacaoService {
             fatura.setEspelhoModel(espelho);
             fatura.setGuiaProcModel(atendimento);
             fatura.setStatus(StatusFatura.ATIVA);
+            fatura.setDataGeracao(LocalDateTime.now());
             fatura = faturaRepository.save(fatura);
         }
 
