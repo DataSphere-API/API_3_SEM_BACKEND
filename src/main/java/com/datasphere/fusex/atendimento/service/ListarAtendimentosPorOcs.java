@@ -1,6 +1,8 @@
 package com.datasphere.fusex.atendimento.service;
 
 import com.datasphere.fusex.beneficiario.BeneficiarioModel;
+import com.datasphere.fusex.domain.enums.ErrorCode;
+import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.dto.request.AtendimentoResponse;
 import com.datasphere.fusex.guia.GuiaModel;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
@@ -14,14 +16,22 @@ import java.util.List;
 @Service
 public class ListarAtendimentosPorOcs {
 
-    GuiaProcRepository guiaProcRepository;
+    private final GuiaProcRepository guiaProcRepository;
+    private final BuscarOcsAutenticadaService buscarOcsAutenticadaService;
 
-    public ListarAtendimentosPorOcs(GuiaProcRepository guiaProcRepository) {
+    public ListarAtendimentosPorOcs(GuiaProcRepository guiaProcRepository,
+                                    BuscarOcsAutenticadaService buscarOcsAutenticadaService) {
         this.guiaProcRepository = guiaProcRepository;
+        this.buscarOcsAutenticadaService = buscarOcsAutenticadaService;
     }
 
+    // A OCS só lista os atendimentos dela.
     @Transactional(readOnly = true)
     public List<AtendimentoResponse> listarAtendimentosPorOcs(String cnpj) {
+        String ocsLogada = buscarOcsAutenticadaService.buscarOcsAutenticada();
+        if (!ocsLogada.equals(cnpj)) {
+            throw new BusinessException(ErrorCode.OCS_DIFERENTE_DO_CONTRATO);
+        }
         List<AtendimentoResponse> respostas = new ArrayList<>();
         for (GuiaProcModel atendimento : guiaProcRepository.findByContratoModel_OcsModel_Cnpj(cnpj)) {
             respostas.add(montarResposta(atendimento));
