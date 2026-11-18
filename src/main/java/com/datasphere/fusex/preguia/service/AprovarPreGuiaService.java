@@ -1,9 +1,6 @@
 package com.datasphere.fusex.preguia.service;
 
-import com.datasphere.fusex.domain.enums.ErrorCode;
-import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.preguia.PreGuiaModel;
-import com.datasphere.fusex.preguia.PreGuiaRepository;
 import com.datasphere.fusex.preguia.StatusPreGuia;
 import com.datasphere.fusex.preguia.dto.AprovacaoResponse;
 import com.datasphere.fusex.preguia.service.IdentificarAprovadorService.Aprovador;
@@ -19,35 +16,44 @@ public class AprovarPreGuiaService {
 
     private final BuscarPreGuiaPorIdService buscarPreGuiaPorIdService;
     private final IdentificarAprovadorService identificarAprovadorService;
-    private final PreGuiaRepository preGuiaRepository;
+    private final ValidarPreGuiaAguardandoDecisaoService validarPreGuiaAguardandoDecisaoService;
+    private final AssinarDecisaoDaPreGuiaService assinarDecisaoDaPreGuiaService;
     private final RegistrarStatusPreGuiaService registrarStatusPreGuiaService;
+    private final MontarAssinaturaService montarAssinaturaService;
 
     public AprovarPreGuiaService(BuscarPreGuiaPorIdService buscarPreGuiaPorIdService,
                                  IdentificarAprovadorService identificarAprovadorService,
-                                 PreGuiaRepository preGuiaRepository,
-                                 RegistrarStatusPreGuiaService registrarStatusPreGuiaService) {
+                                 ValidarPreGuiaAguardandoDecisaoService validarPreGuiaAguardandoDecisaoService,
+                                 AssinarDecisaoDaPreGuiaService assinarDecisaoDaPreGuiaService,
+                                 RegistrarStatusPreGuiaService registrarStatusPreGuiaService,
+                                 MontarAssinaturaService montarAssinaturaService) {
         this.buscarPreGuiaPorIdService = buscarPreGuiaPorIdService;
         this.identificarAprovadorService = identificarAprovadorService;
-        this.preGuiaRepository = preGuiaRepository;
+        this.validarPreGuiaAguardandoDecisaoService = validarPreGuiaAguardandoDecisaoService;
+        this.assinarDecisaoDaPreGuiaService = assinarDecisaoDaPreGuiaService;
         this.registrarStatusPreGuiaService = registrarStatusPreGuiaService;
+        this.montarAssinaturaService = montarAssinaturaService;
     }
 
+    // Basta uma aprovação (médico responsável ou chefe do FUSEx) para a pré-guia ficar APROVADA.
     @Transactional
     public AprovacaoResponse aprovar(Long id) {
         PreGuiaModel preGuia = buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(id);
         Aprovador aprovador = identificarAprovadorService.identificar(preGuia);
-
-        if (preGuia.getStatus() != StatusPreGuia.VALIDADA) {
-            throw new BusinessException(ErrorCode.PRE_GUIA_NAO_VALIDADA);
-        }
+        validarPreGuiaAguardandoDecisaoService.validar(preGuia);
 
         LocalDateTime agora = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-
+        String origem;
         if (aprovador.papel() == Papel.MEDICO) {
-            aprovarComoMedico(preGuia, agora);
+            preGuia.setDataAprovacaoMedico(agora);
+            origem = "aprovacao-medico";
         } else {
-            aprovarComoChefe(preGuia, aprovador.id(), agora);
+            preGuia.setChefeId(aprovador.id());
+            preGuia.setDataAprovacaoChefe(agora);
+            origem = "aprovacao-chefe";
         }
+        assinarDecisaoDaPreGuiaService.assinar(preGuia, aprovador, agora);
+        registrarStatusPreGuiaService.atualizarStatus(preGuia, StatusPreGuia.APROVADA, origem);
 
         return new AprovacaoResponse(
                 preGuia.getId(),
@@ -55,23 +61,7 @@ public class AprovarPreGuiaService {
                 preGuia.getChefeId(),
                 preGuia.getDataAprovacaoMedico(),
                 preGuia.getDataAprovacaoChefe(),
-                null);
-    }
-
-    private void aprovarComoMedico(PreGuiaModel preGuia, LocalDateTime agora) {
-        if (preGuia.getDataAprovacaoMedico() != null) {
-            throw new BusinessException(ErrorCode.APROVACAO_JA_REGISTRADA);
-        }
-        preGuia.setDataAprovacaoMedico(agora);
-        preGuiaRepository.save(preGuia);
-    }
-
-    private void aprovarComoChefe(PreGuiaModel preGuia, Integer chefeId, LocalDateTime agora) {
-        if (preGuia.getDataAprovacaoMedico() == null) {
-            throw new BusinessException(ErrorCode.APROVACAO_MEDICO_PENDENTE);
-        }
-        preGuia.setChefeId(chefeId);
-        preGuia.setDataAprovacaoChefe(agora);
-        registrarStatusPreGuiaService.atualizarStatus(preGuia, StatusPreGuia.APROVADA, "aprovacao-chefe");
+                null,
+                montarAssinaturaService.montar(preGuia));
     }
 }

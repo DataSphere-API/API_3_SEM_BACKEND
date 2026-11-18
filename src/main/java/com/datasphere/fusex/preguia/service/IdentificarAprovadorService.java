@@ -24,25 +24,24 @@ public class IdentificarAprovadorService {
         this.buscarUsuarioLogadoService = buscarUsuarioLogadoService;
     }
 
-
+    // Quem é médico responsável e chefe ao mesmo tempo assina como médico.
     public Aprovador identificar(PreGuiaModel preGuia) {
         UsuarioLogado usuario = buscarUsuarioLogadoService.buscarUsuarioLogado();
 
         boolean medicoResponsavel = usuario.tem(Perfil.MEDICO)
                 && usuario.medicoId() != null
                 && usuario.medicoId().equals(preGuia.getMedId());
-        boolean medicoJaAprovou = preGuia.getDataAprovacaoMedico() != null;
-
-        if (medicoResponsavel && (!medicoJaAprovou || !usuario.tem(Perfil.CHEFE))) {
+        if (medicoResponsavel) {
             return new Aprovador(Papel.MEDICO, usuario.medicoId(), usuario.id(), usuario.nome());
         }
+
         if (usuario.tem(Perfil.CHEFE)) {
             return new Aprovador(Papel.CHEFE, usuario.chefeId(), usuario.id(), usuario.nome());
         }
+
         if (usuario.tem(Perfil.MEDICO)) {
             throw new BusinessException(ErrorCode.MEDICO_NAO_RESPONSAVEL);
         }
         throw new BusinessException(ErrorCode.PERFIL_SEM_PERMISSAO);
     }
 }
-
