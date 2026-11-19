@@ -7,12 +7,12 @@ import com.datasphere.fusex.espelho.StatusEspelho;
 import com.datasphere.fusex.espelho.dto.EspelhoRequest;
 import com.datasphere.fusex.espelho.dto.EspelhoResponse;
 import com.datasphere.fusex.espelho.dto.ItemEspelhoRequest;
-import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
-import com.datasphere.fusex.espelhoItem.EspelhoItemRepository;
+import com.datasphere.fusex.espelhoitem.EspelhoItemModel;
+import com.datasphere.fusex.espelhoitem.EspelhoItemRepository;
 import com.datasphere.fusex.exception.BusinessException;
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
-import com.datasphere.fusex.historicoStatus.EntidadeTipo;
-import com.datasphere.fusex.historicoStatus.service.RegistrarMudancaStatusService;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
+import com.datasphere.fusex.historicostatus.EntidadeTipo;
+import com.datasphere.fusex.historicostatus.service.RegistrarMudancaStatusService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

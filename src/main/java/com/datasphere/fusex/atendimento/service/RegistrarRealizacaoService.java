@@ -1,14 +1,14 @@
 package com.datasphere.fusex.atendimento.service;
 
 import com.datasphere.fusex.domain.enums.ErrorCode;
-import com.datasphere.fusex.atendimento.sessao.SessaoModel;
-import com.datasphere.fusex.atendimento.sessao.SessaoRepository;
-import com.datasphere.fusex.dto.request.BaixaResponse;
-import com.datasphere.fusex.dto.request.ValidarQrCodeRequest;
+import com.datasphere.fusex.atendimento.SessaoModel;
+import com.datasphere.fusex.atendimento.SessaoRepository;
+import com.datasphere.fusex.atendimento.dto.BaixaResponse;
+import com.datasphere.fusex.atendimento.dto.ValidarQrCodeRequest;
 import com.datasphere.fusex.exception.BusinessException;
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
-import com.datasphere.fusex.guiaProc.GuiaProcRepository;
-import com.datasphere.fusex.service.ValidacaoQrService;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
+import com.datasphere.fusex.guiaproc.GuiaProcRepository;
+import com.datasphere.fusex.atendimento.service.ValidacaoQrService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

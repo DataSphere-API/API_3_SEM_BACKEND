@@ -1,8 +1,8 @@
 package com.datasphere.fusex.fatura.service;
 
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
-import com.datasphere.fusex.guiaProc.GuiaProcRepository;
-import com.datasphere.fusex.guiaProc.StatusProcedimento;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
+import com.datasphere.fusex.guiaproc.GuiaProcRepository;
+import com.datasphere.fusex.guiaproc.StatusProcedimento;
 import org.springframework.stereotype.Service;
 
 @Service

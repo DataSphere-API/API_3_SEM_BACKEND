@@ -4,7 +4,7 @@ import com.datasphere.fusex.auditor.service.IdentificarAuditorService;
 import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.StatusEspelho;
-import com.datasphere.fusex.espelho.request.DecisaoEspelhoResponse;
+import com.datasphere.fusex.espelho.dto.DecisaoEspelhoResponse;
 import com.datasphere.fusex.espelho.service.*;
 import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.exception.GlobalExceptionHandler;

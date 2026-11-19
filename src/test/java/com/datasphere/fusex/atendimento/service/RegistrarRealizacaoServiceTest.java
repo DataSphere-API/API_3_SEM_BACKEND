@@ -1,13 +1,13 @@
 package com.datasphere.fusex.atendimento.service;
 
 import com.datasphere.fusex.domain.enums.ErrorCode;
-import com.datasphere.fusex.dto.request.BaixaResponse;
-import com.datasphere.fusex.dto.request.ValidarQrCodeRequest;
+import com.datasphere.fusex.atendimento.dto.BaixaResponse;
+import com.datasphere.fusex.atendimento.dto.ValidarQrCodeRequest;
 import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.guia.GuiaModel;
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
-import com.datasphere.fusex.guiaProc.GuiaProcRepository;
-import com.datasphere.fusex.service.ValidacaoQrService;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
+import com.datasphere.fusex.guiaproc.GuiaProcRepository;
+import com.datasphere.fusex.atendimento.service.ValidacaoQrService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -44,7 +44,7 @@ class RegistrarRealizacaoServiceTest {
     private RecalcularStatusDaGuiaService recalcularStatusDaGuia;
 
     @Mock private BuscarOcsAutenticadaService ocsAutenticada;
-    @Mock private com.datasphere.fusex.atendimento.sessao.SessaoRepository sessaoRepository;
+    @Mock private com.datasphere.fusex.atendimento.SessaoRepository sessaoRepository;
 
     @org.junit.jupiter.api.BeforeEach
     void autenticar() {

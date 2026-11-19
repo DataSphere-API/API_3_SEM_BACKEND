@@ -6,8 +6,8 @@ import com.datasphere.fusex.fatura.FaturaModel;
 import com.datasphere.fusex.fatura.FaturaRepository;
 import com.datasphere.fusex.fatura.StatusFatura;
 import com.datasphere.fusex.fatura.dto.StatusDaFaturaResponse;
-import com.datasphere.fusex.historicoStatus.EntidadeTipo;
-import com.datasphere.fusex.historicoStatus.service.RegistrarMudancaStatusService;
+import com.datasphere.fusex.historicostatus.EntidadeTipo;
+import com.datasphere.fusex.historicostatus.service.RegistrarMudancaStatusService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,7 +1,7 @@
 package com.datasphere.fusex.atendimento.service;
 
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
-import com.datasphere.fusex.guiaProc.GuiaProcRepository;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
+import com.datasphere.fusex.guiaproc.GuiaProcRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;

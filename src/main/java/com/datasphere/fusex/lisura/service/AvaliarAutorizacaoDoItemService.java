@@ -1,7 +1,7 @@
 package com.datasphere.fusex.lisura.service;
 
 import com.datasphere.fusex.contrato.ContratoModel;
-import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
+import com.datasphere.fusex.espelhoitem.EspelhoItemModel;
 import com.datasphere.fusex.fatura.service.CalcularDivergenciaValorService;
 import com.datasphere.fusex.lisura.dto.LisuraItemResponse;
 import org.springframework.stereotype.Service;

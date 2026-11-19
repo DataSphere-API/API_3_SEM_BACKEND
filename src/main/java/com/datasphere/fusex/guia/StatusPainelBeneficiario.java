@@ -1,7 +1,7 @@
 package com.datasphere.fusex.guia;
 
 import com.datasphere.fusex.fatura.StatusFatura;
-import com.datasphere.fusex.guiaProc.StatusProcedimento;
+import com.datasphere.fusex.guiaproc.StatusProcedimento;
 
 // Sequência que o beneficiário vê no painel: solicitada, emitida, realizada, faturada, aprovada, liquidada.
 public enum StatusPainelBeneficiario {

@@ -1,14 +1,14 @@
 package com.datasphere.fusex.atendimento.service;
 
 import com.datasphere.fusex.domain.enums.ErrorCode;
-import com.datasphere.fusex.dto.request.QrCodeResponse;
+import com.datasphere.fusex.atendimento.dto.QrCodeResponse;
 import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.exception.QrCodeIndisponivelException;
 import com.datasphere.fusex.guia.StatusGuia;
 import com.datasphere.fusex.guia.service.ValidadeGuiaService;
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
-import com.datasphere.fusex.guiaProc.GuiaProcRepository;
-import com.datasphere.fusex.guiaProc.StatusProcedimento;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
+import com.datasphere.fusex.guiaproc.GuiaProcRepository;
+import com.datasphere.fusex.guiaproc.StatusProcedimento;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

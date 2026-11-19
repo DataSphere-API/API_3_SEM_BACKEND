@@ -2,11 +2,11 @@ package com.datasphere.fusex.fatura.service;
 
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.StatusEspelho;
-import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
-import com.datasphere.fusex.espelhoItem.EspelhoItemRepository;
+import com.datasphere.fusex.espelhoitem.EspelhoItemModel;
+import com.datasphere.fusex.espelhoitem.EspelhoItemRepository;
 import com.datasphere.fusex.fatura.*;
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
-import com.datasphere.fusex.guiaProc.GuiaProcRepository;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
+import com.datasphere.fusex.guiaproc.GuiaProcRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

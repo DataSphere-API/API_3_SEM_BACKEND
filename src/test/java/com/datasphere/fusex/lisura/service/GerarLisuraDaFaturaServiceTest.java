@@ -1,18 +1,18 @@
 package com.datasphere.fusex.lisura.service;
 
-import com.datasphere.fusex.atendimento.sessao.SessaoRepository;
+import com.datasphere.fusex.atendimento.SessaoRepository;
 import com.datasphere.fusex.contrato.ContratoModel;
 import com.datasphere.fusex.divergencia.service.ClassificarSeveridadeDivergenciaService;
 import com.datasphere.fusex.divergencia.service.ConsolidarDivergenciasService;
 import com.datasphere.fusex.encaminhamento.service.ValidarAuditoriaConcluidaService;
 import com.datasphere.fusex.espelho.EspelhoModel;
-import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
-import com.datasphere.fusex.espelhoItem.EspelhoItemRepository;
+import com.datasphere.fusex.espelhoitem.EspelhoItemModel;
+import com.datasphere.fusex.espelhoitem.EspelhoItemRepository;
 import com.datasphere.fusex.fatura.FaturaModel;
 import com.datasphere.fusex.fatura.ItemFaturaModel;
 import com.datasphere.fusex.fatura.ItemFaturaRepository;
 import com.datasphere.fusex.fatura.service.CalcularDivergenciaValorService;
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
 import com.datasphere.fusex.ocs.OcsModel;
 import org.junit.jupiter.api.Test;
 

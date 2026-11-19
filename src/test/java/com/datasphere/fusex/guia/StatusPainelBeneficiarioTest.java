@@ -1,7 +1,7 @@
 package com.datasphere.fusex.guia;
 
 import com.datasphere.fusex.fatura.StatusFatura;
-import com.datasphere.fusex.guiaProc.StatusProcedimento;
+import com.datasphere.fusex.guiaproc.StatusProcedimento;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

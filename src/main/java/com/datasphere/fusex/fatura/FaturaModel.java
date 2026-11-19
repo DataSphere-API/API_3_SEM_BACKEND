@@ -1,7 +1,7 @@
 package com.datasphere.fusex.fatura;
 
 import com.datasphere.fusex.espelho.EspelhoModel;
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
 import jakarta.persistence.*;
 import lombok.Data;
 
