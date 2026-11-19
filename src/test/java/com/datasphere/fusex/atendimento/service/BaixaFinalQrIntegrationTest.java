@@ -146,7 +146,8 @@ class BaixaFinalQrIntegrationTest {
         assertEquals(409, registrarSessao().getResponse().getStatus());
         assertEquals(1, qtdRealizada());
         mvc.perform(post("/espelhos").contentType("application/json")
-                        .content("{\"atendimentoId\":" + id + ",\"ocsId\":\"12345678000199\",\"itens\":[{\"beneficiarioId\":\"123456789-00\",\"descricao\":\"Sessão\",\"valor\":150}]}")
+                        .content("{\"ocsId\":\"12345678000199\",\"dataInicio\":\"" + java.time.LocalDate.now().withDayOfMonth(1)
+                                + "\",\"dataFim\":\"" + java.time.LocalDate.now() + "\",\"itens\":[{\"atendimentoId\":" + id + ",\"valor\":150}]}")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isUnprocessableEntity());
         assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM espelho_item WHERE atendimento_id=?", Integer.class, id));

@@ -11,7 +11,6 @@ import com.datasphere.fusex.exception.BusinessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -20,18 +19,16 @@ public class CorrigirItemEspelhoService {
     private final EspelhoItemRepository espelhoItemRepository;
     private final EspelhoRepository espelhoRepository;
     private final BuscarEspelhoPorIdService buscarEspelhoPorIdService;
-    private final ValidarBeneficiarioDaGuiaService validarBeneficiarioDaGuiaService;
 
     public CorrigirItemEspelhoService(EspelhoItemRepository espelhoItemRepository,
                                       EspelhoRepository espelhoRepository,
-                                      BuscarEspelhoPorIdService buscarEspelhoPorIdService,
-                                      ValidarBeneficiarioDaGuiaService validarBeneficiarioDaGuiaService) {
+                                      BuscarEspelhoPorIdService buscarEspelhoPorIdService) {
         this.espelhoItemRepository = espelhoItemRepository;
         this.espelhoRepository = espelhoRepository;
         this.buscarEspelhoPorIdService = buscarEspelhoPorIdService;
-        this.validarBeneficiarioDaGuiaService = validarBeneficiarioDaGuiaService;
     }
 
+    // A OCS só corrige o valor cobrado, com o espelho em aberto ou devolvido pelo auditor.
     @Transactional
     public EspelhoItemModel corrigirItemEspelho(Integer espelhoId, Integer itemId, EspelhoItemPatchRequest dados) {
         EspelhoModel espelho = buscarEspelhoPorIdService.buscarEspelhoPorId(espelhoId);
@@ -44,34 +41,12 @@ public class CorrigirItemEspelhoService {
         if (espelho.getStatus() != StatusEspelho.EM_ABERTO && espelho.getStatus() != StatusEspelho.REPROVADO) {
             throw new BusinessException(ErrorCode.ESPELHO_NAO_EDITAVEL);
         }
-
         EspelhoItemModel item = espelhoItemRepository.findByIdAndEspelhoId(itemId, espelhoId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NAO_ENCONTRADO));
-
-        boolean alterado = false;
-
-        if (dados.beneficiarioId() != null && !dados.beneficiarioId().isBlank()) {
-            validarBeneficiarioDaGuiaService.validarBeneficiarioItem(espelho.getAtendimentoId(), dados.beneficiarioId());
-            item.setBeneficiarioId(dados.beneficiarioId());
-            alterado = true;
-        }
-
-        if (dados.descricao() != null && !dados.descricao().isBlank()) {
-            item.setDescricao(dados.descricao());
-            alterado = true;
-        }
-
-        if (dados.valor() != null && dados.valor().compareTo(BigDecimal.ZERO) > 0) {
-            item.setValor(dados.valor());
-            alterado = true;
-        }
-
-        if (alterado) {
-            item = espelhoItemRepository.save(item);
-            espelho.setDataAtualizacao(LocalDateTime.now());
-            espelhoRepository.save(espelho);
-        }
-
+        item.setValor(dados.valor());
+        item = espelhoItemRepository.save(item);
+        espelho.setDataAtualizacao(LocalDateTime.now());
+        espelhoRepository.save(espelho);
         return item;
     }
 }

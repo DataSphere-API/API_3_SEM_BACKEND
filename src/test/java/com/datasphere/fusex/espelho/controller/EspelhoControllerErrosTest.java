@@ -28,15 +28,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class EspelhoControllerErrosTest {
 
-    private static final String CORPO_VALIDO = "{\"atendimentoId\":1,\"ocsId\":\"12345678000199\","
-            + "\"itens\":[{\"beneficiarioId\":\"123456789-00\",\"descricao\":\"Psicoterapia\",\"valor\":150.00}]}";
+    private static final String CORPO_VALIDO = "{\"ocsId\":\"12345678000199\",\"dataInicio\":\"2026-11-01\","
+            + "\"dataFim\":\"2026-11-15\",\"itens\":[{\"atendimentoId\":12,\"valor\":150.00}]}";
 
-    @Mock private ValidarAtendimentoRealizadoService validarAtendimentoRealizadoService;
-    @Mock private ValidarEspelhoNaoDuplicadoPorAtendimentoService validarEspelhoNaoDuplicadoPorAtendimentoService;
     @Mock private CriarEspelhoComItensService criarEspelhoComItensService;
     @Mock private ListarEspelhosService listarEspelhosService;
-    @Mock private ListarEspelhosPorOcsService listarEspelhosPorOcsService;
-    @Mock private ListarEspelhosPorStatusService listarEspelhosPorStatusService;
     @Mock private BuscarEspelhoPorIdService buscarEspelhoPorIdService;
     @Mock private ListarItensDoEspelhoService listarItensDoEspelhoService;
     @Mock private CorrigirItemEspelhoService corrigirItemEspelhoService;
@@ -51,26 +47,26 @@ class EspelhoControllerErrosTest {
 
     @BeforeEach
     void setUp() {
-        EspelhoController controller = new EspelhoController(validarAtendimentoRealizadoService,
-                validarEspelhoNaoDuplicadoPorAtendimentoService, criarEspelhoComItensService, listarEspelhosService,
-                listarEspelhosPorOcsService, listarEspelhosPorStatusService, buscarEspelhoPorIdService,
-                listarItensDoEspelhoService, corrigirItemEspelhoService, removerItemDoEspelhoService,
-                enriquecerListaEspelhosService, aprovarEspelhoService, reprovarEspelhoService, reenviarEspelhoService,
-                identificarAuditorService);
+        EspelhoController controller = new EspelhoController(criarEspelhoComItensService, listarEspelhosService,
+                buscarEspelhoPorIdService, listarItensDoEspelhoService, corrigirItemEspelhoService,
+                removerItemDoEspelhoService, enriquecerListaEspelhosService, aprovarEspelhoService,
+                reprovarEspelhoService, reenviarEspelhoService, identificarAuditorService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }
 
-    @Test
-    void espelhoSemItens_devolve422() throws Exception {
-        when(criarEspelhoComItensService.criarEspelhoComItens(any(EspelhoRequest.class)))
-                .thenThrow(new BusinessException(ErrorCode.ESPELHO_SEM_ITENS, List.of("itens: o espelho deve conter pelo menos um item")));
+    private void criarFalhaCom(BusinessException erro) {
+        when(criarEspelhoComItensService.criarEspelhoComItens(any(EspelhoRequest.class))).thenThrow(erro);
+    }
 
+    @Test
+    void semAtendimentos_devolve400ComOCampo() throws Exception {
         mockMvc.perform(post("/espelhos").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"atendimentoId\":1,\"ocsId\":\"12345678000199\",\"itens\":[]}"))
-                .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.codigo").value("ESPELHO_SEM_ITENS"));
+                        .content(CORPO_VALIDO.replace("[{\"atendimentoId\":12,\"valor\":150.00}]", "[]")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detalhes[0]").value("itens: escolha pelo menos um atendimento"));
+        verifyNoInteractions(criarEspelhoComItensService);
     }
 
     @Test
@@ -82,9 +78,22 @@ class EspelhoControllerErrosTest {
     }
 
     @Test
-    void atendimentoNaoRealizado_devolve422EmJson() throws Exception {
-        when(criarEspelhoComItensService.criarEspelhoComItens(any(EspelhoRequest.class)))
-                .thenThrow(new BusinessException(ErrorCode.ATENDIMENTO_NAO_REALIZADO));
+    void semPeriodo_devolve400() throws Exception {
+        mockMvc.perform(post("/espelhos").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"itens\":[{\"atendimentoId\":12,\"valor\":150.00}]}"))
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(criarEspelhoComItensService);
+    }
+
+    @Test
+    void espelhoCriado_devolve201() throws Exception {
+        mockMvc.perform(post("/espelhos").contentType(MediaType.APPLICATION_JSON).content(CORPO_VALIDO))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void atendimentoNaoRealizado_devolve422() throws Exception {
+        criarFalhaCom(new BusinessException(ErrorCode.ATENDIMENTO_NAO_REALIZADO, List.of("atendimento 12")));
 
         mockMvc.perform(post("/espelhos").contentType(MediaType.APPLICATION_JSON).content(CORPO_VALIDO))
                 .andExpect(status().isUnprocessableEntity())
@@ -92,9 +101,26 @@ class EspelhoControllerErrosTest {
     }
 
     @Test
-    void espelhoDuplicado_devolve409() throws Exception {
-        when(criarEspelhoComItensService.criarEspelhoComItens(any(EspelhoRequest.class)))
-                .thenThrow(new BusinessException(ErrorCode.ATENDIMENTO_JA_EM_ESPELHO));
+    void foraDoMes_devolve422() throws Exception {
+        criarFalhaCom(new BusinessException(ErrorCode.FORA_DO_MES));
+
+        mockMvc.perform(post("/espelhos").contentType(MediaType.APPLICATION_JSON).content(CORPO_VALIDO))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.codigo").value("FORA_DO_MES"));
+    }
+
+    @Test
+    void foraDoPeriodo_devolve422() throws Exception {
+        criarFalhaCom(new BusinessException(ErrorCode.FORA_DO_PERIODO, List.of("atendimento 12")));
+
+        mockMvc.perform(post("/espelhos").contentType(MediaType.APPLICATION_JSON).content(CORPO_VALIDO))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.codigo").value("FORA_DO_PERIODO"));
+    }
+
+    @Test
+    void atendimentoJaEmEspelho_devolve409() throws Exception {
+        criarFalhaCom(new BusinessException(ErrorCode.ATENDIMENTO_JA_EM_ESPELHO, List.of("atendimento 12 já está no espelho #3")));
 
         mockMvc.perform(post("/espelhos").contentType(MediaType.APPLICATION_JSON).content(CORPO_VALIDO))
                 .andExpect(status().isConflict())
@@ -102,33 +128,38 @@ class EspelhoControllerErrosTest {
     }
 
     @Test
-    void ocsDivergente_devolve422EmJson() throws Exception {
-        when(criarEspelhoComItensService.criarEspelhoComItens(any(EspelhoRequest.class)))
-                .thenThrow(new BusinessException(ErrorCode.OCS_DIVERGENTE, List.of("ocsId: a OCS informada não corresponde à OCS do contrato do atendimento")));
-
-        mockMvc.perform(post("/espelhos").contentType(MediaType.APPLICATION_JSON).content(CORPO_VALIDO))
-                .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.codigo").value("OCS_DIVERGENTE"));
-    }
-
-    @Test
-    void beneficiarioForaDaGuia_devolve422EmJson() throws Exception {
-        when(criarEspelhoComItensService.criarEspelhoComItens(any(EspelhoRequest.class)))
-                .thenThrow(new BusinessException(ErrorCode.BENEFICIARIO_FORA_DA_GUIA, List.of("itens[0].beneficiarioId: beneficiário não pertence à guia do atendimento")));
-
-        mockMvc.perform(post("/espelhos").contentType(MediaType.APPLICATION_JSON).content(CORPO_VALIDO))
-                .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.codigo").value("BENEFICIARIO_FORA_DA_GUIA"));
-    }
-
-    @Test
     void espelhoInexistente_devolve404EmJson() throws Exception {
-        when(buscarEspelhoPorIdService.buscarEspelhoPorId(99)).thenReturn(null);
+        when(buscarEspelhoPorIdService.buscarEspelhoVisivel(99))
+                .thenThrow(new BusinessException(ErrorCode.ESPELHO_NAO_ENCONTRADO));
 
         mockMvc.perform(get("/espelhos/99"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.codigo").value("ESPELHO_NAO_ENCONTRADO"))
                 .andExpect(jsonPath("$.mensagem").value("Espelho não encontrado."));
+    }
+
+    @Test
+    void espelhoDeOutraOcs_devolve403() throws Exception {
+        when(buscarEspelhoPorIdService.buscarEspelhoVisivel(5))
+                .thenThrow(new BusinessException(ErrorCode.OCS_DIFERENTE_DO_CONTRATO));
+
+        mockMvc.perform(get("/espelhos/5/itens"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.codigo").value("OCS_DIFERENTE_DO_CONTRATO"));
+        verifyNoInteractions(listarItensDoEspelhoService);
+    }
+
+    @Test
+    void corrigirItemSemValor_devolve400() throws Exception {
+        mockMvc.perform(patch("/espelhos/1/itens/2").contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(corrigirItemEspelhoService);
+    }
+
+    @Test
+    void corrigirItem_devolve204() throws Exception {
+        mockMvc.perform(patch("/espelhos/1/itens/2").contentType(MediaType.APPLICATION_JSON).content("{\"valor\":120.00}"))
+                .andExpect(status().isNoContent());
     }
 
     @Test
