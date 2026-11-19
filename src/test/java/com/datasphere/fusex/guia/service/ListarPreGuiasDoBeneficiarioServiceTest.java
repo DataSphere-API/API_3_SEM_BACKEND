@@ -34,12 +34,12 @@ class ListarPreGuiasDoBeneficiarioServiceTest {
     }
 
     @Test
-    void listaAsPreGuiasDoProprioBeneficiarioComoSolicitadas() {
+    void listaAsPreGuiasDoProprioBeneficiarioComoSolicitadasInclusiveAReprovada() {
         logado("123456789-00");
         PreGuiaModel preGuia = new PreGuiaModel();
         preGuia.setId(3L);
         when(preGuiaRepository.findByBenfIdAndGuiaIdIsNullAndStatusNotInOrderByIdDesc(
-                "123456789-00", List.of(StatusPreGuia.EMITIDA, StatusPreGuia.REPROVADA)))
+                "123456789-00", List.of(StatusPreGuia.EMITIDA)))
                 .thenReturn(List.of(preGuia));
 
         var resposta = service.listar("123456789-00");

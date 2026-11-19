@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -71,9 +72,32 @@ class EditarPreGuiaServiceTest {
     }
 
     @Test
+    void reprovadaReeditadaVoltaParaPreGuiaSemADecisaoAnterior() {
+        var preGuia = preparar(StatusPreGuia.REPROVADA);
+        preGuia.setMotivoReprovacao("Procedimento sem indicação");
+        preGuia.setDataReprovacao(LocalDateTime.of(2026, 11, 10, 9, 0));
+        preGuia.setChefeId(1);
+        preGuia.setAssinaturaUsuarioId(4);
+        preGuia.setAssinaturaNome("Roberto Lima");
+        preGuia.setAssinaturaPerfil("CHEFE");
+        preGuia.setAssinaturaData(LocalDateTime.of(2026, 11, 10, 9, 0));
+
+        var resposta = service.editar(7L, request);
+
+        assertThat(resposta.status()).isEqualTo(StatusPreGuia.PRE_GUIA);
+        assertThat(preGuia.getMotivoReprovacao()).isNull();
+        assertThat(preGuia.getDataReprovacao()).isNull();
+        assertThat(preGuia.getChefeId()).isNull();
+        assertThat(preGuia.getAssinaturaUsuarioId()).isNull();
+        assertThat(preGuia.getAssinaturaNome()).isNull();
+        assertThat(preGuia.getAssinaturaPerfil()).isNull();
+        assertThat(preGuia.getAssinaturaData()).isNull();
+        verify(registrarStatusPreGuiaService).atualizarStatus(preGuia, StatusPreGuia.PRE_GUIA, "edicao-pre-guia");
+    }
+
+    @Test
     void outrosStatusDevolvemConflitoSemAlterarItens() {
-        for (var status : List.of(StatusPreGuia.VALIDADA, StatusPreGuia.APROVADA,
-                StatusPreGuia.REPROVADA, StatusPreGuia.EMITIDA)) {
+        for (var status : List.of(StatusPreGuia.VALIDADA, StatusPreGuia.APROVADA, StatusPreGuia.EMITIDA)) {
             var preGuia = new PreGuiaModel();
             preGuia.setStatus(status);
             when(buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(7L)).thenReturn(preGuia);
