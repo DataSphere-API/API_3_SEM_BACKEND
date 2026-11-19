@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface FaturaRepository extends JpaRepository<FaturaModel, Long> {
     Optional<FaturaModel> findByOcsIdAndCompetenciaAndStatus(String ocsId, String competencia, StatusFatura status);
     List<FaturaModel> findByStatus(StatusFatura status);
+    List<FaturaModel> findByOcsIdAndCompetenciaAndStatusIn(String ocsId, String competencia, List<StatusFatura> status);
 }

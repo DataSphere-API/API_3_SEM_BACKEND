@@ -1,12 +1,17 @@
 package com.datasphere.fusex.fatura.service;
 
 import com.datasphere.fusex.espelho.EspelhoModel;
+import com.datasphere.fusex.espelho.EspelhoRepository;
 import com.datasphere.fusex.espelho.StatusEspelho;
 import com.datasphere.fusex.espelhoitem.EspelhoItemModel;
 import com.datasphere.fusex.espelhoitem.EspelhoItemRepository;
-import com.datasphere.fusex.fatura.*;
+import com.datasphere.fusex.fatura.FaturaModel;
+import com.datasphere.fusex.fatura.FaturaRepository;
+import com.datasphere.fusex.fatura.StatusFatura;
 import com.datasphere.fusex.guiaproc.GuiaProcModel;
 import com.datasphere.fusex.guiaproc.GuiaProcRepository;
+import com.datasphere.fusex.historicostatus.EntidadeTipo;
+import com.datasphere.fusex.historicostatus.service.RegistrarMudancaStatusService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,76 +22,67 @@ import java.util.List;
 @Service
 public class AlimentarFaturaNaAprovacaoService {
 
+    private static final String ORIGEM = "inclusao-na-fatura";
+
     private final FaturaRepository faturaRepository;
-    private final ItemFaturaRepository itemFaturaRepository;
+    private final EspelhoRepository espelhoRepository;
     private final EspelhoItemRepository espelhoItemRepository;
     private final GuiaProcRepository guiaProcRepository;
     private final MontarItensFaturaService montarItensFaturaService;
     private final AtualizarStatusGuiaProcParaFaturadaService atualizarStatusGuiaProcParaFaturadaService;
+    private final RegistrarMudancaStatusService registrarMudancaStatusService;
 
     public AlimentarFaturaNaAprovacaoService(FaturaRepository faturaRepository,
-                                             ItemFaturaRepository itemFaturaRepository,
+                                             EspelhoRepository espelhoRepository,
                                              EspelhoItemRepository espelhoItemRepository,
                                              GuiaProcRepository guiaProcRepository,
                                              MontarItensFaturaService montarItensFaturaService,
-                                             AtualizarStatusGuiaProcParaFaturadaService atualizarStatusGuiaProcParaFaturadaService) {
+                                             AtualizarStatusGuiaProcParaFaturadaService atualizarStatusGuiaProcParaFaturadaService,
+                                             RegistrarMudancaStatusService registrarMudancaStatusService) {
         this.faturaRepository = faturaRepository;
-        this.itemFaturaRepository = itemFaturaRepository;
+        this.espelhoRepository = espelhoRepository;
         this.espelhoItemRepository = espelhoItemRepository;
         this.guiaProcRepository = guiaProcRepository;
         this.montarItensFaturaService = montarItensFaturaService;
         this.atualizarStatusGuiaProcParaFaturadaService = atualizarStatusGuiaProcParaFaturadaService;
+        this.registrarMudancaStatusService = registrarMudancaStatusService;
     }
 
+    // Uma fatura ATIVA por OCS e mês: a primeira aprovação abre, as seguintes só somam itens.
     @Transactional
     public FaturaModel processarAprovacaoEspelho(EspelhoModel espelho) {
         String competencia = espelho.getDataInicio().format(DateTimeFormatter.ofPattern("yyyy-MM"));
-        String ocsId = espelho.getOcsId();
-
         FaturaModel fatura = faturaRepository
-                .findByOcsIdAndCompetenciaAndStatus(ocsId, competencia, StatusFatura.ATIVA)
-                .orElse(null);
-
-        if (fatura != null && fatura.getStatus() == StatusFatura.ENCAMINHADA_APROVACAO) {
-            throw new RuntimeException("Fatura já encaminhada não aceita mais espelhos.");
-        }
-
-        GuiaProcModel atendimento = guiaProcRepository.findById(espelho.getAtendimentoId()).orElseThrow();
-
-        if (fatura == null) {
-            fatura = new FaturaModel();
-            fatura.setOcsId(ocsId);
-            fatura.setCompetencia(competencia);
-            fatura.setEspelhoModel(espelho);
-            fatura.setGuiaProcModel(atendimento);
-            fatura.setStatus(StatusFatura.ATIVA);
-            fatura.setDataGeracao(LocalDateTime.now());
-            fatura = faturaRepository.save(fatura);
-        }
+                .findByOcsIdAndCompetenciaAndStatus(espelho.getOcsId(), competencia, StatusFatura.ATIVA)
+                .orElseGet(() -> abrirFatura(espelho, competencia));
 
         montarItensFaturaService.montarItensFatura(espelho, fatura);
 
-        espelho.setStatus(StatusEspelho.FATURADO);
-        atualizarStatusGuiaProcParaFaturadaService.atualizarStatusGuiaProcParaFaturada(atendimento);
+        List<EspelhoItemModel> itens = espelhoItemRepository.findByEspelhoId(espelho.getId());
+        for (EspelhoItemModel item : itens) {
+            GuiaProcModel atendimento = guiaProcRepository.findById(item.getAtendimentoId()).orElseThrow();
+            atualizarStatusGuiaProcParaFaturadaService.atualizarStatusGuiaProcParaFaturada(atendimento);
+        }
 
+        String statusAnterior = espelho.getStatus().name();
+        espelho.setStatus(StatusEspelho.FATURADO);
+        espelhoRepository.save(espelho);
+        registrarMudancaStatusService.executar(EntidadeTipo.ESPELHO, espelho.getId().longValue(),
+                statusAnterior, StatusEspelho.FATURADO.name(), ORIGEM);
         return fatura;
     }
 
-    @Transactional
-    public void processarReprovacaoEspelho(EspelhoModel espelho) {
-        String competencia = espelho.getDataInicio().format(DateTimeFormatter.ofPattern("yyyy-MM"));
-
-        FaturaModel fatura = faturaRepository
-                .findByOcsIdAndCompetenciaAndStatus(espelho.getOcsId(), competencia, StatusFatura.ATIVA)
-                .orElse(null);
-
-        if (fatura != null && fatura.getStatus() == StatusFatura.ATIVA) {
-            List<EspelhoItemModel> itensEspelho = espelhoItemRepository.findByEspelhoId(espelho.getId());
-            List<Integer> idsItens = itensEspelho.stream().map(EspelhoItemModel::getId).toList();
-
-            itemFaturaRepository.deleteByFaturaIdAndEspelhoItemIdIn(fatura.getId(), idsItens);
-
-            espelho.setStatus(StatusEspelho.EM_ABERTO);
-        }
+    private FaturaModel abrirFatura(EspelhoModel espelho, String competencia) {
+        FaturaModel fatura = new FaturaModel();
+        fatura.setOcsId(espelho.getOcsId());
+        fatura.setCompetencia(competencia);
+        fatura.setEspelhoModel(espelho);
+        fatura.setGuiaProcModel(guiaProcRepository.findById(espelho.getAtendimentoId()).orElse(null));
+        fatura.setStatus(StatusFatura.ATIVA);
+        fatura.setDataGeracao(LocalDateTime.now());
+        fatura = faturaRepository.save(fatura);
+        registrarMudancaStatusService.executar(EntidadeTipo.FATURA, fatura.getId(),
+                null, StatusFatura.ATIVA.name(), "aprovacao-do-espelho");
+        return fatura;
     }
 }

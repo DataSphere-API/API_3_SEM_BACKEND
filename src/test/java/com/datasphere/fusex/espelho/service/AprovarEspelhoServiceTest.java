@@ -9,6 +9,7 @@ import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.fatura.FaturaModel;
 import com.datasphere.fusex.fatura.FaturaRepository;
 import com.datasphere.fusex.fatura.StatusFatura;
+import com.datasphere.fusex.fatura.service.AlimentarFaturaNaAprovacaoService;
 import com.datasphere.fusex.historicostatus.EntidadeTipo;
 import com.datasphere.fusex.historicostatus.service.RegistrarMudancaStatusService;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,6 +38,9 @@ class AprovarEspelhoServiceTest {
 
     @Mock
     private FaturaRepository faturaRepository;
+
+    @Mock
+    private AlimentarFaturaNaAprovacaoService alimentarFaturaNaAprovacaoService;
 
     @InjectMocks
     private AprovarEspelhoService service;
@@ -55,13 +60,14 @@ class AprovarEspelhoServiceTest {
     @Test
     void aprovarEspelhoEmAberto_mudaStatusGravaAuditorEHistorico() {
         when(espelhoRepository.findById(1)).thenReturn(Optional.of(espelho));
-        when(faturaRepository.findByOcsIdAndCompetenciaAndStatus(anyString(), anyString(), eq(StatusFatura.ENCAMINHADA_APROVACAO)))
-                .thenReturn(Optional.empty());
+        when(faturaRepository.findByOcsIdAndCompetenciaAndStatusIn(eq("12345678000199"), eq("2026-11"), anyList()))
+                .thenReturn(List.of());
 
         DecisaoEspelhoResponse resposta = service.aprovarEspelho(1, 2);
 
         assertEquals(1, resposta.id());
         assertEquals(StatusEspelho.APROVADO, resposta.status());
+        verify(alimentarFaturaNaAprovacaoService).processarAprovacaoEspelho(espelho);
         assertNull(resposta.motivo());
         assertEquals(2, resposta.auditorId());
 
@@ -103,12 +109,26 @@ class AprovarEspelhoServiceTest {
         when(espelhoRepository.findById(1)).thenReturn(Optional.of(espelho));
         FaturaModel fatura = new FaturaModel();
         fatura.setStatus(StatusFatura.ENCAMINHADA_APROVACAO);
-        when(faturaRepository.findByOcsIdAndCompetenciaAndStatus("12345678000199", "2026-11", StatusFatura.ENCAMINHADA_APROVACAO))
-                .thenReturn(Optional.of(fatura));
+        when(faturaRepository.findByOcsIdAndCompetenciaAndStatusIn(eq("12345678000199"), eq("2026-11"), anyList()))
+                .thenReturn(List.of(fatura));
 
         BusinessException ex = assertThrows(BusinessException.class, () -> service.aprovarEspelho(1, 2));
         assertEquals(ErrorCode.FATURA_JA_ENCAMINHADA, ex.getErrorCode());
         verify(espelhoRepository, never()).save(any());
-        verifyNoInteractions(registrarMudancaStatusService);
+        verifyNoInteractions(registrarMudancaStatusService, alimentarFaturaNaAprovacaoService);
+    }
+
+    @Test
+    void aprovarEspelhoComFaturaJaLiquidada_tambemLanca409() {
+        when(espelhoRepository.findById(1)).thenReturn(Optional.of(espelho));
+        FaturaModel fatura = new FaturaModel();
+        fatura.setStatus(StatusFatura.LIQUIDADA);
+        when(faturaRepository.findByOcsIdAndCompetenciaAndStatusIn(eq("12345678000199"), eq("2026-11"),
+                argThat(lista -> lista.contains(StatusFatura.LIQUIDADA) && !lista.contains(StatusFatura.ATIVA))))
+                .thenReturn(List.of(fatura));
+
+        BusinessException ex = assertThrows(BusinessException.class, () -> service.aprovarEspelho(1, 2));
+        assertEquals(ErrorCode.FATURA_JA_ENCAMINHADA, ex.getErrorCode());
+        verifyNoInteractions(alimentarFaturaNaAprovacaoService);
     }
 }

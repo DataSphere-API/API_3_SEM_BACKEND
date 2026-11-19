@@ -17,6 +17,6 @@ public class ListarHistoricoPorEntidadeService {
     }
 
     public List<HistoricoStatusModel> executar(EntidadeTipo tipo, Long entidadeId) {
-        return repository.findByEntidadeTipoAndEntidadeIdOrderByDataAsc(tipo, entidadeId);
+        return repository.findByEntidadeTipoAndEntidadeIdOrderByDataAscIdAsc(tipo, entidadeId);
     }
 }

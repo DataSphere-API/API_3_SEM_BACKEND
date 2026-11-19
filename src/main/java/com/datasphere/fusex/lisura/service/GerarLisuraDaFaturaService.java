@@ -1,7 +1,6 @@
 package com.datasphere.fusex.lisura.service;
 
 import com.datasphere.fusex.atendimento.SessaoRepository;
-import com.datasphere.fusex.contrato.ContratoModel;
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelhoitem.EspelhoItemModel;
 import com.datasphere.fusex.espelhoitem.EspelhoItemRepository;
@@ -56,24 +55,17 @@ public class GerarLisuraDaFaturaService {
 
         for (EspelhoItemModel item : itensDoEspelho) {
             GuiaProcModel atendimento = consultarContratoDoItemService.consultarAtendimentoDoItem(item);
-
-            ContratoModel contrato = null;
-            LocalDate dataValidade = null;
             LocalDate dataAtendimento = null;
             if (atendimento != null) {
-                contrato = atendimento.getContratoModel();
-                dataValidade = atendimento.getDataValidade();
                 LocalDateTime realizadaEm = sessaoRepository.findUltimaDataRealizacaoByGuiaProcId(item.getAtendimentoId())
                         .orElseGet(atendimento::getDataValidacao);
                 if (realizadaEm != null) {
                     dataAtendimento = realizadaEm.toLocalDate();
                 }
             }
-
             itensAvaliados.add(avaliarAutorizacaoDoItemService
-                    .avaliarAutorizacaoDoItem(item, contrato, ocsId, dataValidade, dataAtendimento));
+                    .avaliarAutorizacaoDoItem(item, atendimento, ocsId, dataAtendimento));
         }
-
         return new LisuraResponse(fatura.getId(), itensAvaliados);
     }
 
