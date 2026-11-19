@@ -1,12 +1,12 @@
 package com.datasphere.fusex.fatura.service;
 
+import com.datasphere.fusex.contrato.service.CalcularValorContratadoService;
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelhoitem.EspelhoItemModel;
 import com.datasphere.fusex.espelhoitem.EspelhoItemRepository;
 import com.datasphere.fusex.fatura.FaturaModel;
 import com.datasphere.fusex.fatura.ItemFaturaModel;
 import com.datasphere.fusex.fatura.ItemFaturaRepository;
-import com.datasphere.fusex.guiaproc.GuiaProcModel;
 import com.datasphere.fusex.guiaproc.GuiaProcRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,25 +21,30 @@ public class MontarItensFaturaService {
     private final ItemFaturaRepository itemFaturaRepository;
     private final GuiaProcRepository guiaProcRepository;
     private final CalcularDivergenciaValorService calcularDivergenciaValorService;
+    private final CalcularValorContratadoService calcularValorContratadoService;
 
     public MontarItensFaturaService(EspelhoItemRepository espelhoItemRepository,
                                     ItemFaturaRepository itemFaturaRepository,
                                     GuiaProcRepository guiaProcRepository,
-                                    CalcularDivergenciaValorService calcularDivergenciaValorService) {
+                                    CalcularDivergenciaValorService calcularDivergenciaValorService,
+                                    CalcularValorContratadoService calcularValorContratadoService) {
         this.espelhoItemRepository = espelhoItemRepository;
         this.itemFaturaRepository = itemFaturaRepository;
         this.guiaProcRepository = guiaProcRepository;
         this.calcularDivergenciaValorService = calcularDivergenciaValorService;
+        this.calcularValorContratadoService = calcularValorContratadoService;
     }
 
+    // Cada item do espelho vira um item da fatura, comparado com o contrato do próprio atendimento.
     public List<ItemFaturaModel> montarItensFatura(EspelhoModel espelho, FaturaModel fatura) {
-        GuiaProcModel atendimento = guiaProcRepository.findById(espelho.getAtendimentoId()).orElseThrow();
-        BigDecimal valorContratado = atendimento.getContratoModel().getValor();
-
-        List<EspelhoItemModel> itensEspelho = espelhoItemRepository.findByEspelhoId(espelho.getId());
         List<ItemFaturaModel> itensFatura = new ArrayList<>();
-
-        for (EspelhoItemModel itemEspelho : itensEspelho) {
+        for (EspelhoItemModel itemEspelho : espelhoItemRepository.findByEspelhoId(espelho.getId())) {
+            BigDecimal valorContratado = calcularValorContratadoService.calcular(
+                    guiaProcRepository.findById(itemEspelho.getAtendimentoId()).orElse(null));
+            if (valorContratado == null) {
+                // Sem contrato: a lisura marca o item como não autorizado.
+                valorContratado = BigDecimal.ZERO;
+            }
             ItemFaturaModel itemFatura = new ItemFaturaModel();
             itemFatura.setFaturaId(fatura.getId());
             itemFatura.setEspelhoItemId(itemEspelho.getId());
@@ -47,10 +52,8 @@ public class MontarItensFaturaService {
             itemFatura.setValorContratado(valorContratado);
             itemFatura.setDivergenciaValor(
                     calcularDivergenciaValorService.calcularDivergenciaValor(itemEspelho.getValor(), valorContratado));
-
             itensFatura.add(itemFaturaRepository.save(itemFatura));
         }
-
         return itensFatura;
     }
 }
