@@ -1,7 +1,7 @@
 package com.datasphere.fusex.atendimento.controller;
 
 import com.datasphere.fusex.atendimento.service.BuscarQrDoProcedimentoService;
-import com.datasphere.fusex.dto.request.QrCodeResponse;
+import com.datasphere.fusex.atendimento.dto.QrCodeResponse;
 import com.datasphere.fusex.exception.QrCodeIndisponivelException;
 import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.exception.BusinessException;

@@ -3,8 +3,8 @@ package com.datasphere.fusex.preguia.service;
 import com.datasphere.fusex.guia.GuiaModel;
 import com.datasphere.fusex.guia.GuiaRepository;
 import com.datasphere.fusex.guia.StatusGuia;
-import com.datasphere.fusex.historicoStatus.EntidadeTipo;
-import com.datasphere.fusex.historicoStatus.service.RegistrarMudancaStatusService;
+import com.datasphere.fusex.historicostatus.EntidadeTipo;
+import com.datasphere.fusex.historicostatus.service.RegistrarMudancaStatusService;
 import com.datasphere.fusex.preguia.PreGuiaModel;
 import org.springframework.stereotype.Service;
 

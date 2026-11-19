@@ -1,7 +1,7 @@
 package com.datasphere.fusex.espelho.service;
 
-import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
-import com.datasphere.fusex.espelhoItem.EspelhoItemRepository;
+import com.datasphere.fusex.espelhoitem.EspelhoItemModel;
+import com.datasphere.fusex.espelhoitem.EspelhoItemRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -4,8 +4,8 @@ import com.datasphere.fusex.encaminhamento.service.ValidarAuditoriaConcluidaServ
 import com.datasphere.fusex.encaminhamento.service.ValidarMesEncerradoService;
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.EspelhoRepository;
-import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
-import com.datasphere.fusex.espelhoItem.EspelhoItemRepository;
+import com.datasphere.fusex.espelhoitem.EspelhoItemModel;
+import com.datasphere.fusex.espelhoitem.EspelhoItemRepository;
 import com.datasphere.fusex.fatura.FaturaModel;
 import com.datasphere.fusex.fatura.ItemFaturaModel;
 import com.datasphere.fusex.fatura.ItemFaturaRepository;

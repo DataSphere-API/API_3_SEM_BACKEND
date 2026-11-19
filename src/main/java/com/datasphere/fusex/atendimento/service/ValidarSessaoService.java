@@ -4,7 +4,7 @@ import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.guia.GuiaModel;
 import com.datasphere.fusex.guia.StatusGuia;
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

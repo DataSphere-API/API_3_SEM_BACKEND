@@ -1,17 +1,17 @@
 package com.datasphere.fusex.atendimento.service;
 
-import com.datasphere.fusex.atendimento.sessao.SessaoModel;
-import com.datasphere.fusex.atendimento.sessao.SessaoRepository;
+import com.datasphere.fusex.atendimento.SessaoModel;
+import com.datasphere.fusex.atendimento.SessaoRepository;
 import com.datasphere.fusex.domain.enums.ErrorCode;
-import com.datasphere.fusex.dto.request.SessaoRequest;
-import com.datasphere.fusex.dto.request.SessaoResponse;
+import com.datasphere.fusex.atendimento.dto.SessaoRequest;
+import com.datasphere.fusex.atendimento.dto.SessaoResponse;
 import com.datasphere.fusex.exception.BusinessException;
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
-import com.datasphere.fusex.guiaProc.GuiaProcRepository;
-import com.datasphere.fusex.guiaProc.StatusProcedimento;
-import com.datasphere.fusex.historicoStatus.EntidadeTipo;
-import com.datasphere.fusex.historicoStatus.service.RegistrarMudancaStatusService;
-import com.datasphere.fusex.service.ValidacaoQrService;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
+import com.datasphere.fusex.guiaproc.GuiaProcRepository;
+import com.datasphere.fusex.guiaproc.StatusProcedimento;
+import com.datasphere.fusex.historicostatus.EntidadeTipo;
+import com.datasphere.fusex.historicostatus.service.RegistrarMudancaStatusService;
+import com.datasphere.fusex.atendimento.service.ValidacaoQrService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

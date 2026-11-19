@@ -1,7 +1,7 @@
 package com.datasphere.fusex.guia.controller;
 
 import com.datasphere.fusex.guia.service.MontarLinhaDoTempoDaGuiaService;
-import com.datasphere.fusex.historicoStatus.service.HistoricoStatusResponse;
+import com.datasphere.fusex.historicostatus.dto.HistoricoStatusResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

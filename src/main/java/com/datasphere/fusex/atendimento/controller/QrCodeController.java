@@ -1,7 +1,7 @@
 package com.datasphere.fusex.atendimento.controller;
 
 import com.datasphere.fusex.atendimento.service.BuscarQrDoProcedimentoService;
-import com.datasphere.fusex.dto.request.QrCodeResponse;
+import com.datasphere.fusex.atendimento.dto.QrCodeResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

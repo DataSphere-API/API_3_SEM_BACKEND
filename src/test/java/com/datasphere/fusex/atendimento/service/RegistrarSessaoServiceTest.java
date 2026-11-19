@@ -1,14 +1,14 @@
 package com.datasphere.fusex.atendimento.service;
 
-import com.datasphere.fusex.atendimento.sessao.SessaoModel;
-import com.datasphere.fusex.atendimento.sessao.SessaoRepository;
+import com.datasphere.fusex.atendimento.SessaoModel;
+import com.datasphere.fusex.atendimento.SessaoRepository;
 import com.datasphere.fusex.domain.enums.ErrorCode;
-import com.datasphere.fusex.dto.request.SessaoRequest;
-import com.datasphere.fusex.dto.request.SessaoResponse;
+import com.datasphere.fusex.atendimento.dto.SessaoRequest;
+import com.datasphere.fusex.atendimento.dto.SessaoResponse;
 import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.guia.GuiaModel;
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
-import com.datasphere.fusex.guiaProc.GuiaProcRepository;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
+import com.datasphere.fusex.guiaproc.GuiaProcRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,8 +43,8 @@ class RegistrarSessaoServiceTest {
     private ValidarSessaoService validarSessaoService;
 
     @Mock private BuscarOcsAutenticadaService ocsAutenticada;
-    @Mock private com.datasphere.fusex.service.ValidacaoQrService validacaoQrService;
-    @Mock private com.datasphere.fusex.historicoStatus.service.RegistrarMudancaStatusService historico;
+    @Mock private com.datasphere.fusex.atendimento.service.ValidacaoQrService validacaoQrService;
+    @Mock private com.datasphere.fusex.historicostatus.service.RegistrarMudancaStatusService historico;
 
     @org.junit.jupiter.api.BeforeEach
     void autenticar() {
@@ -92,7 +92,7 @@ class RegistrarSessaoServiceTest {
         verify(validarSessaoService).validarSaldoDeSessoes(atendimento);
         verify(sessaoRepository).save(any(SessaoModel.class));
         verify(guiaProcRepository).save(atendimento);
-        verify(historico).executar(com.datasphere.fusex.historicoStatus.EntidadeTipo.GUIA_PROC,
+        verify(historico).executar(com.datasphere.fusex.historicostatus.EntidadeTipo.GUIA_PROC,
                 atendimentoId, "PENDENTE", "EM_ANDAMENTO", "registro-sessao");
     }
 

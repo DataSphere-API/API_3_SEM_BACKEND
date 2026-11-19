@@ -1,0 +1,36 @@
+package com.datasphere.fusex.guiaproc;
+
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface GuiaProcRepository extends JpaRepository<GuiaProcModel, Long> {
+
+    GuiaProcModel findByQr(String qr);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select g from GuiaProcModel g where g.id = :id")
+    Optional<GuiaProcModel> findByIdParaQr(@Param("id") Long id);
+
+    List<GuiaProcModel> findByContratoModel_OcsModel_Cnpj(String cnpj);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select g from GuiaProcModel g where g.qr = :qr")
+    Optional<GuiaProcModel> findByQrParaBaixa(@Param("qr") String qr);
+
+    List<GuiaProcModel> findByGuiaModel_Id(Long guiaId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select g from GuiaProcModel g where g.id = :id")
+    Optional<GuiaProcModel> findByIdParaSessao(@Param("id") Long id);
+
+    @Query(value = "SELECT g.benf_id FROM guia g JOIN guia_proc gp ON gp.guia_id = g.id WHERE gp.id = :atendimentoId", nativeQuery = true)
+    Optional<String> findBeneficiarioIdPorAtendimentoId(@Param("atendimentoId") Long atendimentoId);
+}

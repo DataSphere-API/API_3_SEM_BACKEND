@@ -2,8 +2,8 @@ package com.datasphere.fusex.atendimento.service;
 
 import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.exception.BusinessException;
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
-import com.datasphere.fusex.guiaProc.StatusProcedimento;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
+import com.datasphere.fusex.guiaproc.StatusProcedimento;
 import org.springframework.stereotype.Service;
 
 @Service

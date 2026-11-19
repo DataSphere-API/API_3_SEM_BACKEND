@@ -3,7 +3,7 @@ package com.datasphere.fusex.espelho.service;
 import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.espelho.dto.ItemEspelhoRequest;
 import com.datasphere.fusex.exception.BusinessException;
-import com.datasphere.fusex.guiaProc.GuiaProcRepository;
+import com.datasphere.fusex.guiaproc.GuiaProcRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
