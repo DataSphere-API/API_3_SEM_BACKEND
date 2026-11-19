@@ -1,4 +1,5 @@
 package com.datasphere.fusex.historicostatus.service;
+import com.datasphere.fusex.historicostatus.dto.HistoricoStatusResponse;
 
 import com.datasphere.fusex.auth.dto.LoginRequest;
 import com.datasphere.fusex.auth.dto.LoginResponse;
