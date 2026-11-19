@@ -40,6 +40,13 @@ public class HistoricoStatusModel {
     @Column(name = "origem", nullable = false, length = 50)
     private String origem;
 
+    // Cópia dos dados do usuário no momento do evento, sem relação mutável com Usuario.
+    @Column(name = "usuario_id")
+    private Integer usuarioId;
+
+    @Column(name = "usuario_nome", length = 255)
+    private String usuarioNome;
+
     public HistoricoStatusModel(EntidadeTipo tipo, Long entidadeId, String statusAnterior,
                                 String statusNovo, String origem) {
         this.entidadeTipo = tipo;
