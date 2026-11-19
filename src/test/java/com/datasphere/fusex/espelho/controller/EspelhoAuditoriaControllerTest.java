@@ -26,12 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class EspelhoAuditoriaControllerTest {
 
-    @Mock private ValidarAtendimentoRealizadoService validarAtendimentoRealizadoService;
-    @Mock private ValidarEspelhoNaoDuplicadoPorAtendimentoService validarEspelhoNaoDuplicadoPorAtendimentoService;
     @Mock private CriarEspelhoComItensService criarEspelhoComItensService;
     @Mock private ListarEspelhosService listarEspelhosService;
-    @Mock private ListarEspelhosPorOcsService listarEspelhosPorOcsService;
-    @Mock private ListarEspelhosPorStatusService listarEspelhosPorStatusService;
     @Mock private BuscarEspelhoPorIdService buscarEspelhoPorIdService;
     @Mock private ListarItensDoEspelhoService listarItensDoEspelhoService;
     @Mock private CorrigirItemEspelhoService corrigirItemEspelhoService;
@@ -47,12 +43,8 @@ class EspelhoAuditoriaControllerTest {
     @BeforeEach
     void setUp() {
         EspelhoController controller = new EspelhoController(
-                validarAtendimentoRealizadoService,
-                validarEspelhoNaoDuplicadoPorAtendimentoService,
                 criarEspelhoComItensService,
                 listarEspelhosService,
-                listarEspelhosPorOcsService,
-                listarEspelhosPorStatusService,
                 buscarEspelhoPorIdService,
                 listarItensDoEspelhoService,
                 corrigirItemEspelhoService,
@@ -75,7 +67,7 @@ class EspelhoAuditoriaControllerTest {
         espelho.setId(1);
         espelho.setStatus(StatusEspelho.EM_ABERTO);
 
-        when(buscarEspelhoPorIdService.buscarEspelhoPorId(1)).thenReturn(espelho);
+        when(buscarEspelhoPorIdService.buscarEspelhoVisivel(1)).thenReturn(espelho);
         when(identificarAuditorService.identificarAuditor(2)).thenReturn(2);
         when(aprovarEspelhoService.aprovarEspelho(1, 2))
                 .thenReturn(new DecisaoEspelhoResponse(1, StatusEspelho.APROVADO, null, 2));
@@ -94,7 +86,7 @@ class EspelhoAuditoriaControllerTest {
         espelho.setId(1);
         espelho.setStatus(StatusEspelho.EM_ABERTO);
 
-        when(buscarEspelhoPorIdService.buscarEspelhoPorId(1)).thenReturn(espelho);
+        when(buscarEspelhoPorIdService.buscarEspelhoVisivel(1)).thenReturn(espelho);
         when(identificarAuditorService.identificarAuditor(2)).thenReturn(2);
         when(reprovarEspelhoService.reprovarEspelho(1, 2, "Valor acima do contrato"))
                 .thenReturn(new DecisaoEspelhoResponse(1, StatusEspelho.REPROVADO, "Valor acima do contrato", 2));
@@ -116,7 +108,7 @@ class EspelhoAuditoriaControllerTest {
         espelho.setId(1);
         espelho.setStatus(StatusEspelho.REPROVADO);
 
-        when(buscarEspelhoPorIdService.buscarEspelhoPorId(1)).thenReturn(espelho);
+        when(buscarEspelhoPorIdService.buscarEspelhoVisivel(1)).thenReturn(espelho);
         when(reenviarEspelhoService.reenviarEspelho(1))
                 .thenReturn(new DecisaoEspelhoResponse(1, StatusEspelho.EM_ABERTO, null, null));
 
@@ -130,7 +122,8 @@ class EspelhoAuditoriaControllerTest {
 
     @Test
     void espelhoInexistente_devolve404() throws Exception {
-        when(buscarEspelhoPorIdService.buscarEspelhoPorId(99)).thenReturn(null);
+        when(buscarEspelhoPorIdService.buscarEspelhoVisivel(99))
+                .thenThrow(new BusinessException(ErrorCode.ESPELHO_NAO_ENCONTRADO));
 
         mockMvc.perform(patch("/espelhos/99/aprovar").header("X-Auditor-Id", 2))
                 .andExpect(status().isNotFound())
@@ -149,7 +142,7 @@ class EspelhoAuditoriaControllerTest {
     void auditorInexistente_devolve403() throws Exception {
         EspelhoModel espelho = new EspelhoModel();
         espelho.setId(1);
-        when(buscarEspelhoPorIdService.buscarEspelhoPorId(1)).thenReturn(espelho);
+        when(buscarEspelhoPorIdService.buscarEspelhoVisivel(1)).thenReturn(espelho);
         when(identificarAuditorService.identificarAuditor(99))
                 .thenThrow(new BusinessException(ErrorCode.AUDITOR_INVALIDO));
 
@@ -166,7 +159,7 @@ class EspelhoAuditoriaControllerTest {
     void reprovarSemMotivo_devolve400() throws Exception {
         EspelhoModel espelho = new EspelhoModel();
         espelho.setId(1);
-        when(buscarEspelhoPorIdService.buscarEspelhoPorId(1)).thenReturn(espelho);
+        when(buscarEspelhoPorIdService.buscarEspelhoVisivel(1)).thenReturn(espelho);
         when(identificarAuditorService.identificarAuditor(2)).thenReturn(2);
         when(reprovarEspelhoService.reprovarEspelho(1, 2, null))
                 .thenThrow(new BusinessException(ErrorCode.MOTIVO_OBRIGATORIO));
@@ -184,7 +177,7 @@ class EspelhoAuditoriaControllerTest {
         EspelhoModel espelho = new EspelhoModel();
         espelho.setId(1);
         espelho.setStatus(StatusEspelho.APROVADO);
-        when(buscarEspelhoPorIdService.buscarEspelhoPorId(1)).thenReturn(espelho);
+        when(buscarEspelhoPorIdService.buscarEspelhoVisivel(1)).thenReturn(espelho);
         when(identificarAuditorService.identificarAuditor(2)).thenReturn(2);
         when(aprovarEspelhoService.aprovarEspelho(1, 2))
                 .thenThrow(new BusinessException(ErrorCode.ESPELHO_JA_AUDITADO));
@@ -199,7 +192,7 @@ class EspelhoAuditoriaControllerTest {
         EspelhoModel espelho = new EspelhoModel();
         espelho.setId(1);
         espelho.setStatus(StatusEspelho.EM_ABERTO);
-        when(buscarEspelhoPorIdService.buscarEspelhoPorId(1)).thenReturn(espelho);
+        when(buscarEspelhoPorIdService.buscarEspelhoVisivel(1)).thenReturn(espelho);
         when(reenviarEspelhoService.reenviarEspelho(1))
                 .thenThrow(new BusinessException(ErrorCode.ESPELHO_NAO_REPROVADO));
 
