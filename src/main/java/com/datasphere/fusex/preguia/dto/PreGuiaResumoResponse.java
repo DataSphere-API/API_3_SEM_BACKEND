@@ -15,4 +15,7 @@ public record PreGuiaResumoResponse(
         boolean medicoAprovou,
         boolean chefeAprovou,
         LocalDate dataEmissao,
-        Long guiaId) {}
+        Long guiaId,
+        String beneficiarioPrecCp,
+        String guiaNumero,
+        LocalDate validoAte) {}
