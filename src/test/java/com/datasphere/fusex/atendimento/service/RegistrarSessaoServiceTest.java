@@ -3,7 +3,6 @@ package com.datasphere.fusex.atendimento.service;
 import com.datasphere.fusex.atendimento.SessaoModel;
 import com.datasphere.fusex.atendimento.SessaoRepository;
 import com.datasphere.fusex.domain.enums.ErrorCode;
-import com.datasphere.fusex.atendimento.dto.SessaoRequest;
 import com.datasphere.fusex.atendimento.dto.SessaoResponse;
 import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.guia.GuiaModel;
@@ -73,7 +72,7 @@ class RegistrarSessaoServiceTest {
         when(sessaoRepository.save(any(SessaoModel.class))).thenAnswer(i -> i.getArgument(0));
 
         SessaoResponse response = registrarSessaoService.registrarSessao(
-                atendimentoId, new SessaoRequest("12345678000199"));
+                atendimentoId);
 
         assertThat(response.atendimentoId()).isEqualTo(10L);
         assertThat(response.numeroSessao()).isEqualTo(1);
@@ -115,7 +114,7 @@ class RegistrarSessaoServiceTest {
         when(sessaoRepository.save(any(SessaoModel.class))).thenAnswer(i -> i.getArgument(0));
 
         SessaoResponse response = registrarSessaoService.registrarSessao(
-                atendimentoId, new SessaoRequest("12345678000199"));
+                atendimentoId);
 
         assertThat(response.numeroSessao()).isEqualTo(3);
         assertThat(response.qtdRealizada()).isEqualTo(3);
@@ -136,7 +135,7 @@ class RegistrarSessaoServiceTest {
         when(guiaProcRepository.findByIdParaSessao(anyLong())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> registrarSessaoService.registrarSessao(
-                999L, new SessaoRequest("12345678000199")))
+                999L))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.ATENDIMENTO_NAO_ENCONTRADO);
@@ -161,7 +160,7 @@ class RegistrarSessaoServiceTest {
                 .when(validarSessaoService).validarSaldoDeSessoes(atendimento);
 
         assertThatThrownBy(() -> registrarSessaoService.registrarSessao(
-                atendimentoId, new SessaoRequest("12345678000199")))
+                atendimentoId))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.SESSOES_ESGOTADAS);

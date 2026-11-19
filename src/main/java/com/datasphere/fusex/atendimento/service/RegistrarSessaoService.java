@@ -3,7 +3,6 @@ package com.datasphere.fusex.atendimento.service;
 import com.datasphere.fusex.atendimento.SessaoModel;
 import com.datasphere.fusex.atendimento.SessaoRepository;
 import com.datasphere.fusex.domain.enums.ErrorCode;
-import com.datasphere.fusex.atendimento.dto.SessaoRequest;
 import com.datasphere.fusex.atendimento.dto.SessaoResponse;
 import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.guiaproc.GuiaProcModel;
@@ -44,7 +43,7 @@ public class RegistrarSessaoService {
     }
 
     @Transactional
-    public SessaoResponse registrarSessao(Long atendimentoId, SessaoRequest request) {
+    public SessaoResponse registrarSessao(Long atendimentoId) {
 
         String cnpj = buscarOcsAutenticadaService.buscarOcsAutenticada();
         GuiaProcModel atendimento = guiaProcRepository.findByIdParaSessao(atendimentoId)

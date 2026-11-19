@@ -7,7 +7,6 @@ import com.datasphere.fusex.atendimento.service.RegistrarSessaoService;
 import com.datasphere.fusex.atendimento.dto.AtendimentoResponse;
 import com.datasphere.fusex.atendimento.dto.BaixaResponse;
 import com.datasphere.fusex.atendimento.dto.ConferenciaQrResponse;
-import com.datasphere.fusex.atendimento.dto.SessaoRequest;
 import com.datasphere.fusex.atendimento.dto.SessaoResponse;
 import com.datasphere.fusex.atendimento.dto.ValidarQrCodeRequest;
 import com.datasphere.fusex.atendimento.service.ValidacaoQrService;
@@ -44,12 +43,11 @@ public class AtendimentoController {
         return ResponseEntity.ok(registrarRealizacaoService.registrarRealizacao(request));
     }
 
+    // A OCS vem do login; o corpo não é usado (se vier, é ignorado).
     @PostMapping("/atendimentos/{id}/sessoes")
-    public ResponseEntity<SessaoResponse> registrarSessao(
-            @PathVariable Long id,
-            @Valid @RequestBody SessaoRequest request) {
+    public ResponseEntity<SessaoResponse> registrarSessao(@PathVariable Long id) {
 
-        SessaoResponse response = registrarSessaoService.registrarSessao(id, request);
+        SessaoResponse response = registrarSessaoService.registrarSessao(id);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
