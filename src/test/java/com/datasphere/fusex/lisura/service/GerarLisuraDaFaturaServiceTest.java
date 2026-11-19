@@ -2,6 +2,7 @@ package com.datasphere.fusex.lisura.service;
 
 import com.datasphere.fusex.atendimento.SessaoRepository;
 import com.datasphere.fusex.contrato.ContratoModel;
+import com.datasphere.fusex.contrato.service.CalcularValorContratadoService;
 import com.datasphere.fusex.divergencia.service.ClassificarSeveridadeDivergenciaService;
 import com.datasphere.fusex.divergencia.service.ConsolidarDivergenciasService;
 import com.datasphere.fusex.encaminhamento.service.ValidarAuditoriaConcluidaService;
@@ -69,7 +70,7 @@ class GerarLisuraDaFaturaServiceTest {
 
         var calcularDivergencia = new CalcularDivergenciaValorService();
         var gerarLisura = new GerarLisuraDaFaturaService(
-                itens, consulta, new AvaliarAutorizacaoDoItemService(calcularDivergencia), sessoes,
+                itens, consulta, new AvaliarAutorizacaoDoItemService(calcularDivergencia, new CalcularValorContratadoService()), sessoes,
                 mock(ItemFaturaRepository.class));
         var consolidarDivergencias = new ConsolidarDivergenciasService(
                 gerarLisura, calcularDivergencia,
@@ -153,7 +154,7 @@ class GerarLisuraDaFaturaServiceTest {
         private final SessaoRepository sessoes = mock(SessaoRepository.class);
         private final FaturaModel fatura = new FaturaModel();
         private final GerarLisuraDaFaturaService service = new GerarLisuraDaFaturaService(
-                itens, consulta, new AvaliarAutorizacaoDoItemService(new CalcularDivergenciaValorService()),
+                itens, consulta, new AvaliarAutorizacaoDoItemService(new CalcularDivergenciaValorService(), new CalcularValorContratadoService()),
                 sessoes, vinculos);
 
         private Cenario(String primeiroValor, String segundoValor) {
