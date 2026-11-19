@@ -110,11 +110,20 @@ class PreGuiaCadastroIntegrationTest {
     @Test
     void todosOsStatusNaoEditaveisRetornam409() throws Exception {
         long id = criar();
-        for (String estado : List.of("VALIDADA", "APROVADA", "REPROVADA", "EMITIDA")) {
+        for (String estado : List.of("VALIDADA", "APROVADA", "EMITIDA")) {
             jdbc.update("UPDATE pre_guia SET status=? WHERE id=?", estado, id);
             editar(id, PEDIDO).andExpect(status().isConflict())
                     .andExpect(jsonPath("$.codigo").value("PRE_GUIA_STATUS_INVALIDO"));
         }
+    }
+
+    @Test
+    void reprovadaPodeSerReeditadaEVoltaParaPreGuia() throws Exception {
+        long id = criar();
+        jdbc.update("UPDATE pre_guia SET status='REPROVADA', motivo_reprovacao='Sem indicação', assinatura_nome='Roberto' WHERE id=?", id);
+        editar(id, PEDIDO).andExpect(status().isOk()).andExpect(jsonPath("$.status").value("PRE_GUIA"));
+        assertThat(jdbc.queryForObject("SELECT motivo_reprovacao FROM pre_guia WHERE id=?", String.class, id)).isNull();
+        assertThat(jdbc.queryForObject("SELECT assinatura_nome FROM pre_guia WHERE id=?", String.class, id)).isNull();
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.datasphere.fusex.auth.Perfil;
 import com.datasphere.fusex.auth.service.BuscarUsuarioLogadoService;
 import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.exception.BusinessException;
+import com.datasphere.fusex.preguia.PreGuiaModel;
 import com.datasphere.fusex.preguia.PreGuiaProcRepository;
 import com.datasphere.fusex.preguia.StatusPreGuia;
 import com.datasphere.fusex.preguia.dto.PreGuiaRequest;
@@ -43,16 +44,33 @@ public class EditarPreGuiaService {
         }
         var preGuia = buscarPreGuiaPorIdService.buscarPreGuiaParaAtualizar(id);
         if (preGuia.getStatus() != StatusPreGuia.PRE_GUIA
-                && preGuia.getStatus() != StatusPreGuia.COM_PENDENCIAS) {
+                && preGuia.getStatus() != StatusPreGuia.COM_PENDENCIAS
+                && preGuia.getStatus() != StatusPreGuia.REPROVADA) {
             throw new BusinessException(ErrorCode.PRE_GUIA_STATUS_INVALIDO);
         }
         validarDadosDaPreGuiaService.validar(request);
 
         preGuiaProcRepository.deleteAll(preGuiaProcRepository.findByPreGuiaModel_IdOrderByIdAsc(id));
+        if (preGuia.getStatus() == StatusPreGuia.REPROVADA) {
+            limparDecisaoAnterior(preGuia);
+        }
         preGuia.setBenfId(request.beneficiarioPrecCp());
         preGuia.setMedId(request.medicoId());
         salvarProcedimentosDaPreGuiaService.salvar(preGuia, request.procedimentos());
         registrarStatusPreGuiaService.atualizarStatus(preGuia, StatusPreGuia.PRE_GUIA, "edicao-pre-guia");
         return new PreGuiaSalvaResponse(preGuia.getId(), preGuia.getStatus());
+    }
+
+    // A reprovada reeditada volta a ser rascunho: precisa de nova validação e nova decisão assinada.
+    private void limparDecisaoAnterior(PreGuiaModel preGuia) {
+        preGuia.setMotivoReprovacao(null);
+        preGuia.setDataReprovacao(null);
+        preGuia.setDataAprovacaoMedico(null);
+        preGuia.setDataAprovacaoChefe(null);
+        preGuia.setChefeId(null);
+        preGuia.setAssinaturaUsuarioId(null);
+        preGuia.setAssinaturaNome(null);
+        preGuia.setAssinaturaPerfil(null);
+        preGuia.setAssinaturaData(null);
     }
 }
