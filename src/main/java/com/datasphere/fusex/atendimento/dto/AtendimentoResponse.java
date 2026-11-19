@@ -13,7 +13,8 @@ public record AtendimentoResponse(
         Integer qtdRealizada,
         String statusProcedimento,
         LocalDate dataValidade,
-        LocalDateTime dataRealizacao
+        LocalDateTime dataRealizacao,
+        Integer espelhoId
 ) {
 
     public record Beneficiario(String precCp, String nome) {
