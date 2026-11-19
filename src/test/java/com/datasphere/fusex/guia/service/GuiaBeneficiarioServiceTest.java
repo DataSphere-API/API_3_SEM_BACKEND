@@ -7,6 +7,7 @@ import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.guia.GuiaModel;
 import com.datasphere.fusex.guia.GuiaRepository;
 import com.datasphere.fusex.guiaProc.GuiaProcRepository;
+import com.datasphere.fusex.fatura.ItemFaturaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -30,10 +31,11 @@ class GuiaBeneficiarioServiceTest {
     @Mock private GuiaRepository guiaRepository;
     @Mock private GuiaProcRepository procedimentoRepository;
     @Mock private ValidarConsultaGuiasService validarConsulta;
+    @Mock private ItemFaturaRepository itemFaturaRepository;
 
     private GuiaBeneficiarioService service() {
         return new GuiaBeneficiarioService(beneficiarioRepository, guiaRepository, procedimentoRepository,
-                new ValidadeGuiaService(60), validarConsulta);
+                new ValidadeGuiaService(60), validarConsulta, itemFaturaRepository);
     }
 
     @Test
