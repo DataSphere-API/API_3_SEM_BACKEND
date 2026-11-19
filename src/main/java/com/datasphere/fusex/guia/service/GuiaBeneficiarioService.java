@@ -9,6 +9,10 @@ import com.datasphere.fusex.guia.dto.GuiaBeneficiarioResponse;
 import com.datasphere.fusex.guia.dto.ProcedimentoGuiaResponse;
 import com.datasphere.fusex.guiaProc.GuiaProcModel;
 import com.datasphere.fusex.guiaProc.GuiaProcRepository;
+import com.datasphere.fusex.guiaProc.StatusProcedimento;
+import com.datasphere.fusex.fatura.ItemFaturaRepository;
+import com.datasphere.fusex.fatura.StatusFatura;
+import com.datasphere.fusex.guia.StatusPainelBeneficiario;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,17 +28,20 @@ public class GuiaBeneficiarioService {
     private final GuiaProcRepository guiaProcRepository;
     private final ValidadeGuiaService validadeGuiaService;
     private final ValidarConsultaGuiasService validarConsultaGuiasService;
+    private final ItemFaturaRepository itemFaturaRepository;
 
     public GuiaBeneficiarioService(BeneficiarioRepository beneficiarioRepository,
                                    GuiaRepository guiaRepository,
                                    GuiaProcRepository guiaProcRepository,
                                    ValidadeGuiaService validadeGuiaService,
-                                   ValidarConsultaGuiasService validarConsultaGuiasService) {
+                                   ValidarConsultaGuiasService validarConsultaGuiasService,
+                                   ItemFaturaRepository itemFaturaRepository) {
         this.beneficiarioRepository = beneficiarioRepository;
         this.guiaRepository = guiaRepository;
         this.guiaProcRepository = guiaProcRepository;
         this.validadeGuiaService = validadeGuiaService;
         this.validarConsultaGuiasService = validarConsultaGuiasService;
+        this.itemFaturaRepository = itemFaturaRepository;
     }
 
     @Transactional(readOnly = true)
@@ -72,8 +79,22 @@ public class GuiaBeneficiarioService {
                     p.getStatus(),
                     p.getQtdAutorizada(),
                     p.getQtdRealizada(),
-                    p.getQr() != null));
+                    p.getQr() != null,
+                    statusPainelDoProcedimento(p)));
         }
         return procedimentos;
+    }
+
+    // Procedimento faturado mostra o andamento da fatura (aprovada ou liquidada).
+    StatusPainelBeneficiario statusPainelDoProcedimento(GuiaProcModel procedimento) {
+        StatusProcedimento status = StatusProcedimento.valueOf(procedimento.getStatus());
+        StatusFatura statusDaFatura = null;
+        if (status == StatusProcedimento.FATURADA) {
+            List<StatusFatura> faturas = itemFaturaRepository.listarStatusDasFaturasDoAtendimento(procedimento.getId());
+            if (!faturas.isEmpty()) {
+                statusDaFatura = faturas.get(0);
+            }
+        }
+        return StatusPainelBeneficiario.doProcedimento(status, statusDaFatura);
     }
 }
