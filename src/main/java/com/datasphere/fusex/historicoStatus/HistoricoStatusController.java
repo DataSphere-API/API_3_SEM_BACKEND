@@ -16,11 +16,6 @@ public class HistoricoStatusController {
         this.listarHistoricoPorEntidadeService = listarHistoricoPorEntidadeService;
     }
 
-    @GetMapping("/guias/{id}/historico")
-    public ResponseEntity<List<HistoricoStatusResponse>> historicoGuia(@PathVariable Long id) {
-        return ResponseEntity.ok(buscar(EntidadeTipo.GUIA_PROC, id));
-    }
-
     @GetMapping("/espelhos/{id}/historico")
     public ResponseEntity<List<HistoricoStatusResponse>> historicoEspelho(@PathVariable Long id) {
         return ResponseEntity.ok(buscar(EntidadeTipo.ESPELHO, id));
