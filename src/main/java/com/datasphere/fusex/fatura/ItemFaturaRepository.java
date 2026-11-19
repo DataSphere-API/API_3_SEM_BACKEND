@@ -5,11 +5,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
 public interface ItemFaturaRepository extends JpaRepository<ItemFaturaModel, Integer> {
     List<ItemFaturaModel> findByFaturaId(Long faturaId);
+
+    List<ItemFaturaModel> findByEspelhoItemIdIn(Collection<Integer> espelhoItemIds);
 
     void deleteByFaturaIdAndEspelhoItemIdIn(Long faturaId, List<Integer> espelhoItemIds);
 

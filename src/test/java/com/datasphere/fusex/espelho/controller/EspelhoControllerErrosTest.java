@@ -82,12 +82,12 @@ class EspelhoControllerErrosTest {
     }
 
     @Test
-    void atendimentoNaoRealizado_devolve400EmJson() throws Exception {
+    void atendimentoNaoRealizado_devolve422EmJson() throws Exception {
         when(criarEspelhoComItensService.criarEspelhoComItens(any(EspelhoRequest.class)))
                 .thenThrow(new BusinessException(ErrorCode.ATENDIMENTO_NAO_REALIZADO));
 
         mockMvc.perform(post("/espelhos").contentType(MediaType.APPLICATION_JSON).content(CORPO_VALIDO))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.codigo").value("ATENDIMENTO_NAO_REALIZADO"));
     }
 
