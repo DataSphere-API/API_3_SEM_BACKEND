@@ -59,7 +59,7 @@ public enum ErrorCode {
     ESPELHO_SEM_ITENS("ESPELHO_SEM_ITENS", "O espelho deve conter pelo menos um item.", HttpStatus.UNPROCESSABLE_ENTITY),
     OCS_DIVERGENTE("OCS_DIVERGENTE", "A OCS informada não corresponde à OCS do contrato do atendimento.", HttpStatus.UNPROCESSABLE_ENTITY),
     BENEFICIARIO_FORA_DA_GUIA("BENEFICIARIO_FORA_DA_GUIA", "O beneficiário informado não pertence à guia do atendimento.", HttpStatus.UNPROCESSABLE_ENTITY),
-    ATENDIMENTO_NAO_REALIZADO("ATENDIMENTO_NAO_REALIZADO", "Atendimento não encontrado ou ainda não realizado.", HttpStatus.BAD_REQUEST),
+    ATENDIMENTO_NAO_REALIZADO("ATENDIMENTO_NAO_REALIZADO", "O atendimento ainda não teve a baixa final.", HttpStatus.UNPROCESSABLE_ENTITY),
     ATENDIMENTO_JA_EM_ESPELHO("ATENDIMENTO_JA_EM_ESPELHO", "Já existe um espelho para este atendimento.", HttpStatus.CONFLICT),
     ITEM_ESPELHO_NAO_CORRIGIDO("ITEM_ESPELHO_NAO_CORRIGIDO", "Não foi possível corrigir o item do espelho.", HttpStatus.UNPROCESSABLE_ENTITY),
     ITEM_ESPELHO_NAO_REMOVIDO("ITEM_ESPELHO_NAO_REMOVIDO", "Não foi possível remover o item do espelho.", HttpStatus.UNPROCESSABLE_ENTITY),
@@ -86,6 +86,8 @@ public enum ErrorCode {
     GUIA_NAO_ENCONTRADA("GUIA_NAO_ENCONTRADA", "Guia não encontrada.", HttpStatus.NOT_FOUND),
     DOCUMENTO_GUIA_INDISPONIVEL("DOCUMENTO_GUIA_INDISPONIVEL", "Esta guia foi emitida antes do registro do documento.", HttpStatus.NOT_FOUND),
     DOCUMENTO_GUIA_JA_GRAVADO("DOCUMENTO_GUIA_JA_GRAVADO", "O documento desta guia já foi gravado e não pode mudar.", HttpStatus.CONFLICT),
+    FORA_DO_MES("FORA_DO_MES", "O espelho precisa ser do mês atual ou, até o dia 5, do mês anterior.", HttpStatus.UNPROCESSABLE_ENTITY),
+    FORA_DO_PERIODO("FORA_DO_PERIODO", "O atendimento foi realizado fora do período do espelho.", HttpStatus.UNPROCESSABLE_ENTITY),
 
     DADOS_INVALIDOS("DADOS_INVALIDOS", "Dados da requisição inválidos.", HttpStatus.BAD_REQUEST);
 
