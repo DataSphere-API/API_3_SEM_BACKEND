@@ -5,6 +5,10 @@ import com.datasphere.fusex.auth.UsuarioLogado;
 import com.datasphere.fusex.auth.service.BuscarUsuarioLogadoService;
 import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.exception.BusinessException;
+import com.datasphere.fusex.espelhoitem.EspelhoItemModel;
+import com.datasphere.fusex.espelhoitem.EspelhoItemRepository;
+import com.datasphere.fusex.fatura.ItemFaturaModel;
+import com.datasphere.fusex.fatura.ItemFaturaRepository;
 import com.datasphere.fusex.guia.GuiaModel;
 import com.datasphere.fusex.guia.GuiaRepository;
 import com.datasphere.fusex.guiaproc.GuiaProcModel;
@@ -37,6 +41,8 @@ class MontarLinhaDoTempoDaGuiaServiceTest {
     @Mock private GuiaProcRepository guiaProcRepository;
     @Mock private ListarHistoricoPorEntidadeService historico;
     @Mock private BuscarUsuarioLogadoService usuarioLogado;
+    @Mock private EspelhoItemRepository espelhoItemRepository;
+    @Mock private ItemFaturaRepository itemFaturaRepository;
     @InjectMocks private MontarLinhaDoTempoDaGuiaService service;
 
     @BeforeEach
@@ -147,6 +153,33 @@ class MontarLinhaDoTempoDaGuiaServiceTest {
         when(historico.executar(EntidadeTipo.GUIA, 10L))
                 .thenReturn(List.of(evento(1, EntidadeTipo.GUIA, 10, "EMITIDA", 0)));
         assertThat(service.montar(10L)).extracting("entidadeTipo").containsExactly(EntidadeTipo.GUIA);
+    }
+
+    @Test
+    void incluiOsEventosDoEspelhoEDaFaturaDosProcedimentos() {
+        prepararGuia();
+        var procedimento = new GuiaProcModel();
+        procedimento.setId(20L);
+        when(guiaProcRepository.findByGuiaModel_Id(10L)).thenReturn(List.of(procedimento));
+        var itemDoEspelho = new EspelhoItemModel();
+        itemDoEspelho.setId(40);
+        itemDoEspelho.setEspelhoId(4);
+        itemDoEspelho.setAtendimentoId(20L);
+        when(espelhoItemRepository.findByAtendimentoIdIn(List.of(20L))).thenReturn(List.of(itemDoEspelho));
+        var itemDaFatura = new ItemFaturaModel();
+        itemDaFatura.setFaturaId(30L);
+        itemDaFatura.setEspelhoItemId(40);
+        when(itemFaturaRepository.findByEspelhoItemIdIn(List.of(40))).thenReturn(List.of(itemDaFatura));
+        when(historico.executar(EntidadeTipo.GUIA, 10L)).thenReturn(List.of());
+        when(historico.executar(EntidadeTipo.GUIA_PROC, 20L)).thenReturn(List.of(
+                evento(1, EntidadeTipo.GUIA_PROC, 20, "REALIZADA", 0)));
+        when(historico.executar(EntidadeTipo.ESPELHO, 4L)).thenReturn(List.of(
+                evento(2, EntidadeTipo.ESPELHO, 4, "EM_ABERTO", 1)));
+        when(historico.executar(EntidadeTipo.FATURA, 30L)).thenReturn(List.of(
+                evento(3, EntidadeTipo.FATURA, 30, "ATIVA", 2)));
+
+        assertThat(service.montar(10L)).extracting("entidadeTipo").containsExactly(
+                EntidadeTipo.GUIA_PROC, EntidadeTipo.ESPELHO, EntidadeTipo.FATURA);
     }
 
     private void prepararGuia() {
