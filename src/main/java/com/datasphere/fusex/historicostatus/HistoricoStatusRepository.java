@@ -8,6 +8,6 @@ import java.util.List;
 @Repository
 public interface HistoricoStatusRepository extends JpaRepository<HistoricoStatusModel, Long> {
 
-    List<HistoricoStatusModel> findByEntidadeTipoAndEntidadeIdOrderByDataAsc(
+    List<HistoricoStatusModel> findByEntidadeTipoAndEntidadeIdOrderByDataAscIdAsc(
             EntidadeTipo entidadeTipo, Long entidadeId);
 }
