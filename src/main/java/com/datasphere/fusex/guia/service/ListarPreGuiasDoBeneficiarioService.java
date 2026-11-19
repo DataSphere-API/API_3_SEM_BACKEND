@@ -27,7 +27,8 @@ public class ListarPreGuiasDoBeneficiarioService {
         this.buscarUsuarioLogadoService = buscarUsuarioLogadoService;
     }
 
-    // Pré-guias em andamento (nem emitidas nem reprovadas): o beneficiário vê como "solicitada". Só as próprias.
+    // Pré-guias ainda sem guia aparecem como "solicitada", inclusive a reprovada, que o emissor pode reeditar.
+    // O beneficiário só vê as próprias.
     @Transactional(readOnly = true)
     public List<PreGuiaDoBeneficiarioResponse> listar(String precCp) {
         UsuarioLogado usuario = buscarUsuarioLogadoService.buscarUsuarioLogado();
@@ -38,7 +39,7 @@ public class ListarPreGuiasDoBeneficiarioService {
         List<PreGuiaDoBeneficiarioResponse> resposta = new ArrayList<>();
         for (PreGuiaModel preGuia : preGuiaRepository
                 .findByBenfIdAndGuiaIdIsNullAndStatusNotInOrderByIdDesc(
-                        precCp, List.of(StatusPreGuia.EMITIDA, StatusPreGuia.REPROVADA))) {
+                        precCp, List.of(StatusPreGuia.EMITIDA))) {
             resposta.add(new PreGuiaDoBeneficiarioResponse(
                     preGuia.getId(), StatusPainelBeneficiario.SOLICITADA, preGuia.getDataCriacao()));
         }
