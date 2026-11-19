@@ -5,6 +5,9 @@ import com.datasphere.fusex.auth.UsuarioLogado;
 import com.datasphere.fusex.auth.service.BuscarUsuarioLogadoService;
 import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.exception.BusinessException;
+import com.datasphere.fusex.guia.GuiaModel;
+import com.datasphere.fusex.guia.GuiaRepository;
+import com.datasphere.fusex.guia.service.ValidadeGuiaService;
 import com.datasphere.fusex.preguia.PreGuiaModel;
 import com.datasphere.fusex.preguia.PreGuiaProcModel;
 import com.datasphere.fusex.preguia.PreGuiaProcRepository;
@@ -14,6 +17,7 @@ import com.datasphere.fusex.preguia.dto.PreGuiaResumoResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,17 +29,23 @@ public class ListarPreGuiasService {
     private final BuscarUsuarioLogadoService buscarUsuarioLogadoService;
     private final CalcularValorTotalPreGuiaService calcularValorTotalPreGuiaService;
     private final BuscarDataEmissaoDaPreGuiaService buscarDataEmissaoDaPreGuiaService;
+    private final GuiaRepository guiaRepository;
+    private final ValidadeGuiaService validadeGuiaService;
 
     public ListarPreGuiasService(PreGuiaRepository preGuiaRepository,
                                  PreGuiaProcRepository preGuiaProcRepository,
                                  BuscarUsuarioLogadoService buscarUsuarioLogadoService,
                                  CalcularValorTotalPreGuiaService calcularValorTotalPreGuiaService,
-                                 BuscarDataEmissaoDaPreGuiaService buscarDataEmissaoDaPreGuiaService) {
+                                 BuscarDataEmissaoDaPreGuiaService buscarDataEmissaoDaPreGuiaService,
+                                 GuiaRepository guiaRepository,
+                                 ValidadeGuiaService validadeGuiaService) {
         this.preGuiaRepository = preGuiaRepository;
         this.preGuiaProcRepository = preGuiaProcRepository;
         this.buscarUsuarioLogadoService = buscarUsuarioLogadoService;
         this.calcularValorTotalPreGuiaService = calcularValorTotalPreGuiaService;
         this.buscarDataEmissaoDaPreGuiaService = buscarDataEmissaoDaPreGuiaService;
+        this.guiaRepository = guiaRepository;
+        this.validadeGuiaService = validadeGuiaService;
     }
 
     @Transactional(readOnly = true)
@@ -91,7 +101,13 @@ public class ListarPreGuiasService {
 
     private PreGuiaResumoResponse montarResumo(PreGuiaModel preGuia) {
         List<PreGuiaProcModel> procedimentos = preGuiaProcRepository.findByPreGuiaModel_IdOrderByIdAsc(preGuia.getId());
-
+        LocalDate dataEmissao = buscarDataEmissaoDaPreGuiaService.buscarDataEmissao(preGuia);
+        // Guia emitida: número oficial (ex.: 2026-000123) e validade calculada como no detalhe.
+        String guiaNumero = null;
+        if (preGuia.getGuiaId() != null) {
+            guiaNumero = guiaRepository.findById(preGuia.getGuiaId()).map(GuiaModel::getNumero).orElse(null);
+        }
+        LocalDate validoAte = dataEmissao == null ? null : validadeGuiaService.calcularDataValidade(dataEmissao);
         return new PreGuiaResumoResponse(
                 preGuia.getId(),
                 preGuia.getBeneficiarioModel().getNome(),
@@ -101,7 +117,10 @@ public class ListarPreGuiasService {
                 preGuia.getDataCriacao(),
                 preGuia.getDataAprovacaoMedico() != null,
                 preGuia.getDataAprovacaoChefe() != null,
-                buscarDataEmissaoDaPreGuiaService.buscarDataEmissao(preGuia),
-                preGuia.getGuiaId());
+                dataEmissao,
+                preGuia.getGuiaId(),
+                preGuia.getBenfId(),
+                guiaNumero,
+                validoAte);
     }
 }
