@@ -43,7 +43,7 @@ Para executar a API na sua máquina com o banco PostgreSQL no Docker:
 
 ```bash
 # 1. Subir apenas o banco PostgreSQL isolado
-docker compose -f compose.yaml up -d
+docker compose -f compose.dev.yaml up -d
 
 # 2. Executar a aplicação com o Maven wrapper
 ./mvnw spring-boot:run
