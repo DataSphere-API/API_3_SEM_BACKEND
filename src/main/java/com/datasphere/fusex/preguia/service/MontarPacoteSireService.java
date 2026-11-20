@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MontarPacoteSireService {
@@ -31,6 +32,7 @@ public class MontarPacoteSireService {
     private final CalcularValorTotalPreGuiaService calcularValorTotalPreGuiaService;
     private final CalcularHashPacoteService calcularHashPacoteService;
     private final ValidadeGuiaService validadeGuiaService;
+    private final BuscarAtendimentosDaPreGuiaService buscarAtendimentosDaPreGuiaService;
 
     public MontarPacoteSireService(BuscarPreGuiaPorIdService buscarPreGuiaPorIdService,
                                    PreGuiaProcRepository preGuiaProcRepository,
@@ -38,7 +40,8 @@ public class MontarPacoteSireService {
                                    BeneficiarioRepository beneficiarioRepository,
                                    CalcularValorTotalPreGuiaService calcularValorTotalPreGuiaService,
                                    CalcularHashPacoteService calcularHashPacoteService,
-                                   ValidadeGuiaService validadeGuiaService) {
+                                   ValidadeGuiaService validadeGuiaService,
+                                   BuscarAtendimentosDaPreGuiaService buscarAtendimentosDaPreGuiaService) {
         this.buscarPreGuiaPorIdService = buscarPreGuiaPorIdService;
         this.preGuiaProcRepository = preGuiaProcRepository;
         this.medicoRepository = medicoRepository;
@@ -46,6 +49,7 @@ public class MontarPacoteSireService {
         this.calcularValorTotalPreGuiaService = calcularValorTotalPreGuiaService;
         this.calcularHashPacoteService = calcularHashPacoteService;
         this.validadeGuiaService = validadeGuiaService;
+        this.buscarAtendimentosDaPreGuiaService = buscarAtendimentosDaPreGuiaService;
     }
 
     @Transactional(readOnly = true)
@@ -59,7 +63,8 @@ public class MontarPacoteSireService {
         }
 
         PacoteSireResponse.AprovadoPor aprovadoPor = new PacoteSireResponse.AprovadoPor(
-                preGuia.getChefeId(), preGuia.getDataAprovacaoChefe(), preGuia.getDataAprovacaoMedico());
+                preGuia.getAssinaturaUsuarioId(), preGuia.getAssinaturaNome(),
+                preGuia.getAssinaturaPerfil(), preGuia.getAssinaturaData());
         PacoteSireResponse.Beneficiario beneficiario = montarBeneficiario(preGuia);
         PacoteSireResponse.Medico medico = montarMedico(preGuia);
 
@@ -103,10 +108,11 @@ public class MontarPacoteSireService {
     }
 
     private List<PacoteSireResponse.Procedimento> montarProcedimentos(List<PreGuiaProcModel> procedimentosDaPreGuia) {
+        Map<Long, Long> atendimentos = buscarAtendimentosDaPreGuiaService.buscar(procedimentosDaPreGuia);
         List<PacoteSireResponse.Procedimento> procedimentos = new ArrayList<>();
         for (PreGuiaProcModel p : procedimentosDaPreGuia) {
             procedimentos.add(new PacoteSireResponse.Procedimento(
-                    p.getId(),
+                    atendimentos.get(p.getId()),
                     p.getProcedimentoModel().getNome(),
                     p.getOcsModel().getCnpj(),
                     p.getOcsModel().getNome(),

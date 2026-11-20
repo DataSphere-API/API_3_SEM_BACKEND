@@ -1,0 +1,41 @@
+@baseUrl = http://localhost:8088
+@tokenOcs = COLE_O_TOKEN_DO_LOGIN
+@qr = COLE_UM_QR_DO_BANCO_DE_TESTE
+@atendimentoId = 1
+
+### Login real da OCS do seed dev (Clínica X)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{"cpf":"62819482112","senha":"fusex123"}
+
+### Conferência: CNPJ não é recebido por query; vem do funcionário logado
+GET {{baseUrl}}/atendimentos/qrcode/{{qr}}
+Authorization: Bearer {{tokenOcs}}
+
+### Baixa final: corpo somente com o QR
+POST {{baseUrl}}/atendimentos/validar-qrcode
+Authorization: Bearer {{tokenOcs}}
+Content-Type: application/json
+
+{"qr":"{{qr}}"}
+
+### Repetir a baixa: 409 PROCEDIMENTO_JA_REALIZADO
+POST {{baseUrl}}/atendimentos/validar-qrcode
+Authorization: Bearer {{tokenOcs}}
+Content-Type: application/json
+
+{"qr":"{{qr}}"}
+
+### Sessão: mantém corpo legado, mas a OCS efetiva vem da autenticação
+POST {{baseUrl}}/atendimentos/{{atendimentoId}}/sessoes
+Authorization: Bearer {{tokenOcs}}
+Content-Type: application/json
+
+{"cnpj":"12345678000199"}
+
+### Sem autenticação: 401
+POST {{baseUrl}}/atendimentos/validar-qrcode
+Content-Type: application/json
+
+{"qr":"{{qr}}"}

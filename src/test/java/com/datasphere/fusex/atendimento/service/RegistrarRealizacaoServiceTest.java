@@ -1,13 +1,13 @@
 package com.datasphere.fusex.atendimento.service;
 
 import com.datasphere.fusex.domain.enums.ErrorCode;
-import com.datasphere.fusex.dto.request.BaixaResponse;
-import com.datasphere.fusex.dto.request.ValidarQrCodeRequest;
+import com.datasphere.fusex.atendimento.dto.BaixaResponse;
+import com.datasphere.fusex.atendimento.dto.ValidarQrCodeRequest;
 import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.guia.GuiaModel;
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
-import com.datasphere.fusex.guiaProc.GuiaProcRepository;
-import com.datasphere.fusex.service.ValidacaoQrService;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
+import com.datasphere.fusex.guiaproc.GuiaProcRepository;
+import com.datasphere.fusex.atendimento.service.ValidacaoQrService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,7 +32,7 @@ class RegistrarRealizacaoServiceTest {
 
     private static final String QR = "QR1";
     private static final String CNPJ = "12345678000101";
-    private static final ValidarQrCodeRequest REQUEST = new ValidarQrCodeRequest(QR, CNPJ);
+    private static final ValidarQrCodeRequest REQUEST = new ValidarQrCodeRequest(QR);
 
     @Mock
     private GuiaProcRepository guiaProcRepository;
@@ -43,6 +43,14 @@ class RegistrarRealizacaoServiceTest {
     @Mock
     private RecalcularStatusDaGuiaService recalcularStatusDaGuia;
 
+    @Mock private BuscarOcsAutenticadaService ocsAutenticada;
+    @Mock private com.datasphere.fusex.atendimento.SessaoRepository sessaoRepository;
+
+    @org.junit.jupiter.api.BeforeEach
+    void autenticar() {
+        org.mockito.Mockito.lenient().when(ocsAutenticada.buscarOcsAutenticada()).thenReturn(CNPJ);
+    }
+
     @InjectMocks
     private RegistrarRealizacaoService service;
 
@@ -51,7 +59,7 @@ class RegistrarRealizacaoServiceTest {
         guia.setId(4L);
 
         GuiaProcModel p = new GuiaProcModel();
-        p.setGuiaId(10L);
+        p.setId(10L);
         p.setGuiaModel(guia);
         p.setQr(QR);
         p.setStatus("Pendente");

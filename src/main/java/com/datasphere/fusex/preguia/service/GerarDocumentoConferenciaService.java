@@ -4,11 +4,14 @@ import com.datasphere.fusex.preguia.dto.PacoteSireResponse;
 import com.datasphere.fusex.preguia.pdf.GeradorPdfSimples;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class GerarDocumentoConferenciaService {
+
+    private static final DateTimeFormatter DATA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     private final MontarPacoteSireService montarPacoteSireService;
 
@@ -17,7 +20,10 @@ public class GerarDocumentoConferenciaService {
     }
 
     public byte[] gerarDocumento(Long preGuiaId) {
-        PacoteSireResponse pacote = montarPacoteSireService.montarPacote(preGuiaId);
+        return gerarDocumento(montarPacoteSireService.montarPacote(preGuiaId));
+    }
+
+    public byte[] gerarDocumento(PacoteSireResponse pacote) {
         return GeradorPdfSimples.gerar(montarLinhas(pacote));
     }
 
@@ -51,9 +57,24 @@ public class GerarDocumentoConferenciaService {
         linhas.add(pacote.hash().substring(0, 32));
         linhas.add(pacote.hash().substring(32));
         linhas.add("");
-        linhas.add("");
-        linhas.add("______________________________    ______________________________");
-        linhas.add("Assinatura do Medico                Assinatura da Chefia do FUSEX");
+        linhas.add("APROVACAO");
+        linhas.addAll(montarLinhasDaAssinatura(pacote.aprovadoPor()));
+        return linhas;
+    }
+
+    private List<String> montarLinhasDaAssinatura(PacoteSireResponse.AprovadoPor aprovadoPor) {
+        List<String> linhas = new ArrayList<>();
+        if (aprovadoPor == null || aprovadoPor.dataHora() == null) {
+            linhas.add("Sem aprovacao registrada.");
+            return linhas;
+        }
+        String cargo = "Chefe do FUSEX";
+        if ("MEDICO".equals(aprovadoPor.perfil())) {
+            cargo = "Medico responsavel";
+        }
+        linhas.add("Aprovada por: " + aprovadoPor.nome() + " (" + cargo + ")");
+        linhas.add("Usuario: " + aprovadoPor.usuarioId());
+        linhas.add("Data e hora: " + aprovadoPor.dataHora().format(DATA_HORA));
         return linhas;
     }
 

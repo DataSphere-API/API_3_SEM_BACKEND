@@ -15,11 +15,15 @@ public interface PreGuiaRepository extends JpaRepository<PreGuiaModel, Long> {
 
     List<PreGuiaModel> findAllByOrderByIdAsc();
 
+    List<PreGuiaModel> findByBenfIdAndGuiaIdIsNullAndStatusNotInOrderByIdDesc(String benfId, List<StatusPreGuia> status);
+
     List<PreGuiaModel> findByStatusOrderByIdAsc(StatusPreGuia status);
 
     List<PreGuiaModel> findByMedIdOrderByIdAsc(Integer medId);
 
     List<PreGuiaModel> findByMedIdAndStatusOrderByIdAsc(Integer medId, StatusPreGuia status);
+
+    Optional<PreGuiaModel> findByGuiaId(Long guiaId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select p from PreGuiaModel p where p.id = :id")

@@ -1,10 +1,10 @@
 package com.datasphere.fusex.atendimento.service;
 
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
-import com.datasphere.fusex.guiaProc.GuiaProcRepository;
-import com.datasphere.fusex.guiaProc.StatusProcedimento;
-import com.datasphere.fusex.historicoStatus.EntidadeTipo;
-import com.datasphere.fusex.historicoStatus.service.RegistrarMudancaStatusService;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
+import com.datasphere.fusex.guiaproc.GuiaProcRepository;
+import com.datasphere.fusex.guiaproc.StatusProcedimento;
+import com.datasphere.fusex.historicostatus.EntidadeTipo;
+import com.datasphere.fusex.historicostatus.service.RegistrarMudancaStatusService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -28,7 +28,7 @@ public class AtualizarStatusGuiaProcRealizadaService {
         procedimento.setDataValidacao(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         GuiaProcModel salvo = guiaProcRepository.save (procedimento);
 
-        registrarMudancaStatusService.executar(EntidadeTipo.GUIA_PROC, salvo.getGuiaId(),
+        registrarMudancaStatusService.executar(EntidadeTipo.GUIA_PROC, salvo.getId(),
                 statusAnterior, StatusProcedimento.REALIZADA.name(), "validacao-qrcode");
         return salvo;
     }

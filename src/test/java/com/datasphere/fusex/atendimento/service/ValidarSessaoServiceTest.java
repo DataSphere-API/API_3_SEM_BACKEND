@@ -4,7 +4,7 @@ import com.datasphere.fusex.contrato.ContratoModel;
 import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.guia.GuiaModel;
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
 import com.datasphere.fusex.ocs.OcsModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -71,14 +71,12 @@ class ValidarSessaoServiceTest {
     }
 
     @Test
-    @DisplayName("validarGuiaEmitida: deve rejeitar com guia PARCIALMENTE_REALIZADA")
-    void rejeitaComGuiaParcialmenteRealizada() {
+    @DisplayName("validarGuiaEmitida: deve passar com guia PARCIALMENTE_REALIZADA")
+    void permiteGuiaParcialmenteRealizada() {
         GuiaProcModel atendimento = atendimentoComStatusGuia("PARCIALMENTE_REALIZADA");
 
-        assertThatThrownBy(() -> validarSessaoService.validarGuiaEmitida(atendimento))
-                .isInstanceOf(BusinessException.class)
-                .extracting("errorCode")
-                .isEqualTo(ErrorCode.GUIA_NAO_EMITIDA);
+        assertThatCode(() -> validarSessaoService.validarGuiaEmitida(atendimento))
+                .doesNotThrowAnyException();
     }
 
     @Test

@@ -3,12 +3,12 @@ package com.datasphere.fusex.guia.service;
 import com.datasphere.fusex.guia.GuiaModel;
 import com.datasphere.fusex.guia.GuiaRepository;
 import com.datasphere.fusex.guia.StatusGuia;
-import com.datasphere.fusex.guia.dto.request.ExpiracaoResponse;
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
-import com.datasphere.fusex.guiaProc.GuiaProcRepository;
-import com.datasphere.fusex.guiaProc.StatusProcedimento;
-import com.datasphere.fusex.historicoStatus.EntidadeTipo;
-import com.datasphere.fusex.historicoStatus.service.RegistrarMudancaStatusService;
+import com.datasphere.fusex.guia.dto.ExpiracaoResponse;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
+import com.datasphere.fusex.guiaproc.GuiaProcRepository;
+import com.datasphere.fusex.guiaproc.StatusProcedimento;
+import com.datasphere.fusex.historicostatus.EntidadeTipo;
+import com.datasphere.fusex.historicostatus.service.RegistrarMudancaStatusService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,7 +63,7 @@ public class ExpirarGuiasService {
                 String statusAnterior = procedimento.getStatus();
                 procedimento.setStatus(StatusProcedimento.EXPIRADA.name());
                 guiaProcRepository.save(procedimento);
-                registrarMudancaStatusService.executar(EntidadeTipo.GUIA_PROC, procedimento.getGuiaId(),
+                registrarMudancaStatusService.executar(EntidadeTipo.GUIA_PROC, procedimento.getId(),
                         statusAnterior, StatusProcedimento.EXPIRADA.name(), ORIGEM);
                 expirados++;
             }

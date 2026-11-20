@@ -1,7 +1,7 @@
 package com.datasphere.fusex.preguia.service;
 
-import com.datasphere.fusex.historicoStatus.EntidadeTipo;
-import com.datasphere.fusex.historicoStatus.service.RegistrarMudancaStatusService;
+import com.datasphere.fusex.historicostatus.EntidadeTipo;
+import com.datasphere.fusex.historicostatus.service.RegistrarMudancaStatusService;
 import com.datasphere.fusex.preguia.PreGuiaModel;
 import com.datasphere.fusex.preguia.PreGuiaRepository;
 import com.datasphere.fusex.preguia.StatusPreGuia;

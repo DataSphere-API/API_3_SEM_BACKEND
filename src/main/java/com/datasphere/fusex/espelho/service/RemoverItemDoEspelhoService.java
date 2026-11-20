@@ -1,14 +1,17 @@
 package com.datasphere.fusex.espelho.service;
 
+import com.datasphere.fusex.domain.enums.ErrorCode;
 import com.datasphere.fusex.espelho.EspelhoModel;
 import com.datasphere.fusex.espelho.EspelhoRepository;
 import com.datasphere.fusex.espelho.StatusEspelho;
-import com.datasphere.fusex.espelhoItem.EspelhoItemModel;
-import com.datasphere.fusex.espelhoItem.EspelhoItemRepository;
+import com.datasphere.fusex.espelhoitem.EspelhoItemModel;
+import com.datasphere.fusex.espelhoitem.EspelhoItemRepository;
+import com.datasphere.fusex.exception.BusinessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 
 @Service
 public class RemoverItemDoEspelhoService {
@@ -25,18 +28,28 @@ public class RemoverItemDoEspelhoService {
         this.buscarEspelhoPorIdService = buscarEspelhoPorIdService;
     }
 
+    @Transactional
     public boolean removerItemDoEspelho(Integer espelhoId, Integer itemId) {
         EspelhoModel espelho = buscarEspelhoPorIdService.buscarEspelhoPorId(espelhoId);
-        if (espelho == null || espelho.getStatus() == StatusEspelho.CANCELADO) {
-            return false;
+        if (espelho == null) {
+            throw new BusinessException(ErrorCode.ESPELHO_NAO_ENCONTRADO);
+        }
+        if (espelho.getStatus() == StatusEspelho.CANCELADO) {
+            throw new BusinessException(ErrorCode.ESPELHO_CANCELADO);
+        }
+        if (espelho.getStatus() != StatusEspelho.EM_ABERTO && espelho.getStatus() != StatusEspelho.REPROVADO) {
+            throw new BusinessException(ErrorCode.ESPELHO_NAO_EDITAVEL);
         }
 
-        Optional<EspelhoItemModel> itemOptional = espelhoItemRepository.findByIdAndEspelhoId(itemId, espelhoId);
-        if (itemOptional.isEmpty()) {
-            return false;
+        EspelhoItemModel item = espelhoItemRepository.findByIdAndEspelhoId(itemId, espelhoId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NAO_ENCONTRADO));
+
+        long totalItens = espelhoItemRepository.countByEspelhoId(espelhoId);
+        if (totalItens <= 1) {
+            throw new BusinessException(ErrorCode.ESPELHO_SEM_ITENS, List.of("itens: não é permitido remover o último item do espelho"));
         }
 
-        espelhoItemRepository.delete(itemOptional.get());
+        espelhoItemRepository.delete(item);
 
         espelho.setDataAtualizacao(LocalDateTime.now());
         espelhoRepository.save(espelho);

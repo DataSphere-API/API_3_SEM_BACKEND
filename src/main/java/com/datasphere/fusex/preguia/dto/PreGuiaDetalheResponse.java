@@ -20,7 +20,8 @@ public record PreGuiaDetalheResponse(
         LocalDateTime dataAprovacaoChefe,
         String motivoReprovacao,
         LocalDate dataEmissao,
-        LocalDate validoAte) {
+        LocalDate validoAte,
+        AssinaturaResponse assinatura) {
 
     public record Beneficiario(String precCp, String nome) {}
 

@@ -13,6 +13,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Generated;
+import org.hibernate.generator.EventType;
 
 import java.time.LocalDate;
 
@@ -26,6 +28,10 @@ public class GuiaModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Generated(event = EventType.INSERT)
+    @Column(name = "numero", length = 40, nullable = false, unique = true, insertable = false, updatable = false)
+    private String numero;
 
     @Column(name = "benf_id")
     private String benfId;
@@ -47,4 +53,11 @@ public class GuiaModel {
     private LocalDate dataEmissao;
 
     private String status;
+
+    // Sem @Lob: no PostgreSQL, @Lob em byte[] vira OID em vez de BYTEA.
+    @Column(name = "documento")
+    private byte[] documento;
+
+    @Column(name = "hash_pacote", length = 64)
+    private String hashPacote;
 }

@@ -1,14 +1,13 @@
 package com.datasphere.fusex.atendimento.service;
 
-import com.datasphere.fusex.atendimento.sessao.SessaoModel;
-import com.datasphere.fusex.atendimento.sessao.SessaoRepository;
+import com.datasphere.fusex.atendimento.SessaoModel;
+import com.datasphere.fusex.atendimento.SessaoRepository;
 import com.datasphere.fusex.domain.enums.ErrorCode;
-import com.datasphere.fusex.dto.request.SessaoRequest;
-import com.datasphere.fusex.dto.request.SessaoResponse;
+import com.datasphere.fusex.atendimento.dto.SessaoResponse;
 import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.guia.GuiaModel;
-import com.datasphere.fusex.guiaProc.GuiaProcModel;
-import com.datasphere.fusex.guiaProc.GuiaProcRepository;
+import com.datasphere.fusex.guiaproc.GuiaProcModel;
+import com.datasphere.fusex.guiaproc.GuiaProcRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,6 +41,15 @@ class RegistrarSessaoServiceTest {
     @Mock
     private ValidarSessaoService validarSessaoService;
 
+    @Mock private BuscarOcsAutenticadaService ocsAutenticada;
+    @Mock private com.datasphere.fusex.atendimento.service.ValidacaoQrService validacaoQrService;
+    @Mock private com.datasphere.fusex.historicostatus.service.RegistrarMudancaStatusService historico;
+
+    @org.junit.jupiter.api.BeforeEach
+    void autenticar() {
+        org.mockito.Mockito.lenient().when(ocsAutenticada.buscarOcsAutenticada()).thenReturn("12345678000199");
+    }
+
     @InjectMocks
     private RegistrarSessaoService registrarSessaoService;
 
@@ -55,16 +63,16 @@ class RegistrarSessaoServiceTest {
         GuiaProcModel atendimento = atendimentoValido();
         atendimento.setQtdAutorizada(10);
         atendimento.setQtdRealizada(0);
-        atendimento.setStatus("EMITIDA");
+        atendimento.setStatus("PENDENTE");
 
-        when(guiaProcRepository.findById(atendimentoId)).thenReturn(Optional.of(atendimento));
+        when(guiaProcRepository.findByIdParaSessao(atendimentoId)).thenReturn(Optional.of(atendimento));
         when(sessaoRepository.findMaxNumeroSessaoByGuiaProcId(atendimentoId))
                 .thenReturn(Optional.empty());
-        when(sessaoRepository.existsByGuiaProc_GuiaId(atendimentoId)).thenReturn(false);
+        when(sessaoRepository.existsByGuiaProc_Id(atendimentoId)).thenReturn(false);
         when(sessaoRepository.save(any(SessaoModel.class))).thenAnswer(i -> i.getArgument(0));
 
         SessaoResponse response = registrarSessaoService.registrarSessao(
-                atendimentoId, new SessaoRequest("12345678000199"));
+                atendimentoId);
 
         assertThat(response.atendimentoId()).isEqualTo(10L);
         assertThat(response.numeroSessao()).isEqualTo(1);
@@ -83,6 +91,8 @@ class RegistrarSessaoServiceTest {
         verify(validarSessaoService).validarSaldoDeSessoes(atendimento);
         verify(sessaoRepository).save(any(SessaoModel.class));
         verify(guiaProcRepository).save(atendimento);
+        verify(historico).executar(com.datasphere.fusex.historicostatus.EntidadeTipo.GUIA_PROC,
+                atendimentoId, "PENDENTE", "EM_ANDAMENTO", "registro-sessao");
     }
 
     // ============================================================
@@ -97,14 +107,14 @@ class RegistrarSessaoServiceTest {
         atendimento.setQtdRealizada(2);
         atendimento.setStatus("EM_ANDAMENTO");
 
-        when(guiaProcRepository.findById(atendimentoId)).thenReturn(Optional.of(atendimento));
+        when(guiaProcRepository.findByIdParaSessao(atendimentoId)).thenReturn(Optional.of(atendimento));
         when(sessaoRepository.findMaxNumeroSessaoByGuiaProcId(atendimentoId))
                 .thenReturn(Optional.of(2));
-        when(sessaoRepository.existsByGuiaProc_GuiaId(atendimentoId)).thenReturn(true);
+        when(sessaoRepository.existsByGuiaProc_Id(atendimentoId)).thenReturn(true);
         when(sessaoRepository.save(any(SessaoModel.class))).thenAnswer(i -> i.getArgument(0));
 
         SessaoResponse response = registrarSessaoService.registrarSessao(
-                atendimentoId, new SessaoRequest("12345678000199"));
+                atendimentoId);
 
         assertThat(response.numeroSessao()).isEqualTo(3);
         assertThat(response.qtdRealizada()).isEqualTo(3);
@@ -122,10 +132,10 @@ class RegistrarSessaoServiceTest {
     @Test
     @DisplayName("Deve lançar ATENDIMENTO_NAO_ENCONTRADO quando id não existe")
     void deveLancarErroQuandoAtendimentoNaoExiste() {
-        when(guiaProcRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(guiaProcRepository.findByIdParaSessao(anyLong())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> registrarSessaoService.registrarSessao(
-                999L, new SessaoRequest("12345678000199")))
+                999L))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.ATENDIMENTO_NAO_ENCONTRADO);
@@ -145,12 +155,12 @@ class RegistrarSessaoServiceTest {
         atendimento.setQtdAutorizada(3);
         atendimento.setQtdRealizada(3);
 
-        when(guiaProcRepository.findById(atendimentoId)).thenReturn(Optional.of(atendimento));
+        when(guiaProcRepository.findByIdParaSessao(atendimentoId)).thenReturn(Optional.of(atendimento));
         doThrow(new BusinessException(ErrorCode.SESSOES_ESGOTADAS))
                 .when(validarSessaoService).validarSaldoDeSessoes(atendimento);
 
         assertThatThrownBy(() -> registrarSessaoService.registrarSessao(
-                atendimentoId, new SessaoRequest("12345678000199")))
+                atendimentoId))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.SESSOES_ESGOTADAS);
@@ -167,7 +177,7 @@ class RegistrarSessaoServiceTest {
         guia.setStatus("EMITIDA");
 
         GuiaProcModel atendimento = new GuiaProcModel();
-        atendimento.setGuiaId(10L);
+        atendimento.setId(10L);
         atendimento.setGuiaModel(guia);
         atendimento.setStatus("EMITIDA");
         atendimento.setDataValidade(LocalDate.now().plusDays(30));

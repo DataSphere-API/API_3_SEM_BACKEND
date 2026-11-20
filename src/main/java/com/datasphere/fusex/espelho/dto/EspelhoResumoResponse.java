@@ -16,10 +16,12 @@ public record EspelhoResumoResponse(Integer id,
                                     LocalDateTime dataAtualizacao,
                                     String ocsNome,
                                     Integer quantidadeItens,
-                                    BigDecimal valorTotal) {
+                                    BigDecimal valorTotal,
+                                    String motivoReprovacao,
+                                    int devolucoes) {
 
-    public static EspelhoResumoResponse from(EspelhoModel espelhoModel, String ocsNome, Integer quantidadeItens, BigDecimal valorTotal){
-
+    public static EspelhoResumoResponse from(EspelhoModel espelhoModel, String ocsNome, Integer quantidadeItens,
+                                             BigDecimal valorTotal, int devolucoes) {
         return new EspelhoResumoResponse(espelhoModel.getId(),
                 espelhoModel.getAtendimentoId(),
                 espelhoModel.getOcsId(),
@@ -29,6 +31,8 @@ public record EspelhoResumoResponse(Integer id,
                 espelhoModel.getDataAtualizacao(),
                 ocsNome,
                 quantidadeItens,
-                valorTotal);
+                valorTotal,
+                espelhoModel.getMotivoReprovacao(),
+                devolucoes);
     }
 }

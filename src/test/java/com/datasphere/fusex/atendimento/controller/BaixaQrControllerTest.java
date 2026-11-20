@@ -4,11 +4,11 @@ import com.datasphere.fusex.atendimento.service.ListarAtendimentosPorOcs;
 import com.datasphere.fusex.atendimento.service.RegistrarRealizacaoService;
 import com.datasphere.fusex.atendimento.service.RegistrarSessaoService;
 import com.datasphere.fusex.domain.enums.ErrorCode;
-import com.datasphere.fusex.dto.request.BaixaResponse;
-import com.datasphere.fusex.dto.request.ValidarQrCodeRequest;
+import com.datasphere.fusex.atendimento.dto.BaixaResponse;
+import com.datasphere.fusex.atendimento.dto.ValidarQrCodeRequest;
 import com.datasphere.fusex.exception.BusinessException;
 import com.datasphere.fusex.exception.GlobalExceptionHandler;
-import com.datasphere.fusex.service.ValidacaoQrService;
+import com.datasphere.fusex.atendimento.service.ValidacaoQrService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class BaixaQrControllerTest {
 
-    private static final String BODY = "{\"qr\":\"QR1\",\"cnpj\":\"12345678000101\"}";
+    private static final String BODY = "{\"qr\":\"QR1\"}";
 
     @Mock
     private RegistrarRealizacaoService registrarRealizacaoService;
@@ -91,14 +91,14 @@ class BaixaQrControllerTest {
     }
 
     @Test
-    void procedimentoJaRealizado_retorna422() throws Exception {
+    void procedimentoJaRealizado_retorna409() throws Exception {
         when(registrarRealizacaoService.registrarRealizacao(any(ValidarQrCodeRequest.class)))
-                .thenThrow(new BusinessException(ErrorCode.PROCEDIMENTO_JA_REALIZADO));
+                .thenThrow(new com.datasphere.fusex.exception.QrCodeIndisponivelException(ErrorCode.PROCEDIMENTO_JA_REALIZADO));
 
         mockMvc.perform(post("/atendimentos/validar-qrcode")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(BODY))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.codigo").value("PROCEDIMENTO_JA_REALIZADO"));
     }
 
